@@ -46,6 +46,7 @@ import {
   type OAuthFormData,
   type ProviderType,
 } from "./actions";
+import { CAPABILITY, type CalendarCapability } from "@/types/constants";
 
 interface ConnectionsClientProps {
   initialConnections: ConnectionListItem[];
@@ -73,7 +74,15 @@ const formSchema = z
     clientId: z.string().optional(),
     clientSecret: z.string().optional(),
     tokenUrl: z.string().optional(),
-    capabilities: z.array(z.string()).min(1, "Select at least one capability"),
+    capabilities: z
+      .array(
+        z.enum([
+          CAPABILITY.CONFLICT,
+          CAPABILITY.AVAILABILITY,
+          CAPABILITY.BOOKING,
+        ]),
+      )
+      .min(1, "Select at least one capability"),
     isPrimary: z.boolean(),
   })
   .refine(
@@ -148,7 +157,7 @@ export default function ConnectionsClient({
       clientId: "",
       clientSecret: "",
       tokenUrl: "https://accounts.google.com/o/oauth2/token",
-      capabilities: [],
+      capabilities: [] as CalendarCapability[],
       isPrimary: false,
     },
   });

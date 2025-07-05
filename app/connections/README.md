@@ -63,7 +63,7 @@ interface BasicAuthConfig {
   password: string;
   serverUrl: string;
   calendarUrl?: string;
-  capabilities: string[];
+  capabilities: CalendarCapability[];
 }
 
 interface OAuthConfig {
@@ -75,7 +75,7 @@ interface OAuthConfig {
   tokenUrl: string;
   serverUrl: string;
   calendarUrl?: string;
-  capabilities: string[];
+  capabilities: CalendarCapability[];
 }
 ```
 

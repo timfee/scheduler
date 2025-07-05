@@ -9,6 +9,7 @@ export type ProviderName = (typeof PROVIDER_NAMES)[keyof typeof PROVIDER_NAMES];
 
 export const CAPABILITY = {
   CONFLICT: "conflict",
+  AVAILABILITY: "availability",
   BOOKING: "booking",
 } as const;
 export type CalendarCapability = (typeof CAPABILITY)[keyof typeof CAPABILITY];
