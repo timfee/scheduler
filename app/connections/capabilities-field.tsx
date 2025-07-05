@@ -1,0 +1,110 @@
+"use client";
+
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { Control } from "react-hook-form";
+
+import { CAPABILITY } from "@/types/constants";
+import type { ConnectionFormValues } from "./use-connection-form";
+
+interface CapabilitiesFieldProps {
+  control: Control<ConnectionFormValues>;
+}
+
+export default function CapabilitiesField({ control }: CapabilitiesFieldProps) {
+  return (
+    <FormField
+      control={control}
+      name="capabilities"
+      render={() => (
+        <FormItem>
+          <div className="mb-4">
+            <FormLabel className="text-base">Capabilities</FormLabel>
+            <FormDescription>
+              Select what this calendar connection can be used for
+            </FormDescription>
+          </div>
+          <FormField
+            control={control}
+            name="capabilities"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-y-0 space-x-3">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value?.includes(CAPABILITY.CONFLICT)}
+                    onCheckedChange={(checked) => {
+                      const updated = checked
+                        ? [...field.value, CAPABILITY.CONFLICT]
+                        : field.value?.filter((v) => v !== CAPABILITY.CONFLICT);
+                      field.onChange(updated);
+                    }}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Conflict Checking</FormLabel>
+                  <FormDescription>Booked time is blocked</FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="capabilities"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-y-0 space-x-3">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value?.includes(CAPABILITY.AVAILABILITY)}
+                    onCheckedChange={(checked) => {
+                      const updated = checked
+                        ? [...field.value, CAPABILITY.AVAILABILITY]
+                        : field.value?.filter((v) => v !== CAPABILITY.AVAILABILITY);
+                      field.onChange(updated);
+                    }}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Availability Checking</FormLabel>
+                  <FormDescription>
+                    Booked time is available unless blocked later
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="capabilities"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-y-0 space-x-3">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value?.includes(CAPABILITY.BOOKING)}
+                    onCheckedChange={(checked) => {
+                      const updated = checked
+                        ? [...field.value, CAPABILITY.BOOKING]
+                        : field.value?.filter((v) => v !== CAPABILITY.BOOKING);
+                      field.onChange(updated);
+                    }}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Booking</FormLabel>
+                  <FormDescription>Can add new events to this calendar</FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}

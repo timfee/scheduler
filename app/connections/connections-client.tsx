@@ -1,7 +1,6 @@
 "use client";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,19 +20,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 
 import {
   createConnectionAction,
@@ -47,86 +36,19 @@ import {
   type OAuthFormData,
   type ProviderType,
 } from "./actions";
-import { CAPABILITY, type CalendarCapability } from "@/types/constants";
+import ProviderSelect from "./provider-select";
+import CapabilitiesField from "./capabilities-field";
+import ConnectionsList from "./connections-list";
+import {
+  useConnectionForm,
+  type ConnectionFormValues,
+  PROVIDER_AUTH_METHODS,
+} from "./use-connection-form";
 
 interface ConnectionsClientProps {
   initialConnections: ConnectionListItem[];
 }
 
-const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
-  apple: "Basic",
-  google: "Oauth",
-  fastmail: "Basic",
-  nextcloud: "Basic",
-  caldav: "Basic",
-};
-
-// Define the form schema with conditional validation
-const formSchema = z
-  .object({
-    provider: z.enum(["apple", "google", "fastmail", "nextcloud", "caldav"]),
-    displayName: z.string().min(1, "Display name is required"),
-    authMethod: z.enum(["Basic", "Oauth"]),
-    username: z.string().min(1, "Username is required"),
-    password: z.string().optional(),
-    serverUrl: z.string().optional(),
-    calendarUrl: z.string().optional(),
-    refreshToken: z.string().optional(),
-    clientId: z.string().optional(),
-    clientSecret: z.string().optional(),
-    tokenUrl: z.string().optional(),
-    capabilities: z
-      .array(
-        z.enum([
-          CAPABILITY.CONFLICT,
-          CAPABILITY.AVAILABILITY,
-          CAPABILITY.BOOKING,
-        ]),
-      )
-      .min(1, "Select at least one capability"),
-    isPrimary: z.boolean(),
-  })
-  .refine(
-    (data) => {
-      if (data.authMethod === "Basic") {
-        return !!data.password;
-      }
-      return true;
-    },
-    {
-      message: "Password is required for Basic authentication",
-      path: ["password"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (["nextcloud", "caldav"].includes(data.provider)) {
-        return !!data.serverUrl;
-      }
-      return true;
-    },
-    {
-      message: "Server URL is required for this provider",
-      path: ["serverUrl"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.authMethod === "Oauth") {
-        return (
-          !!data.refreshToken &&
-          !!data.clientId &&
-          !!data.clientSecret &&
-          !!data.tokenUrl
-        );
-      }
-      return true;
-    },
-    {
-      message: "All OAuth fields are required",
-      path: ["refreshToken"],
-    },
-  );
 
 export default function ConnectionsClient({
   initialConnections,
@@ -141,55 +63,14 @@ export default function ConnectionsClient({
     message?: string;
   }>({ testing: false });
 
-  // Fix TypeScript issue with form types
-  type FormSchema = typeof formSchema;
-  type FormValues = z.infer<FormSchema>;
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      provider: "apple",
-      displayName: "",
-      authMethod: "Basic",
-      username: "",
-      password: "",
-      serverUrl: "",
-      calendarUrl: "",
-      refreshToken: "",
-      clientId: "",
-      clientSecret: "",
-      tokenUrl: "https://accounts.google.com/o/oauth2/token",
-      capabilities: [] as CalendarCapability[],
-      isPrimary: false,
-    },
-  });
-
-  const currentProvider = form.watch("provider");
-  const currentAuthMethod = form.watch("authMethod");
-  const needsServerUrl = ["nextcloud", "caldav"].includes(currentProvider);
-
-  // Update auth method when provider changes
-  const handleProviderChange = (provider: ProviderType) => {
-    const authMethod = PROVIDER_AUTH_METHODS[provider];
-    form.setValue("authMethod", authMethod);
-
-    // Reset OAuth fields if switching to Basic
-    if (authMethod === "Basic") {
-      form.setValue("refreshToken", "");
-      form.setValue("clientId", "");
-      form.setValue("clientSecret", "");
-      form.setValue("tokenUrl", "");
-    } else {
-      // Reset Basic fields if switching to OAuth
-      form.setValue("password", "");
-      form.setValue("tokenUrl", "https://accounts.google.com/o/oauth2/token");
-    }
-
-    // Reset server URL unless needed
-    if (!["nextcloud", "caldav"].includes(provider)) {
-      form.setValue("serverUrl", "");
-    }
-  };
+  type FormValues = ConnectionFormValues;
+  const {
+    form,
+    currentProvider,
+    currentAuthMethod,
+    needsServerUrl,
+    handleProviderChange,
+  } = useConnectionForm();
 
   const handleTestConnection = async () => {
     const isValid = await form.trigger();
@@ -367,38 +248,11 @@ export default function ConnectionsClient({
                 className="space-y-6"
               >
                 {/* Provider Selection */}
-                <FormField
+                <ProviderSelect
                   control={form.control}
-                  name="provider"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Provider</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={(value: ProviderType) => {
-                          field.onChange(value);
-                          handleProviderChange(value);
-                        }}
-                        disabled={!!editingConnection}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a provider" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="apple">Apple iCloud</SelectItem>
-                          <SelectItem value="google">
-                            Google Calendar
-                          </SelectItem>
-                          <SelectItem value="fastmail">Fastmail</SelectItem>
-                          <SelectItem value="nextcloud">Nextcloud</SelectItem>
-                          <SelectItem value="caldav">Generic CalDAV</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  value={currentProvider}
+                  onChange={handleProviderChange}
+                  disabled={!!editingConnection}
                 />
 
                 {/* Display Name */}
@@ -575,105 +429,7 @@ export default function ConnectionsClient({
                 )}
 
                 {/* Capabilities */}
-                <FormField
-                  control={form.control}
-                  name="capabilities"
-                  render={() => (
-                    <FormItem>
-                      <div className="mb-4">
-                        <FormLabel className="text-base">
-                          Capabilities
-                        </FormLabel>
-                        <FormDescription>
-                          Select what this calendar connection can be used for
-                        </FormDescription>
-                      </div>
-                      <FormField
-                        control={form.control}
-                        name="capabilities"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes("conflict")}
-                                onCheckedChange={(checked) => {
-                                  const updated = checked
-                                    ? [...field.value, "conflict"]
-                                    : field.value?.filter(
-                                        (value: string) => value !== "conflict",
-                                      );
-                                  field.onChange(updated);
-                                }}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Conflict Checking</FormLabel>
-                              <FormDescription>
-                                Booked time is blocked
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="capabilities"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes("availability")}
-                                onCheckedChange={(checked) => {
-                                  const updated = checked
-                                    ? [...field.value, "availability"]
-                                    : field.value?.filter(
-                                        (value: string) =>
-                                          value !== "availability",
-                                      );
-                                  field.onChange(updated);
-                                }}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Availability Checking</FormLabel>
-                              <FormDescription>
-                                Booked time is available unless blocked later
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="capabilities"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes("booking")}
-                                onCheckedChange={(checked) => {
-                                  const updated = checked
-                                    ? [...field.value, "booking"]
-                                    : field.value?.filter(
-                                        (value: string) => value !== "booking",
-                                      );
-                                  field.onChange(updated);
-                                }}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Booking</FormLabel>
-                              <FormDescription>
-                                Can add new events to this calendar
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <CapabilitiesField control={form.control} />
 
                 {/* Primary Calendar */}
                 <FormField
@@ -766,72 +522,12 @@ export default function ConnectionsClient({
       )}
 
       {/* Connections List */}
-      <div className="space-y-4">
-        {initialConnections.length === 0 ? (
-          <p className="text-muted-foreground">No calendar connections yet.</p>
-        ) : (
-          initialConnections.map((connection) => (
-            <Card key={connection.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      {connection.displayName}
-                      {connection.isPrimary && (
-                        <Badge variant="default">Primary</Badge>
-                      )}
-                    </CardTitle>
-                    <CardDescription>
-                      Provider: {connection.provider}
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    {!connection.isPrimary && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSetPrimary(connection.id)}
-                      >
-                        Set Primary
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(connection)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(connection.id)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div>
-                  <p className="mb-2 text-sm font-medium">Capabilities:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {connection.capabilities.includes("conflict") && (
-                      <Badge variant="secondary">Conflict Checking</Badge>
-                    )}
-                    {connection.capabilities.includes("availability") && (
-                      <Badge variant="secondary">Availability Checking</Badge>
-                    )}
-                    {connection.capabilities.includes("booking") && (
-                      <Badge variant="secondary">Booking</Badge>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+      <ConnectionsList
+        connections={initialConnections}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onSetPrimary={handleSetPrimary}
+      />
     </div>
   );
 }
