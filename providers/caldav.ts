@@ -4,7 +4,7 @@ import {
   type CalendarEvent,
   type CalendarEventInput,
 } from "@/schemas/calendar-event";
-import { DEFAULT_TIMEZONE } from "@/types/constants";
+import { DEFAULT_TIMEZONE, ICAL_PROD_ID } from "@/types/constants";
 import { formatISO, parseISO } from "date-fns";
 import { type DAVClient } from "tsdav";
 import ical from "ical-generator";
@@ -82,7 +82,7 @@ export function createCalDavProvider(client: DAVClient, calendarUrl: string) {
     const dtstamp = new Date();
     const dtstampIso = dtstamp.toISOString();
 
-    const calendar = ical({ prodId: { company: "Your Company", product: "Your Product" } });
+    const calendar = ical({ prodId: ICAL_PROD_ID });
     calendar.createEvent({
       id: uid,
       summary: validatedInput.title,
