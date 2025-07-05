@@ -1,85 +1,139 @@
-import "server-only";
-
 import {
-  DAVClient,
-  fetchCalendarObjects,
-  createCalendarObject,
-  deleteCalendarObject,
-} from "tsdav";
+  CalendarEventInputSchema,
+  CalendarEventSchema,
+  type CalendarEvent,
+  type CalendarEventInput,
+} from "@/schemas/calendar-event";
+import { DEFAULT_TIMEZONE } from "@/types/constants";
 import { DateTime } from "luxon";
+import { type DAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
-import { BookingCalendar, ConflictCalendar } from "@/types/calendar-provider";
 
-export class CalDavUnifiedProvider
-  implements ConflictCalendar, BookingCalendar
-{
-  constructor(
-    private readonly client: DAVClient,
-    private readonly calendarUrl: string,
-  ) {}
+// Helper functions for type-safe calendar data extraction
+function isValidDateProperty(prop: unknown): prop is { value: string } {
+  return (
+    prop !== null &&
+    typeof prop === "object" &&
+    "value" in prop &&
+    typeof prop.value === "string"
+  );
+}
 
-  /** Fetch busy time ranges */
-  async listBusyTimes(opts: { from: string; to: string }) {
-    const objects = await fetchCalendarObjects({
-      calendar: { url: this.calendarUrl },
-      client: this.client,
-      filters: { start: new Date(opts.from), end: new Date(opts.to) },
-    });
+function parseVEventDates(vevent: Record<string, unknown>) {
+  const { dtstart, dtend } = vevent;
 
-    return objects.map((obj) => {
-      const ve = obj.data.vevent;
-      return {
-        startUtc: DateTime.fromISO(ve.dtstart.value, { zone: "utc" }).toISO(),
-        endUtc: DateTime.fromISO(ve.dtend.value, { zone: "utc" }).toISO(),
-      };
-    });
+  if (!isValidDateProperty(dtstart) || !isValidDateProperty(dtend)) {
+    return null;
   }
 
-  /** Create an event */
-  async createAppointment(raw: unknown) {
-    const input = CalendarEventInputSchema.parse(raw);
+  const startDateTime = DateTime.fromISO(dtstart.value, { zone: "utc" });
+  const endDateTime = DateTime.fromISO(dtend.value, { zone: "utc" });
+
+  if (!startDateTime.isValid || !endDateTime.isValid) {
+    return null;
+  }
+
+  const startUtc = startDateTime.toISO();
+  const endUtc = endDateTime.toISO();
+
+  return startUtc && endUtc ? { startUtc, endUtc } : null;
+}
+
+// Factory function to create provider-specific functions
+export function createCalDavProvider(client: DAVClient, calendarUrl: string) {
+  /**
+   * Fetch busy time ranges from the calendar
+   */
+  async function listBusyTimes(opts: { from: string; to: string }) {
+    const objects = await client.fetchCalendarObjects({
+      calendar: { url: calendarUrl },
+      timeRange: {
+        start: new Date(opts.from).toISOString(),
+        end: new Date(opts.to).toISOString(),
+      },
+    });
+
+    return objects
+      .map((obj) => {
+        if (!obj.data || typeof obj.data !== "object") return null;
+        const data = obj.data as Record<string, unknown>;
+        const vevent = data.vevent as Record<string, unknown> | undefined;
+        return vevent ? parseVEventDates(vevent) : null;
+      })
+      .filter(Boolean);
+  }
+
+  /**
+   * Create a calendar event
+   */
+  async function createAppointment(
+    input: CalendarEventInput,
+  ): Promise<CalendarEvent> {
+    const validatedInput = CalendarEventInputSchema.parse(input);
     const uid = uuid();
     const dtstamp = new Date().toISOString();
+
+    // Format dates for iCal (remove hyphens and colons)
+    const formatICalDate = (isoDate: string) => {
+      return isoDate.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+    };
 
     const vevent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
+      "PRODID:-//Your Company//Your Product//EN",
       "BEGIN:VEVENT",
       `UID:${uid}`,
-      `SUMMARY:${input.title}`,
-      `DESCRIPTION:${input.description ?? ""}`,
-      `LOCATION:${input.location ?? ""}`,
-      `DTSTAMP:${dtstamp}`,
-      `DTSTART:${input.startUtc.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z")}`,
-      `DTEND:${input.endUtc.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z")}`,
+      `SUMMARY:${validatedInput.title}`,
+      `DESCRIPTION:${validatedInput.description ?? ""}`,
+      `LOCATION:${validatedInput.location ?? ""}`,
+      `DTSTAMP:${formatICalDate(dtstamp)}`,
+      `DTSTART:${formatICalDate(validatedInput.startUtc)}`,
+      `DTEND:${formatICalDate(validatedInput.endUtc)}`,
       "END:VEVENT",
       "END:VCALENDAR",
     ].join("\r\n");
 
-    await createCalendarObject({
-      calendar: { url: this.calendarUrl },
-      client: this.client,
-      filename: `${uid}.ics`, // As per tsdav docs; UID must match
+    await client.createCalendarObject({
+      calendar: { url: calendarUrl },
+      filename: `${uid}.ics`,
       iCalString: vevent,
     });
 
-    const result = {
-      ...input,
+    const result: CalendarEvent = {
+      ...validatedInput,
       id: uid,
       createdUtc: dtstamp,
       updatedUtc: dtstamp,
-      ownerTimeZone: DEFAULT_TIMEZONE,
+      ownerTimeZone: validatedInput.ownerTimeZone ?? DEFAULT_TIMEZONE,
       metadata: {},
     };
+
     return CalendarEventSchema.parse(result);
   }
 
-  /** Cancel an event by UID */
-  async cancelAppointment(uid: string) {
-    if (!uid) throw new Error("UID required for deletion");
-    await deleteCalendarObject({
-      calendarObject: { url: `${this.calendarUrl}/${uid}.ics` },
-      client: this.client,
+  /**
+   * Cancel a calendar event by UID
+   */
+  async function cancelAppointment(uid: string): Promise<void> {
+    if (!uid) {
+      throw new Error("UID is required for deletion");
+    }
+
+    await client.deleteCalendarObject({
+      calendarObject: {
+        url: `${calendarUrl}/${uid}.ics`,
+        etag: "", // You may need to fetch the object first to get the etag
+      },
     });
   }
+
+  return {
+    listBusyTimes,
+    createAppointment,
+    cancelAppointment,
+  };
 }
+
+// Type for the returned provider
+export type CalDavProvider = ReturnType<typeof createCalDavProvider>;

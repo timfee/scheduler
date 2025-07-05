@@ -1,6 +1,11 @@
 import { z } from "zod/v4";
 
-const globalMeta = z.registry<z.GlobalMeta>();
+const schemaRegistry = z.registry<{
+  id?: string;
+  title?: string;
+  description?: string;
+  examples?: unknown[];
+}>();
 
 export const CalendarEventSchema = z
   .strictObject({
@@ -8,9 +13,9 @@ export const CalendarEventSchema = z
       title: "Event ID",
       description: "Globally unique UUID identifier",
     }),
-    title: z.string().min(1).meta({
+    title: z.string().default("Event").meta({
       title: "Title",
-      description: "Non-empty event title",
+      description: "Event title",
     }),
     description: z.string().optional().meta({
       title: "Description",
@@ -42,20 +47,15 @@ export const CalendarEventSchema = z
       title: "Owner Timezone",
       description: "IANA timezone (e.g., America/Los_Angeles)",
     }),
-    metadata: z.record(z.string(), z.any()).optional().meta({
+    metadata: z.record(z.string(), z.unknown()).optional().meta({
       title: "Metadata",
       description: "Provider-specific raw data",
     }),
   })
-  .meta({
+  .register(schemaRegistry, {
     id: "CalendarEvent",
     title: "CalendarEvent",
     description: "Normalized calendar event structure",
-  })
-  .register(globalMeta, {
-    id: "CalendarEvent",
-    title: "CalendarEvent",
-    description: "Schema metadata for CalendarEvent",
   });
 
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
@@ -67,23 +67,10 @@ export const CalendarEventInputSchema = CalendarEventSchema.pick({
   startUtc: true,
   endUtc: true,
   ownerTimeZone: true,
-})
-  .meta({
-    id: "CalendarEventInput",
-    title: "CalendarEventInput",
-    description: "Fields required to create a calendar event",
-  })
-  .register(globalMeta, {
-    id: "CalendarEventInput",
-    title: "CalendarEventInput",
-    description: "Schema metadata for event creation input",
-  });
+}).register(schemaRegistry, {
+  id: "CalendarEventInput",
+  title: "CalendarEventInput",
+  description: "Fields required to create a calendar event",
+});
 
 export type CalendarEventInput = z.infer<typeof CalendarEventInputSchema>;
-
-export const CalendarEventJSONSchema = z.toJSONSchema(CalendarEventSchema, {
-  metadata: globalMeta,
-  target: "draft-2020-12",
-  reused: "ref",
-  cycles: "ref",
-});

@@ -1,6 +1,10 @@
-// ==================== /types/calendar-provider.ts ====================
-import { CalendarEvent, CalendarEventInput } from "../schemas/calendar-event";
-import { ProviderName, CalendarCapability } from "./constants";
+// types/calendar-provider.ts
+import {
+  type CalendarEvent,
+  type CalendarEventInput,
+} from "@/schemas/calendar-event";
+
+import { type CalendarCapability, type ProviderName } from "./constants";
 
 export interface ConflictCalendar {
   listBusyTimes(opts: {
