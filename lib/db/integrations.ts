@@ -9,7 +9,7 @@ import {
 } from "@/lib/db/schema";
 import { type CalendarCapability } from "@/types/constants";
 import { eq } from "drizzle-orm";
-import { createDAVClient } from "tsdav";
+import { createDAVClient, type DAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
 
 // Well-known CalDAV server URLs
@@ -271,6 +271,54 @@ export async function getCalendarIntegrationsByCapability(
 }
 
 /**
+ * Create a DAV client from a config
+ */
+export async function createDAVClientFromConfig(
+  config: CalendarIntegrationConfig,
+): Promise<DAVClient> {
+  if (config.authMethod === "Basic") {
+    if (!config.username || !config.password) {
+      throw new Error("Missing username or password");
+    }
+
+    if (!config.serverUrl) {
+      throw new Error("Missing server URL");
+    }
+
+    return createDAVClient({
+      serverUrl: config.serverUrl,
+      credentials: {
+        username: config.username,
+        password: config.password,
+      },
+      authMethod: "Basic",
+      defaultAccountType: "caldav",
+    });
+  }
+
+  if (config.authMethod === "Oauth") {
+    if (!config.refreshToken || !config.clientId || !config.clientSecret) {
+      throw new Error("Missing OAuth credentials");
+    }
+
+    return createDAVClient({
+      serverUrl: config.serverUrl,
+      credentials: {
+        tokenUrl: config.tokenUrl,
+        username: config.username,
+        refreshToken: config.refreshToken,
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+      },
+      authMethod: "Oauth",
+      defaultAccountType: "caldav",
+    });
+  }
+
+  throw new Error("Invalid auth method");
+}
+
+/**
  * Test calendar connection
  */
 export async function testCalendarConnection(
@@ -278,48 +326,7 @@ export async function testCalendarConnection(
   config: CalendarIntegrationConfig,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    let client;
-
-    if (config.authMethod === "Basic") {
-      // Basic auth for Apple, FastMail, and generic CalDAV
-      if (!config.username || !config.password) {
-        return { success: false, error: "Missing username or password" };
-      }
-
-      if (!config.serverUrl) {
-        return { success: false, error: "Missing server URL" };
-      }
-
-      client = await createDAVClient({
-        serverUrl: config.serverUrl,
-        credentials: {
-          username: config.username,
-          password: config.password,
-        },
-        authMethod: "Basic",
-        defaultAccountType: "caldav",
-      });
-    } else if (config.authMethod === "Oauth") {
-      // OAuth for Google
-      if (!config.refreshToken || !config.clientId || !config.clientSecret) {
-        return { success: false, error: "Missing OAuth credentials" };
-      }
-
-      client = await createDAVClient({
-        serverUrl: config.serverUrl,
-        credentials: {
-          tokenUrl: config.tokenUrl,
-          username: config.username,
-          refreshToken: config.refreshToken,
-          clientId: config.clientId,
-          clientSecret: config.clientSecret,
-        },
-        authMethod: "Oauth",
-        defaultAccountType: "caldav",
-      });
-    } else {
-      return { success: false, error: "Invalid auth method" };
-    }
+    const client = await createDAVClientFromConfig(config);
 
     // Test by fetching calendars
     const calendars = await client.fetchCalendars();
@@ -344,31 +351,5 @@ export async function createDAVClientFromIntegration(
   integration: CalendarIntegration & { config: CalendarIntegrationConfig },
 ) {
   const { config } = integration;
-
-  if (config.authMethod === "Basic") {
-    return createDAVClient({
-      serverUrl: config.serverUrl,
-      credentials: {
-        username: config.username,
-        password: config.password,
-      },
-      authMethod: "Basic",
-      defaultAccountType: "caldav",
-    });
-  } else if (config.authMethod === "Oauth") {
-    return createDAVClient({
-      serverUrl: config.serverUrl,
-      credentials: {
-        tokenUrl: config.tokenUrl,
-        username: config.username,
-        refreshToken: config.refreshToken,
-        clientId: config.clientId,
-        clientSecret: config.clientSecret,
-      },
-      authMethod: "Oauth",
-      defaultAccountType: "caldav",
-    });
-  }
-
-  throw new Error("Invalid auth method");
+  return createDAVClientFromConfig(config);
 }
