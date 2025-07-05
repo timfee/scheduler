@@ -61,6 +61,24 @@ const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   caldav: "Basic",
 };
 
+const CAPABILITY_OPTIONS = [
+  {
+    id: CAPABILITY.CONFLICT,
+    label: "Conflict Checking",
+    description: "Booked time is blocked",
+  },
+  {
+    id: CAPABILITY.AVAILABILITY,
+    label: "Availability Checking",
+    description: "Booked time is available unless blocked later",
+  },
+  {
+    id: CAPABILITY.BOOKING,
+    label: "Booking",
+    description: "Can add new events to this calendar",
+  },
+] as const;
+
 // Define the form schema with conditional validation
 const formSchema = z
   .object({
@@ -581,95 +599,41 @@ export default function ConnectionsClient({
                   render={() => (
                     <FormItem>
                       <div className="mb-4">
-                        <FormLabel className="text-base">
-                          Capabilities
-                        </FormLabel>
+                        <FormLabel className="text-base">Capabilities</FormLabel>
                         <FormDescription>
                           Select what this calendar connection can be used for
                         </FormDescription>
                       </div>
-                      <FormField
-                        control={form.control}
-                        name="capabilities"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes("conflict")}
-                                onCheckedChange={(checked) => {
-                                  const updated = checked
-                                    ? [...field.value, "conflict"]
-                                    : field.value?.filter(
-                                        (value: string) => value !== "conflict",
-                                      );
-                                  field.onChange(updated);
-                                }}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Conflict Checking</FormLabel>
-                              <FormDescription>
-                                Booked time is blocked
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="capabilities"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes("availability")}
-                                onCheckedChange={(checked) => {
-                                  const updated = checked
-                                    ? [...field.value, "availability"]
-                                    : field.value?.filter(
-                                        (value: string) =>
-                                          value !== "availability",
-                                      );
-                                  field.onChange(updated);
-                                }}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Availability Checking</FormLabel>
-                              <FormDescription>
-                                Booked time is available unless blocked later
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="capabilities"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes("booking")}
-                                onCheckedChange={(checked) => {
-                                  const updated = checked
-                                    ? [...field.value, "booking"]
-                                    : field.value?.filter(
-                                        (value: string) => value !== "booking",
-                                      );
-                                  field.onChange(updated);
-                                }}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Booking</FormLabel>
-                              <FormDescription>
-                                Can add new events to this calendar
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
+                      {CAPABILITY_OPTIONS.map((option) => (
+                        <FormField
+                          key={option.id}
+                          control={form.control}
+                          name="capabilities"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-y-0 space-x-3">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(option.id)}
+                                  onCheckedChange={(checked) => {
+                                    const updated = checked
+                                      ? [...field.value, option.id]
+                                      : field.value?.filter(
+                                          (value: string) => value !== option.id,
+                                        );
+                                    field.onChange(updated);
+                                  }}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>{option.label}</FormLabel>
+                                <FormDescription>
+                                  {option.description}
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
                       <FormMessage />
                     </FormItem>
                   )}
