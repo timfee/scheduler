@@ -31,6 +31,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -121,6 +122,7 @@ const formSchema = z
 export default function ConnectionsClient({
   initialConnections,
 }: ConnectionsClientProps) {
+  const router = useRouter();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingConnection, setEditingConnection] =
     useState<ConnectionListItem | null>(null);
@@ -266,7 +268,7 @@ export default function ConnectionsClient({
           connectionData,
         );
         if (result.success) {
-          window.location.reload();
+          router.refresh();
         } else {
           form.setError("root", {
             message: result.error ?? "Failed to update connection",
@@ -275,7 +277,7 @@ export default function ConnectionsClient({
       } else {
         const result = await createConnectionAction(connectionData);
         if (result.success) {
-          window.location.reload();
+          router.refresh();
         } else {
           form.setError("root", {
             message: result.error ?? "Failed to create connection",
@@ -296,7 +298,7 @@ export default function ConnectionsClient({
 
     const result = await deleteConnectionAction(id);
     if (result.success) {
-      window.location.reload();
+      router.refresh();
     } else {
       alert(result.error ?? "Failed to delete connection");
     }
@@ -305,7 +307,7 @@ export default function ConnectionsClient({
   const handleSetPrimary = async (id: string) => {
     const result = await setPrimaryConnectionAction(id);
     if (result.success) {
-      window.location.reload();
+      router.refresh();
     } else {
       alert(result.error ?? "Failed to set primary connection");
     }
