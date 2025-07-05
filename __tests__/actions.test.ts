@@ -1,4 +1,5 @@
 import { describe, beforeAll, beforeEach, it, expect, jest } from '@jest/globals';
+import { CAPABILITY } from '../types/constants';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('tsdav', () => ({
@@ -50,10 +51,10 @@ describe('createConnectionAction validation', () => {
       username: '',
       password: '',
       serverUrl: 'https://x',
-      capabilities: [],
+      capabilities: [CAPABILITY.CONFLICT],
     } as any);
     expect(result.success).toBe(false);
-    expect(result.error).toMatch('Username and password are required');
+    expect(result.error).toMatch('Username is required');
   });
 
   it('requires server URL for caldav provider', async () => {
@@ -63,7 +64,7 @@ describe('createConnectionAction validation', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [],
+      capabilities: [CAPABILITY.CONFLICT],
     } as any);
     expect(result.success).toBe(false);
     expect(result.error).toMatch('Server URL is required');
@@ -79,7 +80,7 @@ describe('createConnectionAction validation', () => {
       clientId: '',
       clientSecret: '',
       tokenUrl: '',
-      capabilities: [],
+      capabilities: [CAPABILITY.CONFLICT],
     } as any);
     expect(result.success).toBe(false);
     expect(result.error).toMatch('All OAuth fields are required');
@@ -95,7 +96,7 @@ describe('createConnectionAction validation', () => {
       clientId: 'c',
       clientSecret: 's',
       tokenUrl: 'https://token',
-      capabilities: [],
+      capabilities: [CAPABILITY.CONFLICT],
     });
     expect(res.success).toBe(true);
     const created = await integrations.listCalendarIntegrations();
@@ -113,13 +114,26 @@ describe('updateConnectionAction', () => {
 
 describe('testConnectionAction validation', () => {
   it('validates Basic auth', async () => {
-    const res = await actions.testConnectionAction('caldav', { authMethod: 'Basic' } as any);
+    const res = await actions.testConnectionAction('caldav', {
+      authMethod: 'Basic',
+      username: '',
+      password: '',
+      capabilities: [CAPABILITY.CONFLICT],
+    } as any);
     expect(res.success).toBe(false);
-    expect(res.error).toMatch('Username and password are required');
+    expect(res.error).toMatch('Username is required');
   });
 
   it('validates OAuth auth', async () => {
-    const res = await actions.testConnectionAction('google', { authMethod: 'Oauth' } as any);
+    const res = await actions.testConnectionAction('google', {
+      authMethod: 'Oauth',
+      username: 'u',
+      refreshToken: '',
+      clientId: '',
+      clientSecret: '',
+      tokenUrl: '',
+      capabilities: [CAPABILITY.CONFLICT],
+    } as any);
     expect(res.success).toBe(false);
     expect(res.error).toMatch('All OAuth fields are required');
   });
