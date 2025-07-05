@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { describe, it, expect, jest } from '@jest/globals';
 import { createCalDavProvider } from '@/providers/caldav';
+import { ICAL_PROD_ID } from '@/types/constants';
 import { type DAVClient } from 'tsdav';
 
 const client = {
@@ -32,7 +33,9 @@ describe('CalDav provider', () => {
     expect(call.iCalString).toContain(`LOCATION:${input.location}`);
     expect(call.iCalString).toContain(`DESCRIPTION:${input.description}`);
     expect(call.iCalString).toContain(`UID:${event.id}`);
-    expect(call.iCalString).toContain('PRODID:-//Your Company//Your Product//EN');
+    expect(call.iCalString).toContain(
+      `PRODID:-//${ICAL_PROD_ID.company}//${ICAL_PROD_ID.product}//EN`,
+    );
 
     expect(event.title).toBe(input.title);
     expect(event.location).toBe(input.location);
