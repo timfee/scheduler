@@ -124,7 +124,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4 text-sm">
-                Define when you're available for bookings and meetings.
+                Define when you’re available for bookings and meetings.
               </p>
               <Button asChild className="w-full">
                 <Link href="/availability">Manage Availability</Link>
