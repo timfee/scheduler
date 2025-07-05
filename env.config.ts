@@ -10,6 +10,10 @@ export default defineEnv({
       .describe(
         "Encryption key for sensitive data. Must be a 64-character hex string.",
       ),
+    SQLITE_PATH: z
+      .string()
+      .default("scheduler.db")
+      .describe("Filesystem path to the SQLite database"),
   },
   shared: {
     NODE_ENV: z.enum(["development", "production"]).default("development"),
@@ -25,5 +29,6 @@ export default defineEnv({
   envStrict: {
     NODE_ENV: process.env.NODE_ENV,
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+    SQLITE_PATH: process.env.SQLITE_PATH,
   },
 });
