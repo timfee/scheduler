@@ -7,6 +7,7 @@ import {
 import { DEFAULT_TIMEZONE } from "@/types/constants";
 import { formatISO, parseISO } from "date-fns";
 import { type DAVClient } from "tsdav";
+import ical from "ical-generator";
 import { v4 as uuid } from "uuid";
 
 // Helper functions for type-safe calendar data extraction
@@ -78,28 +79,22 @@ export function createCalDavProvider(client: DAVClient, calendarUrl: string) {
   ): Promise<CalendarEvent> {
     const validatedInput = CalendarEventInputSchema.parse(input);
     const uid = uuid();
-    const dtstamp = new Date().toISOString();
+    const dtstamp = new Date();
+    const dtstampIso = dtstamp.toISOString();
 
-    // Format dates for iCal (remove hyphens and colons)
-    const formatICalDate = (isoDate: string) => {
-      return isoDate.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
-    };
+    const calendar = ical({ prodId: { company: "Your Company", product: "Your Product" } });
+    calendar.createEvent({
+      id: uid,
+      summary: validatedInput.title,
+      description: validatedInput.description ?? "",
+      location: validatedInput.location ?? "",
+      start: new Date(validatedInput.startUtc),
+      end: new Date(validatedInput.endUtc),
+      created: dtstamp,
+      stamp: dtstamp,
+    });
 
-    const vevent = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Your Company//Your Product//EN",
-      "BEGIN:VEVENT",
-      `UID:${uid}`,
-      `SUMMARY:${validatedInput.title}`,
-      `DESCRIPTION:${validatedInput.description ?? ""}`,
-      `LOCATION:${validatedInput.location ?? ""}`,
-      `DTSTAMP:${formatICalDate(dtstamp)}`,
-      `DTSTART:${formatICalDate(validatedInput.startUtc)}`,
-      `DTEND:${formatICalDate(validatedInput.endUtc)}`,
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
+    const vevent = calendar.toString();
 
     await client.createCalendarObject({
       calendar: { url: calendarUrl },
@@ -110,8 +105,8 @@ export function createCalDavProvider(client: DAVClient, calendarUrl: string) {
     const result: CalendarEvent = {
       ...validatedInput,
       id: uid,
-      createdUtc: dtstamp,
-      updatedUtc: dtstamp,
+      createdUtc: dtstampIso,
+      updatedUtc: dtstampIso,
       ownerTimeZone: validatedInput.ownerTimeZone ?? DEFAULT_TIMEZONE,
       metadata: {},
     };
