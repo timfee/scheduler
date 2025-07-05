@@ -83,14 +83,6 @@ export async function createCalendarIntegration(
 ): Promise<CalendarIntegration> {
   const now = new Date();
 
-  // If this is marked as primary, unset other primary calendars
-  if (input.isPrimary) {
-    await db
-      .update(calendarIntegrations)
-      .set({ isPrimary: false })
-      .where(eq(calendarIntegrations.isPrimary, true));
-  }
-
   // Validate and prepare server URL
   const serverUrl = getServerUrl(input.provider, input.config.serverUrl);
 
@@ -113,10 +105,21 @@ export async function createCalendarIntegration(
     updatedAt: now,
   };
 
-  const [created] = await db
-    .insert(calendarIntegrations)
-    .values(newIntegration)
-    .returning();
+  const created = db.transaction((tx) => {
+    if (input.isPrimary) {
+      tx
+        .update(calendarIntegrations)
+        .set({ isPrimary: false })
+        .where(eq(calendarIntegrations.isPrimary, true));
+    }
+
+    const [inserted] = tx
+      .insert(calendarIntegrations)
+      .values(newIntegration)
+      .returning();
+
+    return inserted;
+  });
 
   return created;
 }
@@ -227,21 +230,24 @@ export async function updateCalendarIntegration(
 
   if (input.isPrimary !== undefined) {
     updates.isPrimary = input.isPrimary;
+  }
 
-    // If setting as primary, unset other primary calendars
+  const updated = db.transaction((tx) => {
     if (input.isPrimary) {
-      await db
+      tx
         .update(calendarIntegrations)
         .set({ isPrimary: false })
         .where(eq(calendarIntegrations.isPrimary, true));
     }
-  }
 
-  const [updated] = await db
-    .update(calendarIntegrations)
-    .set(updates)
-    .where(eq(calendarIntegrations.id, id))
-    .returning();
+    const [result] = tx
+      .update(calendarIntegrations)
+      .set(updates)
+      .where(eq(calendarIntegrations.id, id))
+      .returning();
+
+    return result ?? null;
+  });
 
   return updated;
 }
