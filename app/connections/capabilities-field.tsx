@@ -9,10 +9,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Control } from "react-hook-form";
+import { type Control } from "react-hook-form";
 
 import { CAPABILITY } from "@/types/constants";
-import type { ConnectionFormValues } from "./use-connection-form";
+import { type ConnectionFormValues } from "./use-connection-form";
 
 interface CapabilitiesFieldProps {
   control: Control<ConnectionFormValues>;

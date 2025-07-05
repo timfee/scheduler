@@ -2,12 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import type { ProviderType } from "./actions";
+import { type ProviderType } from "./actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
 } from "@/schemas/connection";
-import { CAPABILITY, type CalendarCapability } from "@/types/constants";
+import { type CalendarCapability } from "@/types/constants";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   apple: "Basic",

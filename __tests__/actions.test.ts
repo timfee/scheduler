@@ -1,5 +1,8 @@
 import { describe, beforeAll, beforeEach, it, expect, jest } from '@jest/globals';
 import { CAPABILITY } from '../types/constants';
+import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { sql } from 'drizzle-orm';
+import * as schema from '../lib/db/schema';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('tsdav', () => ({
@@ -10,8 +13,8 @@ jest.mock('tsdav', () => ({
 
 let actions: typeof import('../app/connections/actions');
 let integrations: typeof import('../lib/db/integrations');
-let db: any;
-let sql: any;
+let db: BetterSQLite3Database<typeof schema>;
+// Reuse the `sql` tagged template from drizzle for manual queries
 
 beforeAll(async () => {
   process.env.NODE_ENV = "development";
@@ -19,9 +22,8 @@ beforeAll(async () => {
   process.env.SQLITE_PATH = ':memory:';
 
   const dbModule = await import('../lib/db');
-  db = (dbModule as any).db;
-  sql = (await import('drizzle-orm')).sql;
-  await db.run(sql`
+  db = dbModule.db;
+  db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
       id TEXT PRIMARY KEY,
       provider TEXT NOT NULL,
@@ -37,9 +39,9 @@ beforeAll(async () => {
   actions = await import('../app/connections/actions');
 });
 
-beforeEach(async () => {
+beforeEach(() => {
   jest.restoreAllMocks();
-  await db.run(sql`DELETE FROM calendar_integrations`);
+  db.run(sql`DELETE FROM calendar_integrations`);
 });
 
 describe('createConnectionAction validation', () => {
@@ -52,7 +54,7 @@ describe('createConnectionAction validation', () => {
       password: '',
       serverUrl: 'https://x',
       capabilities: [CAPABILITY.CONFLICT],
-    } as any);
+    });
     expect(result.success).toBe(false);
     expect(result.error).toMatch('Username is required');
   });
@@ -65,7 +67,7 @@ describe('createConnectionAction validation', () => {
       username: 'u',
       password: 'p',
       capabilities: [CAPABILITY.CONFLICT],
-    } as any);
+    });
     expect(result.success).toBe(false);
     expect(result.error).toMatch('Server URL is required');
   });
@@ -81,7 +83,7 @@ describe('createConnectionAction validation', () => {
       clientSecret: '',
       tokenUrl: '',
       capabilities: [CAPABILITY.CONFLICT],
-    } as any);
+    });
     expect(result.success).toBe(false);
     expect(result.error).toMatch('All OAuth fields are required');
   });
@@ -106,7 +108,7 @@ describe('createConnectionAction validation', () => {
 
 describe('updateConnectionAction', () => {
   it('returns error when connection not found', async () => {
-    const result = await actions.updateConnectionAction('missing', {} as any);
+    const result = await actions.updateConnectionAction('missing', {});
     expect(result.success).toBe(false);
     expect(result.error).toMatch('Connection not found');
   });
@@ -119,7 +121,7 @@ describe('testConnectionAction validation', () => {
       username: '',
       password: '',
       capabilities: [CAPABILITY.CONFLICT],
-    } as any);
+    });
     expect(res.success).toBe(false);
     expect(res.error).toMatch('Username is required');
   });
@@ -133,7 +135,7 @@ describe('testConnectionAction validation', () => {
       clientSecret: '',
       tokenUrl: '',
       capabilities: [CAPABILITY.CONFLICT],
-    } as any);
+    });
     expect(res.success).toBe(false);
     expect(res.error).toMatch('All OAuth fields are required');
   });

@@ -1,4 +1,8 @@
 import { describe, beforeAll, beforeEach, it, expect } from '@jest/globals';
+import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { sql } from 'drizzle-orm';
+import type * as schema from '../lib/db/schema';
+import { type CalendarCapability } from '../types/constants';
 
 let createCalendarIntegration: typeof import('../lib/db/integrations').createCalendarIntegration;
 let updateCalendarIntegration: typeof import('../lib/db/integrations').updateCalendarIntegration;
@@ -7,8 +11,7 @@ let getCalendarIntegration: typeof import('../lib/db/integrations').getCalendarI
 let getPrimaryCalendarIntegration: typeof import('../lib/db/integrations').getPrimaryCalendarIntegration;
 let getCalendarIntegrationsByCapability: typeof import('../lib/db/integrations').getCalendarIntegrationsByCapability;
 let deleteCalendarIntegration: typeof import('../lib/db/integrations').deleteCalendarIntegration;
-let db: any;
-let sql: any;
+let db: BetterSQLite3Database<typeof schema>;
 
 beforeAll(async () => {
   process.env.NODE_ENV = "development";
@@ -16,9 +19,8 @@ beforeAll(async () => {
   process.env.SQLITE_PATH = ':memory:';
 
   const dbModule = await import('../lib/db');
-  db = (dbModule as any).db;
-  sql = (await import('drizzle-orm')).sql;
-  await db.run(sql`
+  db = dbModule.db;
+  db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
       id TEXT PRIMARY KEY,
       provider TEXT NOT NULL,
@@ -40,12 +42,22 @@ beforeAll(async () => {
   deleteCalendarIntegration = integrations.deleteCalendarIntegration;
 });
 
-beforeEach(async () => {
-  await db.run(sql`DELETE FROM calendar_integrations`);
+beforeEach(() => {
+  db.run(sql`DELETE FROM calendar_integrations`);
 });
 
 it('creates and retrieves integration with decrypted config', async () => {
-  const config = {
+  const config: {
+    authMethod: 'Oauth';
+    username: string;
+    refreshToken: string;
+    clientId: string;
+    clientSecret: string;
+    tokenUrl: string;
+    serverUrl: string;
+    calendarUrl: string | undefined;
+    capabilities: CalendarCapability[];
+  } = {
     authMethod: 'Oauth',
     username: 'user',
     refreshToken: 'r1',
@@ -54,7 +66,7 @@ it('creates and retrieves integration with decrypted config', async () => {
     tokenUrl: 'https://token',
     serverUrl: '',
     calendarUrl: undefined,
-    capabilities: [] as any[],
+    capabilities: [],
   };
   const integration = await createCalendarIntegration({
     provider: 'google',
@@ -90,12 +102,12 @@ it('updates integration and merges config', async () => {
 
   await updateCalendarIntegration(integration.id, {
     displayName: 'Updated',
-    config: { refreshToken: 'r2' } as any,
+    config: { refreshToken: 'r2' },
   });
 
   const updated = await getCalendarIntegration(integration.id);
   expect(updated?.displayName).toBe('Updated');
-  expect((updated?.config as any).refreshToken).toBe('r2');
+  expect(updated?.config.refreshToken).toBe('r2');
 });
 
 it('sets primary integration correctly', async () => {
