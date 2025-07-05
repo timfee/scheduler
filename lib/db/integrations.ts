@@ -113,10 +113,11 @@ export async function createCalendarIntegration(
         .where(eq(calendarIntegrations.isPrimary, true));
     }
 
-    const [inserted] = tx
+    const inserted = tx
       .insert(calendarIntegrations)
       .values(newIntegration)
-      .returning();
+      .returning()
+      .get();
 
     return inserted;
   });
@@ -240,11 +241,12 @@ export async function updateCalendarIntegration(
         .where(eq(calendarIntegrations.isPrimary, true));
     }
 
-    const [result] = tx
+    const result = tx
       .update(calendarIntegrations)
       .set(updates)
       .where(eq(calendarIntegrations.id, id))
-      .returning();
+      .returning()
+      .get();
 
     return result ?? null;
   });

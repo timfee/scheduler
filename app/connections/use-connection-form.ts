@@ -2,10 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import * as z from "zod";
-
-import { CAPABILITY, type CalendarCapability } from "@/types/constants";
 import type { ProviderType } from "./actions";
+import {
+  connectionFormSchema,
+  type ConnectionFormValues,
+} from "@/schemas/connection";
+import { CAPABILITY, type CalendarCapability } from "@/types/constants";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   apple: "Basic",
@@ -15,73 +17,7 @@ const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   caldav: "Basic",
 };
 
-export const connectionFormSchema = z
-  .object({
-    provider: z.enum(["apple", "google", "fastmail", "nextcloud", "caldav"]),
-    displayName: z.string().min(1, "Display name is required"),
-    authMethod: z.enum(["Basic", "Oauth"]),
-    username: z.string().min(1, "Username is required"),
-    password: z.string().optional(),
-    serverUrl: z.string().optional(),
-    calendarUrl: z.string().optional(),
-    refreshToken: z.string().optional(),
-    clientId: z.string().optional(),
-    clientSecret: z.string().optional(),
-    tokenUrl: z.string().optional(),
-    capabilities: z
-      .array(
-        z.enum([
-          CAPABILITY.CONFLICT,
-          CAPABILITY.AVAILABILITY,
-          CAPABILITY.BOOKING,
-        ]),
-      )
-      .min(1, "Select at least one capability"),
-    isPrimary: z.boolean(),
-  })
-  .refine(
-    (data) => {
-      if (data.authMethod === "Basic") {
-        return !!data.password;
-      }
-      return true;
-    },
-    {
-      message: "Password is required for Basic authentication",
-      path: ["password"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (["nextcloud", "caldav"].includes(data.provider)) {
-        return !!data.serverUrl;
-      }
-      return true;
-    },
-    {
-      message: "Server URL is required for this provider",
-      path: ["serverUrl"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.authMethod === "Oauth") {
-        return (
-          !!data.refreshToken &&
-          !!data.clientId &&
-          !!data.clientSecret &&
-          !!data.tokenUrl
-        );
-      }
-      return true;
-    },
-    {
-      message: "All OAuth fields are required",
-      path: ["refreshToken"],
-    },
-  );
-
-export type ConnectionFormValues = z.infer<typeof connectionFormSchema>;
+export { connectionFormSchema, type ConnectionFormValues } from "@/schemas/connection";
 
 export interface UseConnectionFormReturn {
   form: UseFormReturn<ConnectionFormValues>;
