@@ -1,5 +1,26 @@
 "use client";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -231,406 +252,405 @@ export default function ConnectionsClient({
     <div className="space-y-6">
       {/* Add/Edit Form */}
       {isFormOpen && (
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h2 className="mb-4 text-xl font-semibold">
-            {editingConnection ? "Edit Connection" : "Add New Connection"}
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Provider Selection */}
-            <div>
-              <label className="mb-1 block text-sm font-medium">Provider</label>
-              <select
-                value={formData.provider}
-                onChange={(e) =>
-                  handleProviderChange(e.target.value as ProviderType)
-                }
-                disabled={!!editingConnection}
-                className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="apple">Apple iCloud</option>
-                <option value="google">Google Calendar</option>
-                <option value="fastmail">Fastmail</option>
-                <option value="nextcloud">Nextcloud</option>
-                <option value="caldav">Generic CalDAV</option>
-              </select>
-            </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {editingConnection ? "Edit Connection" : "Add New Connection"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Provider Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="provider">Provider</Label>
+                <Select
+                  value={formData.provider}
+                  onValueChange={(value) =>
+                    handleProviderChange(value as ProviderType)
+                  }
+                  disabled={!!editingConnection}
+                >
+                  <SelectTrigger id="provider">
+                    <SelectValue placeholder="Select a provider" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="apple">Apple iCloud</SelectItem>
+                    <SelectItem value="google">Google Calendar</SelectItem>
+                    <SelectItem value="fastmail">Fastmail</SelectItem>
+                    <SelectItem value="nextcloud">Nextcloud</SelectItem>
+                    <SelectItem value="caldav">Generic CalDAV</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Display Name */}
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Display Name
-              </label>
-              <input
-                type="text"
-                value={formData.displayName}
-                onChange={(e) =>
-                  setFormData({ ...formData, displayName: e.target.value })
-                }
-                placeholder="My Calendar"
-                required
-                className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
+              {/* Display Name */}
+              <div className="space-y-2">
+                <Label htmlFor="displayName">Display Name</Label>
+                <Input
+                  id="displayName"
+                  type="text"
+                  value={formData.displayName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, displayName: e.target.value })
+                  }
+                  placeholder="My Calendar"
+                  required
+                />
+              </div>
 
-            {/* Auth-specific fields */}
-            {!editingConnection && (
-              <>
-                {/* Basic Auth Fields */}
-                {formData.authMethod === "Basic" && (
-                  <>
-                    {needsServerUrl && (
-                      <div>
-                        <label className="mb-1 block text-sm font-medium">
-                          Server URL
-                        </label>
-                        <input
-                          type="url"
-                          value={formData.serverUrl}
+              {/* Auth-specific fields */}
+              {!editingConnection && (
+                <>
+                  {/* Basic Auth Fields */}
+                  {formData.authMethod === "Basic" && (
+                    <>
+                      {needsServerUrl && (
+                        <div className="space-y-2">
+                          <Label htmlFor="serverUrl">Server URL</Label>
+                          <Input
+                            id="serverUrl"
+                            type="url"
+                            value={formData.serverUrl}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                serverUrl: e.target.value,
+                              })
+                            }
+                            placeholder="https://caldav.example.com"
+                            required
+                          />
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                          id="username"
+                          type="text"
+                          value={formData.username}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              serverUrl: e.target.value,
+                              username: e.target.value,
                             })
                           }
-                          placeholder="https://caldav.example.com"
+                          placeholder={
+                            formData.provider === "apple"
+                              ? "Your Apple ID"
+                              : "Username"
+                          }
                           required
-                          className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                       </div>
-                    )}
 
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        Username
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.username}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            username: e.target.value,
-                          })
-                        }
-                        placeholder={
-                          formData.provider === "apple"
-                            ? "Your Apple ID"
-                            : "Username"
-                        }
-                        required
-                        className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      />
-                    </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          value={formData.password}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              password: e.target.value,
+                            })
+                          }
+                          placeholder={
+                            formData.provider === "apple"
+                              ? "App-specific password"
+                              : "Password"
+                          }
+                          required
+                        />
+                      </div>
 
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        value={formData.password}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            password: e.target.value,
-                          })
-                        }
-                        placeholder={
-                          formData.provider === "apple"
-                            ? "App-specific password"
-                            : "Password"
-                        }
-                        required
-                        className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      />
-                    </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="calendarUrl">
+                          Calendar URL (Optional)
+                        </Label>
+                        <Input
+                          id="calendarUrl"
+                          type="url"
+                          value={formData.calendarUrl}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              calendarUrl: e.target.value,
+                            })
+                          }
+                          placeholder="Leave empty to auto-discover"
+                        />
+                      </div>
+                    </>
+                  )}
 
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        Calendar URL (Optional)
-                      </label>
-                      <input
-                        type="url"
-                        value={formData.calendarUrl}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            calendarUrl: e.target.value,
-                          })
-                        }
-                        placeholder="Leave empty to auto-discover"
-                        className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </>
-                )}
+                  {/* OAuth Fields */}
+                  {formData.authMethod === "Oauth" && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.username}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              username: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
 
-                {/* OAuth Fields */}
-                {formData.authMethod === "Oauth" && (
-                  <>
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.username}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            username: e.target.value,
-                          })
-                        }
-                        required
-                        className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      />
-                    </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="clientId">Client ID</Label>
+                        <Input
+                          id="clientId"
+                          type="text"
+                          value={formData.clientId}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              clientId: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
 
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        Client ID
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.clientId}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            clientId: e.target.value,
-                          })
-                        }
-                        required
-                        className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      />
-                    </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="clientSecret">Client Secret</Label>
+                        <Input
+                          id="clientSecret"
+                          type="password"
+                          value={formData.clientSecret}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              clientSecret: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
 
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        Client Secret
-                      </label>
-                      <input
-                        type="password"
-                        value={formData.clientSecret}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            clientSecret: e.target.value,
-                          })
-                        }
-                        required
-                        className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        Refresh Token
-                      </label>
-                      <input
-                        type="password"
-                        value={formData.refreshToken}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            refreshToken: e.target.value,
-                          })
-                        }
-                        required
-                        className="w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-
-            {/* Capabilities */}
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Capabilities
-              </label>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.capabilities.includes("conflict")}
-                    onChange={() => handleCapabilityToggle("conflict")}
-                    className="mr-2"
-                  />
-                  <span className="text-sm">
-                    <strong>Conflict Checking</strong> - Booked time is blocked
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.capabilities.includes("availability")}
-                    onChange={() => handleCapabilityToggle("availability")}
-                    className="mr-2"
-                  />
-                  <span className="text-sm">
-                    <strong>Availability Checking</strong> - Booked time is
-                    available unless blocked later
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.capabilities.includes("booking")}
-                    onChange={() => handleCapabilityToggle("booking")}
-                    className="mr-2"
-                  />
-                  <span className="text-sm">
-                    <strong>Booking</strong> - Can add new events to this
-                    calendar
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            {/* Primary Calendar */}
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.isPrimary}
-                onChange={(e) =>
-                  setFormData({ ...formData, isPrimary: e.target.checked })
-                }
-                className="mr-2"
-              />
-              <span className="text-sm">Set as primary calendar</span>
-            </label>
-
-            {/* Test Connection Status */}
-            {testStatus.message && (
-              <div
-                className={`rounded-md p-3 ${
-                  testStatus.success
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {testStatus.message}
-              </div>
-            )}
-
-            {/* Error Message */}
-            {error && (
-              <div className="rounded-md bg-red-100 p-3 text-red-700">
-                {error}
-              </div>
-            )}
-
-            {/* Form Actions */}
-            <div className="flex gap-2">
-              {!editingConnection && (
-                <button
-                  type="button"
-                  onClick={handleTestConnection}
-                  disabled={testStatus.testing || isLoading}
-                  className="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  {testStatus.testing ? "Testing..." : "Test Connection"}
-                </button>
+                      <div className="space-y-2">
+                        <Label htmlFor="refreshToken">Refresh Token</Label>
+                        <Input
+                          id="refreshToken"
+                          type="password"
+                          value={formData.refreshToken}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              refreshToken: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+                </>
               )}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
-              >
-                {isLoading
-                  ? "Saving..."
-                  : editingConnection
-                    ? "Update"
-                    : "Add Connection"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsFormOpen(false);
-                  resetForm();
-                }}
-                className="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
+
+              {/* Capabilities */}
+              <div className="space-y-2">
+                <Label>Capabilities</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="conflict"
+                      checked={formData.capabilities.includes("conflict")}
+                      onCheckedChange={() => handleCapabilityToggle("conflict")}
+                    />
+                    <label
+                      htmlFor="conflict"
+                      className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      <strong>Conflict Checking</strong> - Booked time is
+                      blocked
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="availability"
+                      checked={formData.capabilities.includes("availability")}
+                      onCheckedChange={() =>
+                        handleCapabilityToggle("availability")
+                      }
+                    />
+                    <label
+                      htmlFor="availability"
+                      className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      <strong>Availability Checking</strong> - Booked time is
+                      available unless blocked later
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="booking"
+                      checked={formData.capabilities.includes("booking")}
+                      onCheckedChange={() => handleCapabilityToggle("booking")}
+                    />
+                    <label
+                      htmlFor="booking"
+                      className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      <strong>Booking</strong> - Can add new events to this
+                      calendar
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Primary Calendar */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="primary"
+                  checked={formData.isPrimary}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, isPrimary: !!checked })
+                  }
+                />
+                <label
+                  htmlFor="primary"
+                  className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Set as primary calendar
+                </label>
+              </div>
+
+              {/* Test Connection Status */}
+              {testStatus.message && (
+                <Alert
+                  variant={testStatus.success ? "default" : "destructive"}
+                  className="mt-4"
+                >
+                  {testStatus.success ? (
+                    <CheckCircle2 className="size-4" />
+                  ) : (
+                    <XCircle className="size-4" />
+                  )}
+                  <AlertDescription>{testStatus.message}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <Alert variant="destructive" className="mt-4">
+                  <XCircle className="size-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Form Actions */}
+              <div className="flex gap-2">
+                {!editingConnection && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleTestConnection}
+                    disabled={testStatus.testing || isLoading}
+                  >
+                    {testStatus.testing ? "Testing..." : "Test Connection"}
+                  </Button>
+                )}
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading
+                    ? "Saving..."
+                    : editingConnection
+                      ? "Update"
+                      : "Add Connection"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setIsFormOpen(false);
+                    resetForm();
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       )}
 
       {/* Add Connection Button */}
       {!isFormOpen && (
-        <button
-          onClick={() => setIsFormOpen(true)}
-          className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-        >
-          Add Connection
-        </button>
+        <Button onClick={() => setIsFormOpen(true)}>Add Connection</Button>
       )}
 
       {/* Connections List */}
       <div className="space-y-4">
         {initialConnections.length === 0 ? (
-          <p className="text-gray-500">No calendar connections yet.</p>
+          <p className="text-muted-foreground">No calendar connections yet.</p>
         ) : (
           initialConnections.map((connection) => (
-            <div
-              key={connection.id}
-              className="rounded-lg bg-white p-4 shadow-md"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold">
-                    {connection.displayName}
-                    {connection.isPrimary && (
-                      <span className="ml-2 rounded bg-blue-100 px-2 py-1 text-sm text-blue-700">
-                        Primary
-                      </span>
+            <Card key={connection.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      {connection.displayName}
+                      {connection.isPrimary && (
+                        <Badge variant="default">Primary</Badge>
+                      )}
+                    </CardTitle>
+                    <CardDescription>
+                      Provider: {connection.provider}
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    {!connection.isPrimary && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSetPrimary(connection.id)}
+                      >
+                        Set Primary
+                      </Button>
                     )}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Provider: {connection.provider}
-                  </p>
-                  <div className="mt-2">
-                    <p className="text-sm font-medium">Capabilities:</p>
-                    <ul className="text-sm text-gray-600">
-                      {connection.capabilities.includes("conflict") && (
-                        <li>• Conflict Checking</li>
-                      )}
-                      {connection.capabilities.includes("availability") && (
-                        <li>• Availability Checking</li>
-                      )}
-                      {connection.capabilities.includes("booking") && (
-                        <li>• Booking</li>
-                      )}
-                    </ul>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(connection)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(connection.id)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  {!connection.isPrimary && (
-                    <button
-                      onClick={() => handleSetPrimary(connection.id)}
-                      className="rounded border border-blue-500 px-3 py-1 text-sm text-blue-500 hover:bg-blue-50"
-                    >
-                      Set Primary
-                    </button>
-                  )}
-                  <button
-                    onClick={() => handleEdit(connection)}
-                    className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(connection.id)}
-                    className="rounded border border-red-500 px-3 py-1 text-sm text-red-500 hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
+              </CardHeader>
+              <CardContent>
+                <div>
+                  <p className="mb-2 text-sm font-medium">Capabilities:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {connection.capabilities.includes("conflict") && (
+                      <Badge variant="secondary">Conflict Checking</Badge>
+                    )}
+                    {connection.capabilities.includes("availability") && (
+                      <Badge variant="secondary">Availability Checking</Badge>
+                    )}
+                    {connection.capabilities.includes("booking") && (
+                      <Badge variant="secondary">Booking</Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))
         )}
       </div>

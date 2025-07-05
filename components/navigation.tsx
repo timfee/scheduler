@@ -1,12 +1,18 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Navigation() {
   const pathname = usePathname();
 
-  const isActive = (path: string) => pathname === path;
+  const navItems = [
+    { href: "/", label: "Dashboard" },
+    { href: "/connections", label: "Connections" },
+    { href: "/appointments", label: "Appointments" },
+    { href: "/availability", label: "Availability" },
+  ];
 
   return (
     <nav className="border-b bg-white shadow-sm">
@@ -16,47 +22,17 @@ export default function Navigation() {
             <Link href="/" className="text-xl font-semibold">
               Scheduler
             </Link>
-            <div className="ml-10 flex items-baseline space-x-4">
-              <Link
-                href="/"
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive("/")
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-700 hover:bg-gray-700 hover:text-white"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/connections"
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive("/connections")
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-700 hover:bg-gray-700 hover:text-white"
-                }`}
-              >
-                Connections
-              </Link>
-              <Link
-                href="/appointments"
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive("/appointments")
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-700 hover:bg-gray-700 hover:text-white"
-                }`}
-              >
-                Appointments
-              </Link>
-              <Link
-                href="/availability"
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive("/availability")
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-700 hover:bg-gray-700 hover:text-white"
-                }`}
-              >
-                Availability
-              </Link>
+            <div className="ml-10 flex items-baseline space-x-2">
+              {navItems.map((item) => (
+                <Button
+                  key={item.href}
+                  asChild
+                  variant={pathname === item.href ? "default" : "ghost"}
+                  size="sm"
+                >
+                  <Link href={item.href}>{item.label}</Link>
+                </Button>
+              ))}
             </div>
           </div>
         </div>

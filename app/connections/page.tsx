@@ -1,3 +1,13 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+
 import { listConnectionsAction } from "./actions";
 import ConnectionsClient from "./connections-client";
 
@@ -9,10 +19,23 @@ export default async function ConnectionsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-4xl">
-          <h1 className="mb-6 text-3xl font-bold">Calendar Connections</h1>
-          <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-            Failed to load connections: {result.error}
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-3xl">Calendar Connections</CardTitle>
+              <CardDescription>
+                Manage your calendar integrations and connections
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Alert variant="destructive">
+                <AlertCircle className="size-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  Failed to load connections: {result.error}
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -24,8 +47,18 @@ export default async function ConnectionsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="mb-6 text-3xl font-bold">Calendar Connections</h1>
-        <ConnectionsClient initialConnections={connections} />
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl">Calendar Connections</CardTitle>
+            <CardDescription>
+              Connect your calendars for conflict checking, availability
+              management, and event booking
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ConnectionsClient initialConnections={connections} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

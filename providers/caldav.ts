@@ -5,7 +5,7 @@ import {
   type CalendarEventInput,
 } from "@/schemas/calendar-event";
 import { DEFAULT_TIMEZONE } from "@/types/constants";
-import { DateTime } from "luxon";
+import { formatISO, parseISO } from "date-fns";
 import { type DAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
 
@@ -26,17 +26,24 @@ function parseVEventDates(vevent: Record<string, unknown>) {
     return null;
   }
 
-  const startDateTime = DateTime.fromISO(dtstart.value, { zone: "utc" });
-  const endDateTime = DateTime.fromISO(dtend.value, { zone: "utc" });
+  try {
+    // Parse ISO dates - they should already be in UTC from CalDAV
+    const startDate = parseISO(dtstart.value);
+    const endDate = parseISO(dtend.value);
 
-  if (!startDateTime.isValid || !endDateTime.isValid) {
+    // Validate that dates are valid
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return null;
+    }
+
+    // Format back to ISO strings with UTC timezone
+    const startUtc = formatISO(startDate);
+    const endUtc = formatISO(endDate);
+
+    return { startUtc, endUtc };
+  } catch {
     return null;
   }
-
-  const startUtc = startDateTime.toISO();
-  const endUtc = endDateTime.toISO();
-
-  return startUtc && endUtc ? { startUtc, endUtc } : null;
 }
 
 // Factory function to create provider-specific functions
