@@ -7,6 +7,7 @@ import {
   type CalendarIntegration,
   type NewCalendarIntegration,
 } from "@/lib/db/schema";
+import { type CalendarCapability } from "@/types/constants";
 import { eq } from "drizzle-orm";
 import { createDAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
@@ -23,7 +24,7 @@ const WELL_KNOWN_SERVERS = {
 export type ProviderType = keyof typeof WELL_KNOWN_SERVERS;
 
 export interface BaseCalendarConfig {
-  capabilities: string[]; // ['conflict', 'availability', 'booking']
+  capabilities: CalendarCapability[]; // ['conflict', 'availability', 'booking']
 }
 
 export interface BasicAuthConfig extends BaseCalendarConfig {
@@ -260,7 +261,7 @@ export async function deleteCalendarIntegration(id: string): Promise<boolean> {
  * Get calendar integrations by capability
  */
 export async function getCalendarIntegrationsByCapability(
-  capability: string,
+  capability: CalendarCapability,
 ): Promise<Array<CalendarIntegration & { config: CalendarIntegrationConfig }>> {
   const allIntegrations = await listCalendarIntegrations();
 

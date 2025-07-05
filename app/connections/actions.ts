@@ -14,6 +14,7 @@ import {
   type ProviderType,
   type UpdateCalendarIntegrationInput,
 } from "@/lib/db/integrations";
+import { type CalendarCapability } from "@/types/constants";
 import { revalidatePath } from "next/cache";
 
 export type { ProviderType };
@@ -26,7 +27,7 @@ export interface BasicAuthFormData {
   password: string;
   serverUrl?: string;
   calendarUrl?: string;
-  capabilities: string[];
+  capabilities: CalendarCapability[];
   isPrimary?: boolean;
 }
 
@@ -41,7 +42,7 @@ export interface OAuthFormData {
   tokenUrl: string;
   serverUrl?: string;
   calendarUrl?: string;
-  capabilities: string[];
+  capabilities: CalendarCapability[];
   isPrimary?: boolean;
 }
 
@@ -58,7 +59,7 @@ export interface ConnectionListItem {
   provider: string;
   displayName: string;
   isPrimary: boolean;
-  capabilities: string[];
+  capabilities: CalendarCapability[];
   createdAt: Date;
   updatedAt: Date;
 }
