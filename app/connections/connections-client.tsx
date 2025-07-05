@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -80,33 +79,31 @@ export default function ConnectionsClient({
     setTestStatus({ testing: true });
 
     // Build the connection data based on auth method
-    let testData: Partial<ConnectionFormData>;
-    if (values.authMethod === "Basic") {
-      testData = {
-        provider: values.provider,
-        displayName: values.displayName,
-        authMethod: "Basic",
-        username: values.username,
-        password: values.password ?? "",
-        serverUrl: values.serverUrl,
-        calendarUrl: values.calendarUrl,
-        capabilities: values.capabilities,
-      } satisfies Partial<BasicAuthFormData>;
-    } else {
-      testData = {
-        provider: values.provider,
-        displayName: values.displayName,
-        authMethod: "Oauth",
-        username: values.username,
-        refreshToken: values.refreshToken ?? "",
-        clientId: values.clientId ?? "",
-        clientSecret: values.clientSecret ?? "",
-        tokenUrl: values.tokenUrl ?? "",
-        serverUrl: values.serverUrl,
-        calendarUrl: values.calendarUrl,
-        capabilities: values.capabilities,
-      } satisfies Partial<OAuthFormData>;
-    }
+    const testData: Partial<ConnectionFormData> =
+      values.authMethod === "Basic"
+        ? {
+            provider: values.provider,
+            displayName: values.displayName,
+            authMethod: "Basic",
+            username: values.username,
+            password: values.password ?? "",
+            serverUrl: values.serverUrl,
+            calendarUrl: values.calendarUrl,
+            capabilities: values.capabilities,
+          }
+        : {
+            provider: values.provider,
+            displayName: values.displayName,
+            authMethod: "Oauth",
+            username: values.username,
+            refreshToken: values.refreshToken ?? "",
+            clientId: values.clientId ?? "",
+            clientSecret: values.clientSecret ?? "",
+            tokenUrl: values.tokenUrl ?? "",
+            serverUrl: values.serverUrl,
+            calendarUrl: values.calendarUrl,
+            capabilities: values.capabilities,
+          };
 
     const result = await testConnectionAction(values.provider, testData);
     setTestStatus({
@@ -121,36 +118,34 @@ export default function ConnectionsClient({
   const onSubmit = async (values: FormValues) => {
     try {
       // Build the connection data based on auth method
-      let connectionData: ConnectionFormData;
-      if (values.authMethod === "Basic") {
-        connectionData = {
-          provider: values.provider,
-          displayName: values.displayName,
-          authMethod: "Basic",
-          username: values.username,
-          password: values.password ?? "",
-          serverUrl: values.serverUrl,
-          calendarUrl: values.calendarUrl,
-          capabilities: values.capabilities,
-          isPrimary: values.isPrimary,
-        } satisfies BasicAuthFormData;
-      } else {
-        connectionData = {
-          provider: values.provider,
-          displayName: values.displayName,
-          authMethod: "Oauth",
-          username: values.username,
-          refreshToken: values.refreshToken ?? "",
-          clientId: values.clientId ?? "",
-          clientSecret: values.clientSecret ?? "",
-          tokenUrl:
-            values.tokenUrl ?? "https://accounts.google.com/o/oauth2/token",
-          serverUrl: values.serverUrl,
-          calendarUrl: values.calendarUrl,
-          capabilities: values.capabilities,
-          isPrimary: values.isPrimary,
-        } satisfies OAuthFormData;
-      }
+      const connectionData: ConnectionFormData =
+        values.authMethod === "Basic"
+          ? {
+              provider: values.provider,
+              displayName: values.displayName,
+              authMethod: "Basic",
+              username: values.username,
+              password: values.password ?? "",
+              serverUrl: values.serverUrl,
+              calendarUrl: values.calendarUrl,
+              capabilities: values.capabilities,
+              isPrimary: values.isPrimary,
+            }
+          : {
+              provider: values.provider,
+              displayName: values.displayName,
+              authMethod: "Oauth",
+              username: values.username,
+              refreshToken: values.refreshToken ?? "",
+              clientId: values.clientId ?? "",
+              clientSecret: values.clientSecret ?? "",
+              tokenUrl:
+                values.tokenUrl ?? "https://accounts.google.com/o/oauth2/token",
+              serverUrl: values.serverUrl,
+              calendarUrl: values.calendarUrl,
+              capabilities: values.capabilities,
+              isPrimary: values.isPrimary,
+            };
 
       if (editingConnection) {
         const result = await updateConnectionAction(

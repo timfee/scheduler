@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { CAPABILITY, type CalendarCapability } from "@/types/constants";
+import { CAPABILITY } from "@/types/constants";
 
 /**
  * Schema for connection form values used on both client and server.
@@ -29,62 +29,71 @@ const baseSchema = z.object({
     isPrimary: z.boolean().optional().default(false),
   });
 
-function withValidations<T extends z.ZodTypeAny>(schema: T) {
-  return schema
-    .refine(
-      (data) => {
-        if (data.authMethod === "Basic") {
-          return !!data.password;
-        }
-        return true;
-      },
-      {
-        message: "Password is required for Basic authentication",
-        path: ["password"],
-      },
-    )
-    .refine(
-      (data) => {
-        if (["nextcloud", "caldav"].includes(data.provider)) {
-          return !!data.serverUrl;
-        }
-        return true;
-      },
-      {
-        message: "Server URL is required for this provider",
-        path: ["serverUrl"],
-      },
-    )
-    .refine(
-      (data) => {
-        if (data.authMethod === "Oauth") {
-          return (
-            !!data.refreshToken &&
-            !!data.clientId &&
-            !!data.clientSecret &&
-            !!data.tokenUrl
-          );
-        }
-        return true;
-      },
-      {
-        message: "All OAuth fields are required",
-        path: ["refreshToken"],
-      },
-    );
-}
+export const connectionFormSchema = baseSchema.superRefine((data, ctx) => {
+  if (data.authMethod === "Basic" && !data.password) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Password is required for Basic authentication",
+      path: ["password"],
+    });
+  }
 
-export const connectionFormSchema = withValidations(baseSchema);
+  if (["nextcloud", "caldav"].includes(data.provider) && !data.serverUrl) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Server URL is required for this provider",
+      path: ["serverUrl"],
+    });
+  }
+
+  if (
+    data.authMethod === "Oauth" &&
+    (!data.refreshToken || !data.clientId || !data.clientSecret || !data.tokenUrl)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "All OAuth fields are required",
+      path: ["refreshToken"],
+    });
+  }
+});
 
 export type ConnectionFormValues = z.infer<typeof connectionFormSchema>;
 
 // Schema for just the connection config (no display name or primary flag)
-export const connectionConfigSchema = withValidations(
-  baseSchema.omit({
-    displayName: true,
-    isPrimary: true,
-  }),
-);
+export const connectionConfigSchema = baseSchema
+  .omit({ displayName: true, isPrimary: true })
+  .superRefine((data, ctx) => {
+    if (data.authMethod === "Basic" && !data.password) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Password is required for Basic authentication",
+        path: ["password"],
+      });
+    }
+
+    if (["nextcloud", "caldav"].includes(data.provider) && !data.serverUrl) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Server URL is required for this provider",
+        path: ["serverUrl"],
+      });
+    }
+
+    if (
+      data.authMethod === "Oauth" &&
+      (!data.refreshToken ||
+        !data.clientId ||
+        !data.clientSecret ||
+        !data.tokenUrl)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "All OAuth fields are required",
+        path: ["refreshToken"],
+      });
+    }
+  });
 
 export type ConnectionConfigValues = z.infer<typeof connectionConfigSchema>;
 
