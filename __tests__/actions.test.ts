@@ -173,3 +173,40 @@ describe('testConnectionAction validation', () => {
     expect(res.success).toBe(true);
   });
 });
+
+describe('connection calendar helpers', () => {
+  it('lists calendars for an existing connection', async () => {
+    const created = await actions.createConnectionAction({
+      provider: 'apple',
+      displayName: 'Apple',
+      authMethod: 'Basic',
+      username: 'u',
+      password: 'p',
+      capabilities: [CAPABILITY.CONFLICT],
+      isPrimary: false,
+    });
+    expect(created.success).toBe(true);
+    const list = await actions.listCalendarsForConnectionAction(
+      created.data!.id,
+    );
+    expect(list.success).toBe(true);
+    expect(list.data).toEqual([
+      { url: 'https://calendar.local/cal1', displayName: 'https://calendar.local/cal1' },
+    ]);
+  });
+
+  it('gets connection details', async () => {
+    const created = await actions.createConnectionAction({
+      provider: 'apple',
+      displayName: 'Apple',
+      authMethod: 'Basic',
+      username: 'u',
+      password: 'p',
+      capabilities: [CAPABILITY.CONFLICT],
+      isPrimary: false,
+    });
+    const details = await actions.getConnectionDetailsAction(created.data!.id);
+    expect(details.success).toBe(true);
+    expect(details.data?.calendarUrl).toBe('https://calendar.local/cal1');
+  });
+});

@@ -9,6 +9,7 @@ import {
   prepareConfig,
   updateCalendarIntegration,
   createDAVClientFromConfig,
+  createDAVClientFromIntegration,
   type CalendarIntegrationConfig,
   type CreateCalendarIntegrationInput,
   type ProviderType,
@@ -331,6 +332,66 @@ export async function listCalendarsAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to list calendars",
+    };
+  }
+}
+
+export interface ConnectionDetails {
+  calendarUrl?: string;
+}
+
+/**
+ * Get sanitized details for an existing connection
+ */
+export async function getConnectionDetailsAction(
+  id: string,
+): Promise<ConnectionActionResult<ConnectionDetails>> {
+  try {
+    const integration = await getCalendarIntegration(id);
+    if (!integration) {
+      return { success: false, error: "Connection not found" };
+    }
+
+    return {
+      success: true,
+      data: { calendarUrl: integration.config.calendarUrl },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to load connection",
+    };
+  }
+}
+
+/**
+ * List available calendars for an existing connection
+ */
+export async function listCalendarsForConnectionAction(
+  id: string,
+): Promise<ConnectionActionResult<CalendarOption[]>> {
+  try {
+    const integration = await getCalendarIntegration(id);
+    if (!integration) {
+      return { success: false, error: "Connection not found" };
+    }
+
+    const client = await createDAVClientFromIntegration(integration);
+    const calendars = await client.fetchCalendars();
+
+    return {
+      success: true,
+      data: calendars.map((c) => ({
+        url: c.url,
+        displayName: typeof c.displayName === "string" ? c.displayName : c.url,
+      })),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to list calendars",
     };
   }
 }

@@ -37,6 +37,8 @@ import {
   testConnectionAction,
   updateConnectionAction,
   listCalendarsAction,
+  getConnectionDetailsAction,
+  listCalendarsForConnectionAction,
   type CalendarOption,
   type ConnectionFormData,
   type ConnectionListItem,
@@ -212,8 +214,24 @@ export default function ConnectionsClient({
     }
   };
 
-  const handleEdit = (connection: ConnectionListItem) => {
+  const handleEdit = async (connection: ConnectionListItem) => {
     setEditingConnection(connection);
+    setIsFormOpen(true);
+    setTestStatus({ testing: false });
+
+    const [details, calRes] = await Promise.all([
+      getConnectionDetailsAction(connection.id),
+      listCalendarsForConnectionAction(connection.id),
+    ]);
+
+    if (calRes.success) {
+      setCalendars(calRes.data ?? []);
+    } else {
+      setCalendars([]);
+    }
+
+    const calendarUrl = details.success ? details.data?.calendarUrl ?? "" : "";
+
     form.reset({
       provider: connection.provider as ProviderType,
       displayName: connection.displayName,
@@ -224,15 +242,12 @@ export default function ConnectionsClient({
       username: "",
       password: "",
       serverUrl: "",
-      calendarUrl: "",
+      calendarUrl,
       refreshToken: "",
       clientId: "",
       clientSecret: "",
       tokenUrl: "https://accounts.google.com/o/oauth2/token",
     });
-    setIsFormOpen(true);
-    setTestStatus({ testing: false });
-    setCalendars([]);
   };
 
   const resetForm = () => {
