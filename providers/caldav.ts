@@ -52,7 +52,9 @@ export function createCalDavProvider(client: DAVClient, calendarUrl: string) {
   /**
    * Fetch busy time ranges from the calendar
    */
-  async function listBusyTimes(opts: { from: string; to: string }) {
+  async function listBusyTimes(
+    opts: { from: string; to: string },
+  ): Promise<{ startUtc: string; endUtc: string }[]> {
     const objects = await client.fetchCalendarObjects({
       calendar: { url: calendarUrl },
       timeRange: {
@@ -68,7 +70,7 @@ export function createCalDavProvider(client: DAVClient, calendarUrl: string) {
         const vevent = data.vevent as Record<string, unknown> | undefined;
         return vevent ? parseVEventDates(vevent) : null;
       })
-      .filter(Boolean);
+      .filter((v): v is { startUtc: string; endUtc: string } => Boolean(v));
   }
 
   /**

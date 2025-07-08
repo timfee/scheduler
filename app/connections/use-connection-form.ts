@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm, type UseFormReturn, type Resolver } from "react-hook-form";
 import { type ProviderType } from "./actions";
 import {
   connectionFormSchema,
@@ -20,7 +20,7 @@ const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
 export { connectionFormSchema, type ConnectionFormValues } from "@/schemas/connection";
 
 export interface UseConnectionFormReturn {
-  form: UseFormReturn<ConnectionFormValues>;
+  form: UseFormReturn<ConnectionFormValues, unknown, ConnectionFormValues>;
   currentProvider: ProviderType;
   currentAuthMethod: "Basic" | "Oauth";
   needsServerUrl: boolean;
@@ -29,7 +29,7 @@ export interface UseConnectionFormReturn {
 
 export function useConnectionForm(): UseConnectionFormReturn {
   const form = useForm<ConnectionFormValues>({
-    resolver: zodResolver(connectionFormSchema),
+    resolver: zodResolver(connectionFormSchema) as Resolver<ConnectionFormValues>,
     defaultValues: {
       provider: "apple",
       displayName: "",

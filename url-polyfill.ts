@@ -1,28 +1,41 @@
-import { URL } from 'node:url';
+import { URL, type UrlWithParsedQuery, type UrlWithStringQuery } from 'node:url';
 import * as nodeUrl from 'node:url';
 
 const originalParse = nodeUrl.parse;
 
-(nodeUrl as any).parse = function(urlStr: string, parseQueryString?: boolean) {
+(nodeUrl as {
+  parse: (
+    urlStr: string,
+    parseQueryString?: boolean,
+  ) => UrlWithParsedQuery | UrlWithStringQuery;
+}).parse = function (
+  urlStr: string,
+  parseQueryString?: boolean,
+): UrlWithParsedQuery | UrlWithStringQuery {
   try {
     const base = urlStr.startsWith('http') ? undefined : 'http://localhost';
     const u = new URL(urlStr, base);
-    const result: any = {
+    const query = parseQueryString
+      ? Object.fromEntries(u.searchParams.entries())
+      : u.search.replace(/^\?/, '');
+    const result = {
       href: u.href,
       protocol: u.protocol,
       slashes: true,
       host: u.host,
-      auth: u.username ? `${u.username}${u.password ? ':' + u.password : ''}` : null,
+      auth: u.username ? `${u.username}${u.password ? `:${u.password}` : ''}` : null,
       hostname: u.hostname,
       port: u.port,
       pathname: u.pathname,
       search: u.search,
-      query: parseQueryString ? Object.fromEntries(u.searchParams.entries()) : u.search.replace(/^\?/, ''),
+      query,
       hash: u.hash,
-      path: u.pathname + u.search,
+      path: `${u.pathname}${u.search}`,
     };
-    return result;
+    return result as UrlWithParsedQuery | UrlWithStringQuery;
   } catch {
-    return originalParse(urlStr, parseQueryString);
+    return originalParse(urlStr, parseQueryString ?? false) as
+      | UrlWithParsedQuery
+      | UrlWithStringQuery;
   }
 };

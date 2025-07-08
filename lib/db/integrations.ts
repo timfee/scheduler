@@ -9,7 +9,7 @@ import {
 } from "@/lib/db/schema";
 import { type CalendarCapability } from "@/types/constants";
 import { eq } from "drizzle-orm";
-import { createDAVClient, type DAVClient } from "tsdav";
+import { createDAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
 
 // Well-known CalDAV server URLs
@@ -308,7 +308,7 @@ export async function getCalendarIntegrationsByCapability(
  */
 export async function createDAVClientFromConfig(
   config: CalendarIntegrationConfig,
-): Promise<DAVClient> {
+): Promise<Awaited<ReturnType<typeof createDAVClient>>> {
   if (config.authMethod === "Basic") {
     if (!config.username || !config.password) {
       throw new Error("Missing username or password");
