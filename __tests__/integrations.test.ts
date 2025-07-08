@@ -1,7 +1,6 @@
-import { describe, beforeAll, beforeEach, it, expect } from '@jest/globals';
-import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { sql } from 'drizzle-orm';
-import type * as schema from '../lib/db/schema';
+import { describe, beforeAll, beforeEach, afterAll, it, expect } from '@jest/globals';
+import { createTestDb, cleanupTestDb } from './helpers/db';
+import { calendarIntegrations } from '@/lib/db/schema';
 import { type CalendarCapability } from '../types/constants';
 import { type OAuthConfig } from '../lib/db/integrations';
 
@@ -12,26 +11,17 @@ let getCalendarIntegration: typeof import('../lib/db/integrations').getCalendarI
 let getPrimaryCalendarIntegration: typeof import('../lib/db/integrations').getPrimaryCalendarIntegration;
 let getCalendarIntegrationsByCapability: typeof import('../lib/db/integrations').getCalendarIntegrationsByCapability;
 let deleteCalendarIntegration: typeof import('../lib/db/integrations').deleteCalendarIntegration;
-let db: BetterSQLite3Database<typeof schema>;
+let db: ReturnType<typeof createTestDb>['db'];
+let sqlite: ReturnType<typeof createTestDb>['sqlite'];
 
 beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: "development" });
   process.env.ENCRYPTION_KEY = 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
   process.env.SQLITE_PATH = ':memory:';
 
-  const dbModule = await import('../lib/db');
-  db = dbModule.db;
-  db.run(sql`
-    CREATE TABLE IF NOT EXISTS calendar_integrations (
-      id TEXT PRIMARY KEY,
-      provider TEXT NOT NULL,
-      display_name TEXT NOT NULL,
-      encrypted_config TEXT NOT NULL,
-      is_primary INTEGER DEFAULT 0 NOT NULL,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL
-    )
-  `);
+  const testDb = createTestDb();
+  db = testDb.db;
+  sqlite = testDb.sqlite;
 
   const integrations = await import('../lib/db/integrations');
   createCalendarIntegration = integrations.createCalendarIntegration;
@@ -43,8 +33,12 @@ beforeAll(async () => {
   deleteCalendarIntegration = integrations.deleteCalendarIntegration;
 });
 
+afterAll(() => {
+  cleanupTestDb(sqlite);
+});
+
 beforeEach(() => {
-  db.run(sql`DELETE FROM calendar_integrations`);
+  db.delete(calendarIntegrations).run();
 });
 
 it('creates and retrieves integration with decrypted config', async () => {
