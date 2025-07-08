@@ -11,8 +11,6 @@ export function buildConfigFromValues(values: ConnectionFormValues): CalendarInt
       username: values.username,
       password: values.password!,
       serverUrl: values.serverUrl ?? "",
-      calendarUrl: values.calendarUrl,
-      capabilities: values.capabilities,
     };
     return cfg;
   }
@@ -25,8 +23,6 @@ export function buildConfigFromValues(values: ConnectionFormValues): CalendarInt
     clientSecret: values.clientSecret!,
     tokenUrl: values.tokenUrl!,
     serverUrl: values.serverUrl ?? "",
-    calendarUrl: values.calendarUrl,
-    capabilities: values.capabilities,
   };
   return cfg;
 }
@@ -38,58 +34,49 @@ export function buildConfigFromValues(values: ConnectionFormValues): CalendarInt
  */
 export function mergeConfig(
   existing: CalendarIntegrationConfig,
-  updates: Partial<ConnectionFormValues>,
+  updates: Record<string, unknown>,
 ): { config: CalendarIntegrationConfig; credentialsChanged: boolean } {
   let credentialsChanged = false;
   const result: CalendarIntegrationConfig = { ...existing } as CalendarIntegrationConfig;
+  const u = updates as any;
 
   if (existing.authMethod === "Basic") {
-    if (updates.username !== undefined) {
-      credentialsChanged ||= updates.username !== existing.username;
-      result.username = updates.username;
+    if (u.username !== undefined) {
+      credentialsChanged ||= u.username !== existing.username;
+      result.username = u.username;
     }
-    if (updates.password !== undefined) {
-      credentialsChanged ||= updates.password !== existing.password;
-      (result as BasicAuthConfig).password = updates.password;
+    if (u.password !== undefined) {
+      credentialsChanged ||= u.password !== existing.password;
+      (result as BasicAuthConfig).password = u.password;
     }
-    if (updates.serverUrl !== undefined) {
-      credentialsChanged ||= updates.serverUrl !== existing.serverUrl;
-      result.serverUrl = updates.serverUrl;
-    }
-    if (updates.calendarUrl !== undefined) {
-      result.calendarUrl = updates.calendarUrl;
+    if (u.serverUrl !== undefined) {
+      credentialsChanged ||= u.serverUrl !== existing.serverUrl;
+      result.serverUrl = u.serverUrl;
     }
   } else {
-    if (updates.username !== undefined) {
-      credentialsChanged ||= updates.username !== existing.username;
-      result.username = updates.username;
+    if (u.username !== undefined) {
+      credentialsChanged ||= u.username !== existing.username;
+      result.username = u.username;
     }
-    if (updates.refreshToken !== undefined) {
-      credentialsChanged ||= updates.refreshToken !== existing.refreshToken;
-      (result as OAuthConfig).refreshToken = updates.refreshToken;
+    if (u.refreshToken !== undefined) {
+      credentialsChanged ||= u.refreshToken !== existing.refreshToken;
+      (result as OAuthConfig).refreshToken = u.refreshToken;
     }
-    if (updates.clientId !== undefined) {
-      credentialsChanged ||= updates.clientId !== existing.clientId;
-      (result as OAuthConfig).clientId = updates.clientId;
+    if (u.clientId !== undefined) {
+      credentialsChanged ||= u.clientId !== existing.clientId;
+      (result as OAuthConfig).clientId = u.clientId;
     }
-    if (updates.clientSecret !== undefined) {
-      credentialsChanged ||= updates.clientSecret !== existing.clientSecret;
-      (result as OAuthConfig).clientSecret = updates.clientSecret;
+    if (u.clientSecret !== undefined) {
+      credentialsChanged ||= u.clientSecret !== existing.clientSecret;
+      (result as OAuthConfig).clientSecret = u.clientSecret;
     }
-    if (updates.tokenUrl !== undefined) {
-      (result as OAuthConfig).tokenUrl = updates.tokenUrl;
+    if (u.tokenUrl !== undefined) {
+      (result as OAuthConfig).tokenUrl = u.tokenUrl;
     }
-    if (updates.serverUrl !== undefined) {
-      credentialsChanged ||= updates.serverUrl !== existing.serverUrl;
-      result.serverUrl = updates.serverUrl;
+    if (u.serverUrl !== undefined) {
+      credentialsChanged ||= u.serverUrl !== existing.serverUrl;
+      result.serverUrl = u.serverUrl;
     }
-    if (updates.calendarUrl !== undefined) {
-      result.calendarUrl = updates.calendarUrl;
-    }
-  }
-
-  if (updates.capabilities !== undefined) {
-    result.capabilities = updates.capabilities;
   }
 
   return { config: result, credentialsChanged };

@@ -4,10 +4,14 @@ import { db } from "@/lib/db";
 import { decrypt, encrypt } from "@/lib/db/encryption";
 import {
   calendarIntegrations,
+  calendars,
   type CalendarIntegration,
   type NewCalendarIntegration,
+  type Calendar,
+  type NewCalendar,
 } from "@/lib/db/schema";
 import { type CalendarCapability } from "@/types/constants";
+import { Result, ok, err, CalendarConnectionError } from "@/lib/errors";
 import { eq } from "drizzle-orm";
 import { createDAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
@@ -52,13 +56,11 @@ export interface CreateCalendarIntegrationInput {
   provider: ProviderType;
   displayName: string;
   config: CalendarIntegrationConfig;
-  isPrimary?: boolean;
 }
 
 export interface UpdateCalendarIntegrationInput {
   displayName?: string;
   config?: CalendarIntegrationConfig;
-  isPrimary?: boolean;
 }
 
 /**
@@ -82,22 +84,23 @@ export function resolveServerUrl(provider: ProviderType, customUrl?: string): st
 export async function prepareConfig(
   provider: ProviderType,
   config: CalendarIntegrationConfig,
-): Promise<CalendarIntegrationConfig> {
-  const resolved = {
-    ...config,
-    serverUrl: resolveServerUrl(provider, config.serverUrl),
-  } as CalendarIntegrationConfig;
+): Promise<Result<CalendarIntegrationConfig, CalendarConnectionError>> {
+  try {
+    const resolved = {
+      ...config,
+      serverUrl: resolveServerUrl(provider, config.serverUrl),
+    } as CalendarIntegrationConfig;
 
-  if (!resolved.calendarUrl) {
-    const client = await createDAVClientFromConfig(resolved);
-    const calendars = await client.fetchCalendars();
-    if (calendars.length === 0) {
-      throw new Error("No calendars found");
-    }
-    resolved.calendarUrl = calendars[0].url;
+    // Don't auto-select calendar anymore - let user choose
+    return ok(resolved);
+  } catch (error) {
+    return err<CalendarConnectionError>(
+      new CalendarConnectionError(
+        error instanceof Error ? error.message : "Failed to prepare configuration",
+        "INVALID_CONFIG",
+      ),
+    ) as Result<CalendarIntegrationConfig, CalendarConnectionError>;
   }
-
-  return resolved;
 }
 
 /**
@@ -105,7 +108,7 @@ export async function prepareConfig(
  */
 export async function createCalendarIntegration(
   input: CreateCalendarIntegrationInput,
-): Promise<CalendarIntegration> {
+): Promise<Result<CalendarIntegration, Error>> {
   const now = new Date();
 
   // Validate and prepare server URL
@@ -118,36 +121,88 @@ export async function createCalendarIntegration(
   };
 
   // Encrypt the configuration
-  const encryptedConfig = encrypt(JSON.stringify(configWithServerUrl));
+  const encryptResult = encrypt(JSON.stringify(configWithServerUrl));
+  if (!encryptResult.success) {
+    return err(encryptResult.error);
+  }
 
   const newIntegration: NewCalendarIntegration = {
     id: uuid(),
     provider: input.provider,
     displayName: input.displayName,
-    encryptedConfig,
-    isPrimary: input.isPrimary ?? false,
+    encryptedConfig: encryptResult.data,
     createdAt: now,
     updatedAt: now,
   };
-
-  const created = db.transaction((tx) => {
-    if (input.isPrimary) {
-      tx
-        .update(calendarIntegrations)
-        .set({ isPrimary: false })
-        .where(eq(calendarIntegrations.isPrimary, true));
-    }
-
-    const inserted = tx
+  try {
+    const created = db
       .insert(calendarIntegrations)
       .values(newIntegration)
       .returning()
       .get();
+    return ok(created);
+  } catch (error) {
+    return err(error instanceof Error ? error : new Error("Failed to create integration"));
+  }
+}
 
-    return inserted;
-  });
+// NEW: Add calendars to an integration
+export async function addCalendarToIntegration(
+  integrationId: string,
+  calendarUrl: string,
+  displayName: string,
+  capability: CalendarCapability,
+): Promise<Result<Calendar, Error>> {
+  const newCalendar: NewCalendar = {
+    id: uuid(),
+    integrationId,
+    calendarUrl,
+    displayName,
+    capability,
+    createdAt: new Date(),
+  };
 
-  return created;
+  try {
+    const created = db.insert(calendars).values(newCalendar).returning().get();
+    return ok(created);
+  } catch (error) {
+    return err(error instanceof Error ? error : new Error("Failed to add calendar"));
+  }
+}
+
+// NEW: Get calendars for an integration
+export async function getCalendarsForIntegration(
+  integrationId: string,
+): Promise<Calendar[]> {
+  return db.select().from(calendars).where(eq(calendars.integrationId, integrationId));
+}
+
+// NEW: Update calendar capability
+export async function updateCalendarCapability(
+  calendarId: string,
+  capability: CalendarCapability,
+): Promise<Result<Calendar, Error>> {
+  try {
+    const updated = db
+      .update(calendars)
+      .set({ capability })
+      .where(eq(calendars.id, calendarId))
+      .returning()
+      .get();
+    return ok(updated);
+  } catch (error) {
+    return err(error instanceof Error ? error : new Error("Failed to update calendar"));
+  }
+}
+
+// NEW: Remove a calendar
+export async function removeCalendar(calendarId: string): Promise<Result<boolean, Error>> {
+  try {
+    const result = db.delete(calendars).where(eq(calendars.id, calendarId)).run();
+    return ok(result.changes > 0);
+  } catch (error) {
+    return err(error instanceof Error ? error : new Error("Failed to remove calendar"));
+  }
 }
 
 /**
@@ -158,12 +213,14 @@ export async function listCalendarIntegrations(): Promise<
 > {
   const integrations = await db.select().from(calendarIntegrations);
 
-  return integrations.map((integration) => ({
-    ...integration,
-    config: JSON.parse(
-      decrypt(integration.encryptedConfig),
-    ) as CalendarIntegrationConfig,
-  }));
+  return integrations.map((integration) => {
+    const dec = decrypt(integration.encryptedConfig);
+    const cfg = dec.success ? JSON.parse(dec.data) : {};
+    return {
+      ...integration,
+      config: cfg as CalendarIntegrationConfig,
+    };
+  });
 }
 
 /**
@@ -184,35 +241,12 @@ export async function getCalendarIntegration(
     return null;
   }
 
+  const dec = decrypt(integration.encryptedConfig);
   return {
     ...integration,
-    config: JSON.parse(
-      decrypt(integration.encryptedConfig),
-    ) as CalendarIntegrationConfig,
-  };
-}
-
-/**
- * Get the primary calendar integration
- */
-export async function getPrimaryCalendarIntegration(): Promise<
-  (CalendarIntegration & { config: CalendarIntegrationConfig }) | null
-> {
-  const [integration] = await db
-    .select()
-    .from(calendarIntegrations)
-    .where(eq(calendarIntegrations.isPrimary, true))
-    .limit(1);
-
-  if (!integration) {
-    return null;
-  }
-
-  return {
-    ...integration,
-    config: JSON.parse(
-      decrypt(integration.encryptedConfig),
-    ) as CalendarIntegrationConfig,
+    config: dec.success
+      ? (JSON.parse(dec.data) as CalendarIntegrationConfig)
+      : ({} as CalendarIntegrationConfig),
   };
 }
 
@@ -222,10 +256,10 @@ export async function getPrimaryCalendarIntegration(): Promise<
 export async function updateCalendarIntegration(
   id: string,
   input: UpdateCalendarIntegrationInput,
-): Promise<CalendarIntegration | null> {
+): Promise<Result<CalendarIntegration | null, Error>> {
   const existing = await getCalendarIntegration(id);
   if (!existing) {
-    return null;
+    return ok(null);
   }
 
   const updates: Partial<NewCalendarIntegration> = {
@@ -251,43 +285,38 @@ export async function updateCalendarIntegration(
       );
     }
 
-    updates.encryptedConfig = encrypt(JSON.stringify(mergedConfig));
-  }
-
-  if (input.isPrimary !== undefined) {
-    updates.isPrimary = input.isPrimary;
-  }
-
-  const updated = db.transaction((tx) => {
-    if (input.isPrimary) {
-      tx
-        .update(calendarIntegrations)
-        .set({ isPrimary: false })
-        .where(eq(calendarIntegrations.isPrimary, true));
+    const enc = encrypt(JSON.stringify(mergedConfig));
+    if (!enc.success) {
+      return err<Error>(enc.error) as Result<CalendarIntegration | null, Error>;
     }
-
-    const result = tx
+    updates.encryptedConfig = enc.data;
+  }
+  try {
+    const result = db
       .update(calendarIntegrations)
       .set(updates)
       .where(eq(calendarIntegrations.id, id))
       .returning()
       .get();
-
-    return result ?? null;
-  });
-
-  return updated;
+    return ok(result ?? null);
+  } catch (error) {
+    return err(error instanceof Error ? error : new Error("Failed to update"));
+  }
 }
 
 /**
  * Delete a calendar integration
  */
-export async function deleteCalendarIntegration(id: string): Promise<boolean> {
-  const result = await db
-    .delete(calendarIntegrations)
-    .where(eq(calendarIntegrations.id, id));
-
-  return result.changes > 0;
+export async function deleteCalendarIntegration(id: string): Promise<Result<boolean, Error>> {
+  try {
+    const result = db
+      .delete(calendarIntegrations)
+      .where(eq(calendarIntegrations.id, id))
+      .run();
+    return ok(result.changes > 0);
+  } catch (error) {
+    return err(error instanceof Error ? error : new Error("Failed to delete"));
+  }
 }
 
 /**

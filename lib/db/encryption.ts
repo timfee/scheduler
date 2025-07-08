@@ -34,12 +34,12 @@ export function encrypt(text: string): Result<string, EncryptionError> {
 
     return ok(result);
   } catch (error) {
-    return err(
+    return err<EncryptionError>(
       new EncryptionError(
         error instanceof Error ? error.message : "Encryption failed",
         "ENCRYPT_FAILED",
       ),
-    );
+    ) as Result<string, EncryptionError>;
   }
 }
 
@@ -67,11 +67,11 @@ export function decrypt(encryptedText: string): Result<string, EncryptionError> 
 
     return ok(decrypted.toString("utf8"));
   } catch (error) {
-    return err(
+    return err<EncryptionError>(
       new EncryptionError(
         error instanceof Error ? error.message : "Decryption failed",
         "DECRYPT_FAILED",
       ),
-    );
+    ) as Result<string, EncryptionError>;
   }
 }
