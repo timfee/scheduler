@@ -64,7 +64,7 @@ export interface UpdateCalendarIntegrationInput {
 /**
  * Get the server URL for a provider
  */
-function getServerUrl(provider: ProviderType, customUrl?: string): string {
+export function resolveServerUrl(provider: ProviderType, customUrl?: string): string {
   const wellKnownUrl = WELL_KNOWN_SERVERS[provider];
 
   // For providers that require custom URLs
@@ -76,6 +76,31 @@ function getServerUrl(provider: ProviderType, customUrl?: string): string {
 }
 
 /**
+ * Ensure the config has a server and calendar URL. If missing, attempt
+ * to resolve the well-known server URL and discover the first calendar.
+ */
+export async function prepareConfig(
+  provider: ProviderType,
+  config: CalendarIntegrationConfig,
+): Promise<CalendarIntegrationConfig> {
+  const resolved = {
+    ...config,
+    serverUrl: resolveServerUrl(provider, config.serverUrl),
+  } as CalendarIntegrationConfig;
+
+  if (!resolved.calendarUrl) {
+    const client = await createDAVClientFromConfig(resolved);
+    const calendars = await client.fetchCalendars();
+    if (calendars.length === 0) {
+      throw new Error("No calendars found");
+    }
+    resolved.calendarUrl = calendars[0].url;
+  }
+
+  return resolved;
+}
+
+/**
  * Create a new calendar integration
  */
 export async function createCalendarIntegration(
@@ -84,7 +109,7 @@ export async function createCalendarIntegration(
   const now = new Date();
 
   // Validate and prepare server URL
-  const serverUrl = getServerUrl(input.provider, input.config.serverUrl);
+  const serverUrl = resolveServerUrl(input.provider, input.config.serverUrl);
 
   // Update config with proper server URL
   const configWithServerUrl = {
@@ -220,7 +245,7 @@ export async function updateCalendarIntegration(
 
     // Ensure server URL is set
     if (!mergedConfig.serverUrl && existing.provider !== "caldav") {
-      mergedConfig.serverUrl = getServerUrl(
+      mergedConfig.serverUrl = resolveServerUrl(
         existing.provider as ProviderType,
         mergedConfig.serverUrl,
       );

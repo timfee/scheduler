@@ -6,6 +6,7 @@ import {
   getCalendarIntegration,
   listCalendarIntegrations,
   testCalendarConnection,
+  prepareConfig,
   updateCalendarIntegration,
   type CalendarIntegrationConfig,
   type CreateCalendarIntegrationInput,
@@ -57,7 +58,8 @@ export async function createConnectionAction(
     }
 
     const values = parsed.data;
-    const config = buildConfigFromValues(values);
+    const rawConfig = buildConfigFromValues(values);
+    const config = await prepareConfig(values.provider, rawConfig);
 
     // Test the connection first
     const testResult = await testCalendarConnection(values.provider, config);
@@ -143,10 +145,15 @@ export async function updateConnectionAction(
         formData,
       );
 
+      const prepared = await prepareConfig(
+        existing.provider as ProviderType,
+        config,
+      );
+
       if (credentialsChanged) {
         const testResult = await testCalendarConnection(
           existing.provider as ProviderType,
-          config,
+          prepared,
         );
         if (!testResult.success) {
           return {
@@ -156,7 +163,7 @@ export async function updateConnectionAction(
         }
       }
 
-      updateInput.config = config;
+      updateInput.config = prepared;
     }
 
     const updated = await updateCalendarIntegration(id, updateInput);
@@ -265,7 +272,8 @@ export async function testConnectionAction(
       return { success: false, error: parsed.error.errors[0]?.message };
     }
 
-    const testConfig = buildConfigFromValues(parsed.data);
+    const raw = buildConfigFromValues(parsed.data);
+    const testConfig = await prepareConfig(provider, raw);
 
     const result = await testCalendarConnection(provider, testConfig);
 

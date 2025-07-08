@@ -7,7 +7,9 @@ import * as schema from '../lib/db/schema';
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('tsdav', () => ({
   createDAVClient: jest.fn().mockResolvedValue({
-    fetchCalendars: jest.fn().mockResolvedValue([{}]),
+    fetchCalendars: jest.fn().mockResolvedValue([
+      { url: 'https://calendar.local/cal1' },
+    ]),
   }),
 }));
 
@@ -104,6 +106,21 @@ describe('createConnectionAction validation', () => {
     const created = await integrations.listCalendarIntegrations();
     expect(created).toHaveLength(1);
   });
+
+  it('auto-discovers config for well-known providers', async () => {
+    const res = await actions.createConnectionAction({
+      provider: 'apple',
+      displayName: 'iCloud',
+      authMethod: 'Basic',
+      username: 'user',
+      password: 'pass',
+      capabilities: [CAPABILITY.CONFLICT],
+    });
+    expect(res.success).toBe(true);
+    const [integration] = await integrations.listCalendarIntegrations();
+    expect(integration.config.serverUrl).toBe('https://caldav.icloud.com');
+    expect(integration.config.calendarUrl).toBe('https://calendar.local/cal1');
+  });
 });
 
 describe('updateConnectionAction', () => {
@@ -138,5 +155,15 @@ describe('testConnectionAction validation', () => {
     });
     expect(res.success).toBe(false);
     expect(res.error).toMatch('All OAuth fields are required');
+  });
+
+  it('auto-discovers URLs for test action', async () => {
+    const res = await actions.testConnectionAction('apple', {
+      authMethod: 'Basic',
+      username: 'u',
+      password: 'p',
+      capabilities: [CAPABILITY.CONFLICT],
+    });
+    expect(res.success).toBe(true);
   });
 });
