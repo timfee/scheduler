@@ -8,6 +8,7 @@ import {
   testCalendarConnection,
   prepareConfig,
   updateCalendarIntegration,
+  createDAVClientFromConfig,
   type CalendarIntegrationConfig,
   type CreateCalendarIntegrationInput,
   type ProviderType,
@@ -33,6 +34,11 @@ export interface ConnectionActionResult<T = undefined> {
   success: boolean;
   error?: string;
   data?: T;
+}
+
+export interface CalendarOption {
+  url: string;
+  displayName: string;
 }
 
 export interface ConnectionListItem {
@@ -285,6 +291,45 @@ export async function testConnectionAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Connection test failed",
+    };
+  }
+}
+
+/**
+ * List available calendars for given credentials
+ */
+export async function listCalendarsAction(
+  provider: ProviderType,
+  config: Partial<ConnectionFormData>,
+): Promise<ConnectionActionResult<CalendarOption[]>> {
+  try {
+    const parsed = connectionConfigSchema.safeParse({
+      provider,
+      ...config,
+      displayName: "",
+      isPrimary: false,
+    });
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.errors[0]?.message };
+    }
+
+    const raw = buildConfigFromValues(parsed.data);
+    const prepared = await prepareConfig(provider, raw);
+
+    const client = await createDAVClientFromConfig(prepared);
+    const calendars = await client.fetchCalendars();
+
+    return {
+      success: true,
+      data: calendars.map((c) => ({
+        url: c.url,
+        displayName: c.displayName ?? c.url,
+      })),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to list calendars",
     };
   }
 }
