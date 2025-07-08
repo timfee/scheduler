@@ -278,7 +278,7 @@ export async function testConnectionAction(
       return { success: false, error: parsed.error.errors[0]?.message };
     }
 
-    const raw = buildConfigFromValues(parsed.data);
+    const raw = buildConfigFromValues(parsed.data as ConnectionFormValues);
     const testConfig = await prepareConfig(provider, raw);
 
     const result = await testCalendarConnection(provider, testConfig);
@@ -313,7 +313,7 @@ export async function listCalendarsAction(
       return { success: false, error: parsed.error.errors[0]?.message };
     }
 
-    const raw = buildConfigFromValues(parsed.data);
+    const raw = buildConfigFromValues(parsed.data as ConnectionFormValues);
     const prepared = await prepareConfig(provider, raw);
 
     const client = await createDAVClientFromConfig(prepared);
@@ -323,7 +323,8 @@ export async function listCalendarsAction(
       success: true,
       data: calendars.map((c) => ({
         url: c.url,
-        displayName: c.displayName ?? c.url,
+        displayName:
+          typeof c.displayName === "string" ? c.displayName : c.url,
       })),
     };
   } catch (error) {

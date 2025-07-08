@@ -5,9 +5,13 @@ import { ICAL_PROD_ID } from '@/types/constants';
 import { type DAVClient } from 'tsdav';
 
 const client = {
-  createCalendarObject: jest.fn().mockResolvedValue({}),
-  deleteCalendarObject: jest.fn().mockResolvedValue({}),
-  fetchCalendarObjects: jest.fn().mockResolvedValue([]),
+  createCalendarObject: jest
+    .fn<() => Promise<unknown>>()
+    .mockResolvedValue({}),
+  deleteCalendarObject: jest.fn<() => Promise<unknown>>().mockResolvedValue({}),
+  fetchCalendarObjects: jest
+    .fn<() => Promise<unknown[]>>()
+    .mockResolvedValue([]),
 } as unknown as DAVClient;
 
 describe('CalDav provider', () => {
@@ -26,7 +30,7 @@ describe('CalDav provider', () => {
 
     const mockCreate = client.createCalendarObject as jest.Mock;
     expect(mockCreate).toHaveBeenCalledTimes(1);
-    const call = mockCreate.mock.calls[0][0];
+    const call = mockCreate.mock.calls[0][0] as { iCalString: string };
     expect(call.iCalString).toContain('BEGIN:VCALENDAR');
     expect(call.iCalString).toContain('BEGIN:VEVENT');
     expect(call.iCalString).toContain(`SUMMARY:${input.title}`);

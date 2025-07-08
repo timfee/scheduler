@@ -3,6 +3,7 @@ import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import type * as schema from '../lib/db/schema';
 import { type CalendarCapability } from '../types/constants';
+import { type OAuthConfig } from '../lib/db/integrations';
 
 let createCalendarIntegration: typeof import('../lib/db/integrations').createCalendarIntegration;
 let updateCalendarIntegration: typeof import('../lib/db/integrations').updateCalendarIntegration;
@@ -14,7 +15,7 @@ let deleteCalendarIntegration: typeof import('../lib/db/integrations').deleteCal
 let db: BetterSQLite3Database<typeof schema>;
 
 beforeAll(async () => {
-  process.env.NODE_ENV = "development";
+  Object.assign(process.env, { NODE_ENV: "development" });
   process.env.ENCRYPTION_KEY = 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
   process.env.SQLITE_PATH = ':memory:';
 
@@ -84,30 +85,31 @@ it('creates and retrieves integration with decrypted config', async () => {
 });
 
 it('updates integration and merges config', async () => {
+  const initialConfig = {
+    authMethod: 'Oauth' as const,
+    username: 'u1',
+    refreshToken: 'r1',
+    clientId: 'c1',
+    clientSecret: 's1',
+    tokenUrl: 'https://token',
+    serverUrl: '',
+    calendarUrl: undefined,
+    capabilities: [] as CalendarCapability[],
+  };
   const integration = await createCalendarIntegration({
     provider: 'google',
     displayName: 'Google',
-    config: {
-      authMethod: 'Oauth',
-      username: 'u1',
-      refreshToken: 'r1',
-      clientId: 'c1',
-      clientSecret: 's1',
-      tokenUrl: 'https://token',
-      serverUrl: '',
-      calendarUrl: undefined,
-      capabilities: [],
-    },
+    config: initialConfig,
   });
 
   await updateCalendarIntegration(integration.id, {
     displayName: 'Updated',
-    config: { refreshToken: 'r2' },
+    config: { ...initialConfig, refreshToken: 'r2' },
   });
 
   const updated = await getCalendarIntegration(integration.id);
   expect(updated?.displayName).toBe('Updated');
-  expect(updated?.config.refreshToken).toBe('r2');
+  expect((updated?.config as OAuthConfig).refreshToken).toBe('r2');
 });
 
 it('sets primary integration correctly', async () => {

@@ -1,16 +1,17 @@
 import { describe, beforeAll, beforeEach, it, expect, jest } from '@jest/globals';
 import { CAPABILITY } from '../types/constants';
+import { type DAVClient } from 'tsdav';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import * as schema from '../lib/db/schema';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('tsdav', () => ({
-  createDAVClient: jest.fn().mockResolvedValue({
-    fetchCalendars: jest.fn().mockResolvedValue([
-      { url: 'https://calendar.local/cal1' },
-    ]),
-  }),
+  createDAVClient: jest.fn(async () => ({
+    fetchCalendars: jest.fn<
+      () => Promise<{ url: string }[]>
+    >().mockResolvedValue([{ url: 'https://calendar.local/cal1' }]),
+  } as unknown as DAVClient)),
 }));
 
 let actions: typeof import('../app/connections/actions');
@@ -19,7 +20,7 @@ let db: BetterSQLite3Database<typeof schema>;
 // Reuse the `sql` tagged template from drizzle for manual queries
 
 beforeAll(async () => {
-  process.env.NODE_ENV = "development";
+  Object.assign(process.env, { NODE_ENV: "development" });
   process.env.ENCRYPTION_KEY = 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
   process.env.SQLITE_PATH = ':memory:';
 
@@ -56,6 +57,7 @@ describe('createConnectionAction validation', () => {
       password: '',
       serverUrl: 'https://x',
       capabilities: [CAPABILITY.CONFLICT],
+      isPrimary: false,
     });
     expect(result.success).toBe(false);
     expect(result.error).toMatch('Username is required');
@@ -69,6 +71,7 @@ describe('createConnectionAction validation', () => {
       username: 'u',
       password: 'p',
       capabilities: [CAPABILITY.CONFLICT],
+      isPrimary: false,
     });
     expect(result.success).toBe(false);
     expect(result.error).toMatch('Server URL is required');
@@ -85,6 +88,7 @@ describe('createConnectionAction validation', () => {
       clientSecret: '',
       tokenUrl: '',
       capabilities: [CAPABILITY.CONFLICT],
+      isPrimary: false,
     });
     expect(result.success).toBe(false);
     expect(result.error).toMatch('All OAuth fields are required');
@@ -101,6 +105,7 @@ describe('createConnectionAction validation', () => {
       clientSecret: 's',
       tokenUrl: 'https://token',
       capabilities: [CAPABILITY.CONFLICT],
+      isPrimary: false,
     });
     expect(res.success).toBe(true);
     const created = await integrations.listCalendarIntegrations();
@@ -115,6 +120,7 @@ describe('createConnectionAction validation', () => {
       username: 'user',
       password: 'pass',
       capabilities: [CAPABILITY.CONFLICT],
+      isPrimary: false,
     });
     expect(res.success).toBe(true);
     const [integration] = await integrations.listCalendarIntegrations();

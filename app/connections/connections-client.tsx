@@ -38,10 +38,8 @@ import {
   updateConnectionAction,
   listCalendarsAction,
   type CalendarOption,
-  type BasicAuthFormData,
   type ConnectionFormData,
   type ConnectionListItem,
-  type OAuthFormData,
   type ProviderType,
 } from "./actions";
 import ProviderSelect from "./provider-select";
