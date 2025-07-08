@@ -9,7 +9,7 @@ function initDb() {
 
   // Create database connection
   const sqlite = new Database("scheduler.db");
-  const db = drizzle(sqlite, { schema });
+  const db = drizzle(sqlite);
 
   try {
     createTables(db);
