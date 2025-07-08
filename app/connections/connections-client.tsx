@@ -19,6 +19,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -29,6 +36,8 @@ import {
   setPrimaryConnectionAction,
   testConnectionAction,
   updateConnectionAction,
+  listCalendarsAction,
+  type CalendarOption,
   type BasicAuthFormData,
   type ConnectionFormData,
   type ConnectionListItem,
@@ -61,6 +70,7 @@ export default function ConnectionsClient({
     success?: boolean;
     message?: string;
   }>({ testing: false });
+  const [calendars, setCalendars] = useState<CalendarOption[]>([]);
 
   type FormValues = ConnectionFormValues;
   const {
@@ -106,6 +116,12 @@ export default function ConnectionsClient({
           };
 
     const result = await testConnectionAction(values.provider, testData);
+    if (result.success) {
+      const calRes = await listCalendarsAction(values.provider, testData);
+      if (calRes.success) {
+        setCalendars(calRes.data ?? []);
+      }
+    }
     setTestStatus({
       testing: false,
       success: result.success,
@@ -218,12 +234,14 @@ export default function ConnectionsClient({
     });
     setIsFormOpen(true);
     setTestStatus({ testing: false });
+    setCalendars([]);
   };
 
   const resetForm = () => {
     form.reset();
     setEditingConnection(null);
     setTestStatus({ testing: false });
+    setCalendars([]);
   };
 
   return (
@@ -342,16 +360,38 @@ export default function ConnectionsClient({
                           name="calendarUrl"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Calendar URL (Optional)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="url"
-                                  placeholder="Leave empty to auto-discover"
-                                  {...field}
-                                />
-                              </FormControl>
+                              <FormLabel>Calendar</FormLabel>
+                              {calendars.length > 0 ? (
+                                <Select
+                                  value={field.value}
+                                  onValueChange={field.onChange}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select a calendar" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {calendars.map((c) => (
+                                      <SelectItem key={c.url} value={c.url}>
+                                        {c.displayName}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <FormControl>
+                                  <Input
+                                    type="url"
+                                    placeholder="Leave empty to auto-discover"
+                                    {...field}
+                                  />
+                                </FormControl>
+                              )}
                               <FormDescription>
-                                Specify a specific calendar URL if needed
+                                {calendars.length > 0
+                                  ? "Choose which calendar to use"
+                                  : "Specify a specific calendar URL if needed"}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
