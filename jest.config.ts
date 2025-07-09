@@ -26,7 +26,7 @@ const config: JestConfigWithTsJest = {
 
   testEnvironment: "node",
   testMatch: ["**/__tests__/**/*.test.ts"],
-  setupFiles: ["<rootDir>/__tests__/setupEnv.ts"],
+  setupFilesAfterEnv: ["<rootDir>/test/setupEnv.ts"],
   roots: ["<rootDir>"],
   modulePaths: [compilerOptions.baseUrl],
   moduleNameMapper: {

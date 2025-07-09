@@ -6,7 +6,7 @@ import {
 } from "@/schemas/calendar-event";
 import { DEFAULT_TIMEZONE, ICAL_PROD_ID } from "@/types/constants";
 import { formatISO, parseISO } from "date-fns";
-import { type DAVClient } from "tsdav";
+import { type createDAVClient } from "tsdav";
 import ical from "ical-generator";
 import { v4 as uuid } from "uuid";
 
@@ -48,7 +48,10 @@ function parseVEventDates(vevent: Record<string, unknown>) {
 }
 
 // Factory function to create provider-specific functions
-export function createCalDavProvider(client: DAVClient, calendarUrl: string) {
+export function createCalDavProvider(
+  client: Awaited<ReturnType<typeof createDAVClient>>,
+  calendarUrl: string,
+) {
   /**
    * Fetch busy time ranges from the calendar
    */

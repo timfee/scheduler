@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { createDAVClient } from 'tsdav';
 
-let fetchCalendarOptions: typeof import('@/lib/db/integrations').fetchCalendarOptions;
+let fetchCalendarOptions: typeof import('@/infrastructure/database/integrations').fetchCalendarOptions;
 
 beforeAll(async () => {
   jest.resetModules();
@@ -10,7 +10,7 @@ beforeAll(async () => {
     'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
   process.env.SQLITE_PATH = ':memory:';
 
-  ({ fetchCalendarOptions } = await import('@/lib/db/integrations'));
+  ({ fetchCalendarOptions } = await import('@/infrastructure/database/integrations'));
 });
 
 describe('fetchCalendarOptions', () => {
@@ -21,7 +21,7 @@ describe('fetchCalendarOptions', () => {
           { url: 'https://a', displayName: 'A' },
           { url: 'https://b', displayName: 'B' },
         ]),
-    } as DavClient;
+    } as unknown as Awaited<ReturnType<typeof createDAVClient>>;
 
     const result = await fetchCalendarOptions(client);
     expect(result).toEqual([

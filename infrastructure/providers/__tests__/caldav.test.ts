@@ -4,7 +4,7 @@
 import { jest } from '@jest/globals';
 import { createCalDavProvider } from '@/infrastructure/providers/caldav';
 import { ICAL_PROD_ID } from '@/types/constants';
-import { type DAVClient } from 'tsdav';
+import { type createDAVClient } from 'tsdav';
 
 const client = {
   createCalendarObject: jest
@@ -14,7 +14,7 @@ const client = {
   fetchCalendarObjects: jest
     .fn<() => Promise<unknown[]>>()
     .mockResolvedValue([]),
-} as unknown as DAVClient;
+} as unknown as Awaited<ReturnType<typeof createDAVClient>>;
 
 describe('CalDav provider', () => {
   it('generates iCal event using ical-generator', async () => {

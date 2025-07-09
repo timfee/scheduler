@@ -3,16 +3,16 @@
 import { jest } from '@jest/globals';
 import { createTestDb, cleanupTestDb } from './helpers/db';
 import { calendarIntegrations } from '@/infrastructure/database/schema';
-import { type CalendarCapability } from '../types/constants';
-import { type OAuthConfig } from '../infrastructure/database/integrations';
+import { type CalendarCapability } from '../../../types/constants';
+import { type OAuthConfig } from '../integrations';
 
-let createCalendarIntegration: typeof import('../infrastructure/database/integrations').createCalendarIntegration;
-let updateCalendarIntegration: typeof import('../infrastructure/database/integrations').updateCalendarIntegration;
-let listCalendarIntegrations: typeof import('../infrastructure/database/integrations').listCalendarIntegrations;
-let getCalendarIntegration: typeof import('../infrastructure/database/integrations').getCalendarIntegration;
-let getPrimaryCalendarIntegration: typeof import('../infrastructure/database/integrations').getPrimaryCalendarIntegration;
-let getCalendarIntegrationsByCapability: typeof import('../infrastructure/database/integrations').getCalendarIntegrationsByCapability;
-let deleteCalendarIntegration: typeof import('../infrastructure/database/integrations').deleteCalendarIntegration;
+let createCalendarIntegration: typeof import('../integrations').createCalendarIntegration;
+let updateCalendarIntegration: typeof import('../integrations').updateCalendarIntegration;
+let listCalendarIntegrations: typeof import('../integrations').listCalendarIntegrations;
+let getCalendarIntegration: typeof import('../integrations').getCalendarIntegration;
+let getPrimaryCalendarIntegration: typeof import('../integrations').getPrimaryCalendarIntegration;
+let getCalendarIntegrationsByCapability: typeof import('../integrations').getCalendarIntegrationsByCapability;
+let deleteCalendarIntegration: typeof import('../integrations').deleteCalendarIntegration;
 let db: ReturnType<typeof createTestDb>['db'];
 let sqlite: ReturnType<typeof createTestDb>['sqlite'];
 
@@ -27,11 +27,11 @@ beforeAll(async () => {
 
   // Provide the test database to integration helpers for ESM modules
   (jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
-    '../infrastructure/database',
+    '@/infrastructure/database',
     () => ({ db }),
   );
 
-  const integrations = await import('../infrastructure/database/integrations');
+  const integrations = await import('../integrations');
   createCalendarIntegration = integrations.createCalendarIntegration;
   updateCalendarIntegration = integrations.updateCalendarIntegration;
   listCalendarIntegrations = integrations.listCalendarIntegrations;

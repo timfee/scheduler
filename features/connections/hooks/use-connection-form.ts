@@ -7,7 +7,6 @@ import {
   connectionFormSchema,
   type ConnectionFormValues,
 } from "../schemas/connection";
-import { type CalendarCapability } from "@/types/constants";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   apple: "Basic",
@@ -42,7 +41,7 @@ export function useConnectionForm(): UseConnectionFormReturn {
       clientId: "",
       clientSecret: "",
       tokenUrl: "https://accounts.google.com/o/oauth2/token",
-      capabilities: [] as CalendarCapability[],
+      capabilities: [],
       isPrimary: false,
     },
   });
