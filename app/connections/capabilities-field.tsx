@@ -42,7 +42,7 @@ export default function CapabilitiesField({ control }: CapabilitiesFieldProps) {
                     onCheckedChange={(checked) => {
                       const updated = checked
                         ? [...field.value, CAPABILITY.CONFLICT]
-                        : field.value?.filter((v) => v !== CAPABILITY.CONFLICT);
+                        : field.value?.filter((v: string) => v !== CAPABILITY.CONFLICT);
                       field.onChange(updated);
                     }}
                   />
@@ -65,7 +65,7 @@ export default function CapabilitiesField({ control }: CapabilitiesFieldProps) {
                     onCheckedChange={(checked) => {
                       const updated = checked
                         ? [...field.value, CAPABILITY.AVAILABILITY]
-                        : field.value?.filter((v) => v !== CAPABILITY.AVAILABILITY);
+                        : field.value?.filter((v: string) => v !== CAPABILITY.AVAILABILITY);
                       field.onChange(updated);
                     }}
                   />
@@ -90,7 +90,7 @@ export default function CapabilitiesField({ control }: CapabilitiesFieldProps) {
                     onCheckedChange={(checked) => {
                       const updated = checked
                         ? [...field.value, CAPABILITY.BOOKING]
-                        : field.value?.filter((v) => v !== CAPABILITY.BOOKING);
+                        : field.value?.filter((v: string) => v !== CAPABILITY.BOOKING);
                       field.onChange(updated);
                     }}
                   />

@@ -1,15 +1,15 @@
 import crypto from "crypto";
 import env from "@/env.config";
-import { Result, ok, err, EncryptionError } from "@/lib/errors";
+import { EncryptionError } from "@/lib/errors";
 
 function validateEncryptionKey(key: string): boolean {
   return /^[0-9A-Fa-f]{64}$/.test(key);
 }
 
-export function encrypt(text: string): Result<string, EncryptionError> {
+export function encrypt(text: string): string {
   try {
     if (!validateEncryptionKey(env.ENCRYPTION_KEY)) {
-      return err(new EncryptionError("Invalid encryption key format", "INVALID_KEY"));
+      throw new EncryptionError("Invalid encryption key format", "INVALID_KEY");
     }
 
     const iv = crypto.randomBytes(16);
@@ -32,22 +32,23 @@ export function encrypt(text: string): Result<string, EncryptionError> {
       encrypted.toString("hex"),
     ].join(":");
 
-    return ok(result);
+    return result;
   } catch (error) {
-    return err<EncryptionError>(
-      new EncryptionError(
-        error instanceof Error ? error.message : "Encryption failed",
-        "ENCRYPT_FAILED",
-      ),
-    ) as Result<string, EncryptionError>;
+    throw new EncryptionError(
+      error instanceof Error ? error.message : "Encryption failed",
+      "ENCRYPT_FAILED",
+    );
   }
 }
 
-export function decrypt(encryptedText: string): Result<string, EncryptionError> {
+export function decrypt(encryptedText: string): string {
   try {
     const parts = encryptedText.split(":");
     if (parts.length !== 3) {
-      return err(new EncryptionError("Invalid encrypted data format", "DECRYPT_FAILED"));
+      throw new EncryptionError(
+        "Invalid encrypted data format",
+        "DECRYPT_FAILED",
+      );
     }
 
     const [ivHex, authTagHex, encrypted] = parts;
@@ -65,13 +66,11 @@ export function decrypt(encryptedText: string): Result<string, EncryptionError> 
       decipher.final(),
     ]);
 
-    return ok(decrypted.toString("utf8"));
+    return decrypted.toString("utf8");
   } catch (error) {
-    return err<EncryptionError>(
-      new EncryptionError(
-        error instanceof Error ? error.message : "Decryption failed",
-        "DECRYPT_FAILED",
-      ),
-    ) as Result<string, EncryptionError>;
+    throw new EncryptionError(
+      error instanceof Error ? error.message : "Decryption failed",
+      "DECRYPT_FAILED",
+    );
   }
 }

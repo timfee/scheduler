@@ -1,4 +1,6 @@
-import { describe, beforeAll, beforeEach, afterAll, it, expect } from '@jest/globals';
+/* eslint-disable @typescript-eslint/no-var-requires */
+// Use Jest globals for lifecycle hooks and import `jest` for mocking
+import { jest } from '@jest/globals';
 import { createTestDb, cleanupTestDb } from './helpers/db';
 import { calendarIntegrations } from '@/lib/db/schema';
 import { type CalendarCapability } from '../types/constants';
@@ -23,6 +25,12 @@ beforeAll(async () => {
   db = testDb.db;
   sqlite = testDb.sqlite;
 
+  // Provide the test database to integration helpers for ESM modules
+  (jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
+    '../lib/db',
+    () => ({ db }),
+  );
+
   const integrations = await import('../lib/db/integrations');
   createCalendarIntegration = integrations.createCalendarIntegration;
   updateCalendarIntegration = integrations.updateCalendarIntegration;
@@ -35,9 +43,13 @@ beforeAll(async () => {
 
 afterAll(() => {
   cleanupTestDb(sqlite);
+  jest.resetModules();
 });
 
 beforeEach(() => {
+  jest.restoreAllMocks();
+  // Reset table for each test
+  // eslint-disable-next-line drizzle/enforce-delete-with-where
   db.delete(calendarIntegrations).run();
 });
 
@@ -164,7 +176,7 @@ it('deletes integration', async () => {
 });
 
 it('filters by capability', async () => {
-  const a = await createCalendarIntegration({
+  await createCalendarIntegration({
     provider: 'google',
     displayName: 'A',
     config: {

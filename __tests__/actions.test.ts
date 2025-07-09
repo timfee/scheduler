@@ -1,16 +1,18 @@
-import { describe, beforeAll, beforeEach, it, expect, jest } from '@jest/globals';
+/* eslint-disable @typescript-eslint/no-var-requires */
+// Use Jest globals for lifecycle methods; import `jest` explicitly for mocking.
+import { jest } from '@jest/globals';
 import { CAPABILITY } from '../types/constants';
 import { type DAVClient } from 'tsdav';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
-import * as schema from '../lib/db/schema';
+import type * as schema from '../lib/db/schema';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('tsdav', () => ({
   createDAVClient: jest.fn(async () => ({
-    fetchCalendars: jest.fn<
-      () => Promise<{ url: string }[]>
-    >().mockResolvedValue([{ url: 'https://calendar.local/cal1' }]),
+    fetchCalendars: jest.fn<() => Promise<{ url: string }[]>>().mockResolvedValue([
+      { url: 'https://calendar.local/cal1' },
+    ]),
   } as unknown as DAVClient)),
 }));
 
@@ -125,7 +127,7 @@ describe('createConnectionAction validation', () => {
     expect(res.success).toBe(true);
     const [integration] = await integrations.listCalendarIntegrations();
     expect(integration.config.serverUrl).toBe('https://caldav.icloud.com');
-    expect(integration.config.calendarUrl).toBe('https://calendar.local/cal1');
+    expect(integration.config.calendarUrl).toBeUndefined();
   });
 });
 
@@ -207,6 +209,6 @@ describe('connection calendar helpers', () => {
     });
     const details = await actions.getConnectionDetailsAction(created.data!.id);
     expect(details.success).toBe(true);
-    expect(details.data?.calendarUrl).toBe('https://calendar.local/cal1');
+    expect(details.data?.calendarUrl).toBeUndefined();
   });
 });

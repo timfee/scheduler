@@ -1,16 +1,18 @@
 import { type CalendarIntegrationConfig, type BasicAuthConfig, type OAuthConfig } from "./integrations";
-import { type ConnectionFormValues } from "@/schemas/connection";
+import { type ConnectionConfigValues } from "@/schemas/connection";
 
 /**
  * Build a CalendarIntegrationConfig from validated form values.
  */
-export function buildConfigFromValues(values: ConnectionFormValues): CalendarIntegrationConfig {
+export function buildConfigFromValues(values: ConnectionConfigValues): CalendarIntegrationConfig {
   if (values.authMethod === "Basic") {
     const cfg: BasicAuthConfig = {
       authMethod: "Basic",
       username: values.username,
       password: values.password!,
       serverUrl: values.serverUrl ?? "",
+      calendarUrl: values.calendarUrl,
+      capabilities: values.capabilities,
     };
     return cfg;
   }
@@ -23,6 +25,8 @@ export function buildConfigFromValues(values: ConnectionFormValues): CalendarInt
     clientSecret: values.clientSecret!,
     tokenUrl: values.tokenUrl!,
     serverUrl: values.serverUrl ?? "",
+    calendarUrl: values.calendarUrl,
+    capabilities: values.capabilities,
   };
   return cfg;
 }
@@ -34,11 +38,11 @@ export function buildConfigFromValues(values: ConnectionFormValues): CalendarInt
  */
 export function mergeConfig(
   existing: CalendarIntegrationConfig,
-  updates: Record<string, unknown>,
+  updates: Partial<ConnectionConfigValues>,
 ): { config: CalendarIntegrationConfig; credentialsChanged: boolean } {
   let credentialsChanged = false;
   const result: CalendarIntegrationConfig = { ...existing } as CalendarIntegrationConfig;
-  const u = updates as any;
+  const u: Partial<ConnectionConfigValues> = updates;
 
   if (existing.authMethod === "Basic") {
     if (u.username !== undefined) {
@@ -52,6 +56,9 @@ export function mergeConfig(
     if (u.serverUrl !== undefined) {
       credentialsChanged ||= u.serverUrl !== existing.serverUrl;
       result.serverUrl = u.serverUrl;
+    }
+    if (u.calendarUrl !== undefined) {
+      result.calendarUrl = u.calendarUrl;
     }
   } else {
     if (u.username !== undefined) {
@@ -77,6 +84,13 @@ export function mergeConfig(
       credentialsChanged ||= u.serverUrl !== existing.serverUrl;
       result.serverUrl = u.serverUrl;
     }
+    if (u.calendarUrl !== undefined) {
+      result.calendarUrl = u.calendarUrl;
+    }
+  }
+
+  if (u.capabilities !== undefined) {
+    result.capabilities = u.capabilities;
   }
 
   return { config: result, credentialsChanged };

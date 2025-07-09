@@ -34,5 +34,5 @@ export function validateEnv(): Env {
 
 // Helper to get validated env
 export function getEnv(): Env {
-  return cachedEnv || validateEnv();
+  return cachedEnv ?? validateEnv();
 }
