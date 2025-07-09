@@ -31,12 +31,12 @@
   - [x] Split `ConnectionsClient` into smaller pieces
   - [x] Add loading and suspense boundaries
 
-- [ ] **Phase 8: Testing Structure**
+- [x] **Phase 8: Testing Structure**
 - [x] Co-locate tests with features
-  - [ ] Use MSW for API mocks
+  - [x] Use MSW for API mocks
 
 ## Chunks of Related Work
 - [x] Chunk 1: Core Restructuring (Phases 1,2,4)
 - [x] Chunk 2: State and Error Management (Phases 3,5)
 - [x] Chunk 3: Component and Type Improvements (Phases 6,7)
-- [ ] Chunk 4: Testing and Quality (Phase 8)
+- [x] Chunk 4: Testing and Quality (Phase 8)
