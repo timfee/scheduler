@@ -21,7 +21,7 @@ describe('fetchCalendarOptions', () => {
           { url: 'https://a', displayName: 'A' },
           { url: 'https://b', displayName: 'B' },
         ]),
-    } as unknown as Awaited<ReturnType<typeof createDAVClient>>;
+    } as DavClient;
 
     const result = await fetchCalendarOptions(client);
     expect(result).toEqual([
