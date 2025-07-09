@@ -10,10 +10,11 @@ import {
   updateCalendarIntegration,
   createDAVClientFromConfig,
   createDAVClientFromIntegration,
-  type CalendarIntegrationConfig,
+  fetchCalendarOptions,
   type CreateCalendarIntegrationInput,
   type ProviderType,
   type UpdateCalendarIntegrationInput,
+  type CalendarOption,
 } from "@/lib/db/integrations";
 import {
   buildConfigFromValues,
@@ -28,6 +29,7 @@ import { type CalendarCapability } from "@/types/constants";
 import { revalidatePath } from "next/cache";
 
 export type { ProviderType };
+export type { CalendarOption };
 
 export type ConnectionFormData = ConnectionFormValues;
 
@@ -37,10 +39,6 @@ export interface ConnectionActionResult<T = undefined> {
   data?: T;
 }
 
-export interface CalendarOption {
-  url: string;
-  displayName: string;
-}
 
 export interface ConnectionListItem {
   id: string;
@@ -69,7 +67,7 @@ export async function createConnectionAction(
     const config = await prepareConfig(values.provider, rawConfig);
 
     // Test the connection first
-    const testResult = await testCalendarConnection(values.provider, config);
+    const testResult = await testCalendarConnection(config);
     if (!testResult.success) {
       return {
         success: false,
@@ -158,10 +156,7 @@ export async function updateConnectionAction(
       );
 
       if (credentialsChanged) {
-        const testResult = await testCalendarConnection(
-          existing.provider as ProviderType,
-          prepared,
-        );
+        const testResult = await testCalendarConnection(prepared);
         if (!testResult.success) {
           return {
             success: false,
@@ -279,10 +274,10 @@ export async function testConnectionAction(
       return { success: false, error: parsed.error.errors[0]?.message };
     }
 
-    const raw = buildConfigFromValues(parsed.data as ConnectionFormValues);
+    const raw = buildConfigFromValues(parsed.data);
     const testConfig = await prepareConfig(provider, raw);
 
-    const result = await testCalendarConnection(provider, testConfig);
+    const result = await testCalendarConnection(testConfig);
 
     return {
       success: result.success,
@@ -314,19 +309,15 @@ export async function listCalendarsAction(
       return { success: false, error: parsed.error.errors[0]?.message };
     }
 
-    const raw = buildConfigFromValues(parsed.data as ConnectionFormValues);
+    const raw = buildConfigFromValues(parsed.data);
     const prepared = await prepareConfig(provider, raw);
 
     const client = await createDAVClientFromConfig(prepared);
-    const calendars = await client.fetchCalendars();
+    const calendars = await fetchCalendarOptions(client);
 
     return {
       success: true,
-      data: calendars.map((c) => ({
-        url: c.url,
-        displayName:
-          typeof c.displayName === "string" ? c.displayName : c.url,
-      })),
+      data: calendars,
     };
   } catch (error) {
     return {
@@ -378,14 +369,11 @@ export async function listCalendarsForConnectionAction(
     }
 
     const client = await createDAVClientFromIntegration(integration);
-    const calendars = await client.fetchCalendars();
+    const calendars = await fetchCalendarOptions(client);
 
     return {
       success: true,
-      data: calendars.map((c) => ({
-        url: c.url,
-        displayName: typeof c.displayName === "string" ? c.displayName : c.url,
-      })),
+      data: calendars,
     };
   } catch (error) {
     return {

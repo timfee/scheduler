@@ -31,19 +31,15 @@ export async function addCalendarAction(
       capability,
     });
 
-    const result = await addCalendarToIntegration(
+    const calendar = await addCalendarToIntegration(
       validated.integrationId,
       validated.calendarUrl,
       validated.displayName,
       validated.capability as CalendarCapability,
     );
 
-    if (!result.success) {
-      return { success: false, error: result.error.message };
-    }
-
     revalidatePath("/connections");
-    return { success: true, data: result.data };
+    return { success: true, data: calendar };
   } catch (error) {
     return {
       success: false,
@@ -57,11 +53,7 @@ export async function updateCalendarCapabilityAction(
   capability: CalendarCapability,
 ) {
   try {
-    const result = await updateCalendarCapability(calendarId, capability);
-
-    if (!result.success) {
-      return { success: false, error: result.error.message };
-    }
+    await updateCalendarCapability(calendarId, capability);
 
     revalidatePath("/connections");
     return { success: true };
@@ -75,10 +67,10 @@ export async function updateCalendarCapabilityAction(
 
 export async function removeCalendarAction(calendarId: string) {
   try {
-    const result = await removeCalendar(calendarId);
+    const deleted = await removeCalendar(calendarId);
 
-    if (!result.success) {
-      return { success: false, error: result.error.message };
+    if (!deleted) {
+      return { success: false, error: "Failed to remove calendar" };
     }
 
     revalidatePath("/connections");

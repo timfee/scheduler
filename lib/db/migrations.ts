@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-export function createTables(db: BetterSQLite3Database) {
+export function createTables<T extends Record<string, unknown>>(db: BetterSQLite3Database<T>) {
   // Create all tables
   db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
@@ -9,6 +9,7 @@ export function createTables(db: BetterSQLite3Database) {
       provider TEXT NOT NULL,
       display_name TEXT NOT NULL,
       encrypted_config TEXT NOT NULL,
+      is_primary INTEGER DEFAULT 0 NOT NULL,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     )
@@ -49,7 +50,7 @@ export function createTables(db: BetterSQLite3Database) {
   db.run(sql`CREATE INDEX IF NOT EXISTS idx_api_cache_expires_at ON api_cache(expires_at)`);
 }
 
-export function dropTables(db: BetterSQLite3Database) {
+export function dropTables<T extends Record<string, unknown>>(db: BetterSQLite3Database<T>) {
   db.run(sql`DROP TABLE IF EXISTS api_cache`);
   db.run(sql`DROP TABLE IF EXISTS preferences`);
   db.run(sql`DROP TABLE IF EXISTS calendars`);

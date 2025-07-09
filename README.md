@@ -42,3 +42,18 @@ Then open [http://localhost:3000](http://localhost:3000).
 | `pnpm lint` | Run ESLint |
 | `pnpm test` | Execute tests |
 | `pnpm format` | Format code with Prettier |
+
+## Architecture
+
+- **app/**: Next.js server and client components, plus API routes.
+- **lib/**: Database utilities, encryption, and shared helpers.
+- **providers/**: Calendar provider implementations.
+- **schemas/** and **types/**: Zod schemas and shared TypeScript types.
+- **test/** and **__tests__/**: Unit and integration tests.
+
+Server actions return `ConnectionActionResult` objects with `success`, `data`, and `error` fields rather than throwing. Under the hood, low level helpers may throw custom errors from `lib/errors.ts`; actions catch these and return user‑friendly messages.
+
+## Error handling
+
+Errors related to calendar connections or encryption extend `CalendarConnectionError` or `EncryptionError`. These classes include a `code` field to allow mapping to descriptive messages. When an action fails, the error is caught and converted to a message for the UI using `mapErrorToUserMessage`.
+

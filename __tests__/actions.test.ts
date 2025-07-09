@@ -1,16 +1,18 @@
-import { describe, beforeAll, beforeEach, it, expect, jest } from '@jest/globals';
-import { CAPABILITY } from '../types/constants';
+/* eslint-disable @typescript-eslint/no-var-requires */
+// Use Jest globals for lifecycle methods; import `jest` explicitly for mocking.
+import { jest } from '@jest/globals';
+import { CALENDAR_CAPABILITY } from '../types/constants';
 import { type DAVClient } from 'tsdav';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
-import * as schema from '../lib/db/schema';
+import type * as schema from '../lib/db/schema';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('tsdav', () => ({
   createDAVClient: jest.fn(async () => ({
-    fetchCalendars: jest.fn<
-      () => Promise<{ url: string }[]>
-    >().mockResolvedValue([{ url: 'https://calendar.local/cal1' }]),
+    fetchCalendars: jest.fn<() => Promise<{ url: string }[]>>().mockResolvedValue([
+      { url: 'https://calendar.local/cal1' },
+    ]),
   } as unknown as DAVClient)),
 }));
 
@@ -56,7 +58,7 @@ describe('createConnectionAction validation', () => {
       username: '',
       password: '',
       serverUrl: 'https://x',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(result.success).toBe(false);
@@ -70,7 +72,7 @@ describe('createConnectionAction validation', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(result.success).toBe(false);
@@ -87,7 +89,7 @@ describe('createConnectionAction validation', () => {
       clientId: '',
       clientSecret: '',
       tokenUrl: '',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(result.success).toBe(false);
@@ -104,7 +106,7 @@ describe('createConnectionAction validation', () => {
       clientId: 'c',
       clientSecret: 's',
       tokenUrl: 'https://token',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(res.success).toBe(true);
@@ -119,13 +121,13 @@ describe('createConnectionAction validation', () => {
       authMethod: 'Basic',
       username: 'user',
       password: 'pass',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(res.success).toBe(true);
     const [integration] = await integrations.listCalendarIntegrations();
     expect(integration.config.serverUrl).toBe('https://caldav.icloud.com');
-    expect(integration.config.calendarUrl).toBe('https://calendar.local/cal1');
+    expect(integration.config.calendarUrl).toBeUndefined();
   });
 });
 
@@ -143,7 +145,7 @@ describe('testConnectionAction validation', () => {
       authMethod: 'Basic',
       username: '',
       password: '',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
     });
     expect(res.success).toBe(false);
     expect(res.error).toMatch('Username is required');
@@ -157,7 +159,7 @@ describe('testConnectionAction validation', () => {
       clientId: '',
       clientSecret: '',
       tokenUrl: '',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
     });
     expect(res.success).toBe(false);
     expect(res.error).toMatch('All OAuth fields are required');
@@ -168,7 +170,7 @@ describe('testConnectionAction validation', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
     });
     expect(res.success).toBe(true);
   });
@@ -182,7 +184,7 @@ describe('connection calendar helpers', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(created.success).toBe(true);
@@ -202,11 +204,11 @@ describe('connection calendar helpers', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     const details = await actions.getConnectionDetailsAction(created.data!.id);
     expect(details.success).toBe(true);
-    expect(details.data?.calendarUrl).toBe('https://calendar.local/cal1');
+    expect(details.data?.calendarUrl).toBeUndefined();
   });
 });
