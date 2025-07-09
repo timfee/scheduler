@@ -10,6 +10,7 @@ import {
   createDAVClientFromConfig,
   createDAVClientFromIntegration,
   fetchCalendarOptions,
+  isProviderType,
   type CreateCalendarIntegrationInput,
   type ProviderType,
   type UpdateCalendarIntegrationInput,
@@ -125,10 +126,10 @@ export async function updateConnectionAction(
         formData,
       );
 
-      const prepared = await prepareConfig(
-        existing.provider as ProviderType,
-        config,
-      );
+      if (!isProviderType(existing.provider)) {
+        throw new Error("Invalid provider");
+      }
+      const prepared = await prepareConfig(existing.provider, config);
 
       if (credentialsChanged) {
         const testResult = await testCalendarConnection(prepared);

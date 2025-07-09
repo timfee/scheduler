@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // Use Jest globals for lifecycle methods; import `jest` explicitly for mocking.
 import { jest } from '@jest/globals';
-import { CALENDAR_CAPABILITY } from '../types/constants';
+import { CALENDAR_CAPABILITY } from '../../../types/constants';
 import { type DAVClient } from 'tsdav';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
-import type * as schema from '../infrastructure/database/schema';
+import type * as schema from '../../../infrastructure/database/schema';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('tsdav', () => ({
@@ -16,8 +16,8 @@ jest.mock('tsdav', () => ({
   } as unknown as DAVClient)),
 }));
 
-let actions: typeof import('../features/connections/actions/actions');
-let integrations: typeof import('../infrastructure/database/integrations');
+let actions: typeof import('../actions/actions');
+let integrations: typeof import('../../../infrastructure/database/integrations');
 let db: BetterSQLite3Database<typeof schema>;
 // Reuse the `sql` tagged template from drizzle for manual queries
 
@@ -26,7 +26,7 @@ beforeAll(async () => {
   process.env.ENCRYPTION_KEY = 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
   process.env.SQLITE_PATH = ':memory:';
 
-  const dbModule = await import('../infrastructure/database');
+  const dbModule = await import('../../../infrastructure/database');
   db = dbModule.db;
   db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
@@ -40,8 +40,8 @@ beforeAll(async () => {
     )
   `);
 
-  integrations = await import('../infrastructure/database/integrations');
-  actions = await import('../features/connections/actions/actions');
+  integrations = await import('../../../infrastructure/database/integrations');
+  actions = await import('../actions/actions');
 });
 
 beforeEach(() => {

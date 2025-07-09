@@ -27,6 +27,14 @@ const WELL_KNOWN_SERVERS = {
 
 export type ProviderType = keyof typeof WELL_KNOWN_SERVERS;
 
+export const PROVIDER_TYPES: ProviderType[] = Object.keys(
+  WELL_KNOWN_SERVERS,
+) as ProviderType[];
+
+export function isProviderType(value: string): value is ProviderType {
+  return PROVIDER_TYPES.includes(value as ProviderType);
+}
+
 export interface BaseCalendarConfig {
   capabilities: CalendarCapability[]; // ['conflict', 'availability', 'booking']
 }
@@ -88,10 +96,10 @@ export async function prepareConfig(
   config: CalendarIntegrationConfig,
 ): Promise<CalendarIntegrationConfig> {
   try {
-    const resolved = {
+    const resolved: CalendarIntegrationConfig = {
       ...config,
       serverUrl: resolveServerUrl(provider, config.serverUrl),
-    } as CalendarIntegrationConfig;
+    };
 
     // Don't auto-select calendar anymore - let user choose
     return resolved;
@@ -198,13 +206,13 @@ export async function listCalendarIntegrations(): Promise<
   return integrations.map((integration) => {
     let cfg: CalendarIntegrationConfig | Record<string, unknown> = {};
     try {
-      cfg = JSON.parse(decrypt(integration.encryptedConfig)) as Record<string, unknown>;
+      cfg = JSON.parse(decrypt(integration.encryptedConfig)) as CalendarIntegrationConfig;
     } catch {
       cfg = {};
     }
     return {
       ...integration,
-      config: cfg as unknown as CalendarIntegrationConfig,
+      config: cfg as CalendarIntegrationConfig,
     };
   });
 }
@@ -228,10 +236,10 @@ export async function getCalendarIntegration(
   }
 
   try {
-    const cfg = JSON.parse(decrypt(integration.encryptedConfig)) as Record<string, unknown>;
+    const cfg = JSON.parse(decrypt(integration.encryptedConfig)) as CalendarIntegrationConfig;
     return {
       ...integration,
-      config: cfg as unknown as CalendarIntegrationConfig,
+      config: cfg,
     };
   } catch {
     return {
@@ -255,10 +263,10 @@ export async function getPrimaryCalendarIntegration(): Promise<
   }
 
   try {
-    const cfg = JSON.parse(decrypt(integration.encryptedConfig)) as Record<string, unknown>;
+    const cfg = JSON.parse(decrypt(integration.encryptedConfig)) as CalendarIntegrationConfig;
     return {
       ...integration,
-      config: cfg as unknown as CalendarIntegrationConfig,
+      config: cfg,
     };
   } catch {
     return {
@@ -296,9 +304,13 @@ export async function updateCalendarIntegration(
     };
 
     // Ensure server URL is set
-    if (!mergedConfig.serverUrl && existing.provider !== "caldav") {
+    if (
+      !mergedConfig.serverUrl &&
+      existing.provider !== "caldav" &&
+      isProviderType(existing.provider)
+    ) {
       mergedConfig.serverUrl = resolveServerUrl(
-        existing.provider as ProviderType,
+        existing.provider,
         mergedConfig.serverUrl,
       );
     }

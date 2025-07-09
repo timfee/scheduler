@@ -1,32 +1,7 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { CheckCircle2, XCircle } from "lucide-react";
+import ConnectionForm from "./connection-form";
 import { useState, useEffect } from "react";
 
 import {
@@ -41,12 +16,9 @@ import {
   listConnectionsAction,
   type CalendarOption,
   type ConnectionFormData,
-  type ProviderType,
 } from "../actions";
 import { type ConnectionListItem } from "../data";
 import { userMessageFromError } from "@/features/shared/errors";
-import ProviderSelect from "./provider-select";
-import CapabilitiesField from "./capabilities-field";
 import ConnectionsList from "./connections-list";
 import { useConnectionStore } from "../stores/connection-store";
 import {
@@ -175,9 +147,36 @@ export default function ConnectionsClient({
             };
 
       if (editingConnection) {
-        await updateConnectionAction(editingConnection.id, connectionData);
+        const optimistic = {
+          ...editingConnection,
+          ...connectionData,
+          updatedAt: new Date(),
+        };
+        updateConnection(optimistic);
+        try {
+          await updateConnectionAction(editingConnection.id, connectionData);
+        } catch (error) {
+          updateConnection(editingConnection);
+          throw error;
+        }
       } else {
-        await createConnectionAction(connectionData);
+        const tempId = `temp-${Date.now()}`;
+        const optimistic: ConnectionListItem = {
+          id: tempId,
+          provider: connectionData.provider,
+          displayName: connectionData.displayName,
+          isPrimary: connectionData.isPrimary ?? false,
+          capabilities: connectionData.capabilities,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        addConnection(optimistic);
+        try {
+          await createConnectionAction(connectionData);
+        } catch (error) {
+          removeConnection(tempId);
+          throw error;
+        }
       }
       const updated = await listConnectionsAction();
       setConnections(updated);
@@ -193,23 +192,31 @@ export default function ConnectionsClient({
       return;
     }
 
+    const existing = connections.find((c) => c.id === id);
+    if (existing) removeConnection(id);
     try {
       await deleteConnectionAction(id);
-      const updated = await listConnectionsAction();
-      setConnections(updated);
     } catch (error) {
+      if (existing) addConnection(existing);
       alert(userMessageFromError(error, "Failed to delete connection"));
     }
+    const updated = await listConnectionsAction();
+    setConnections(updated);
   };
 
   const handleSetPrimary = async (id: string) => {
+    const prev = [...connections];
+    setConnections(
+      connections.map((c) => ({ ...c, isPrimary: c.id === id })),
+    );
     try {
       await setPrimaryConnectionAction(id);
-      const updated = await listConnectionsAction();
-      setConnections(updated);
     } catch (error) {
+      setConnections(prev);
       alert(userMessageFromError(error, "Failed to set primary connection"));
     }
+    const updated = await listConnectionsAction();
+    setConnections(updated);
   };
 
   const handleEdit = async (connection: ConnectionListItem) => {
@@ -226,9 +233,9 @@ export default function ConnectionsClient({
       const calendarUrl = details.calendarUrl ?? "";
 
       form.reset({
-        provider: connection.provider as ProviderType,
+        provider: connection.provider,
         displayName: connection.displayName,
-        authMethod: PROVIDER_AUTH_METHODS[connection.provider as ProviderType],
+        authMethod: PROVIDER_AUTH_METHODS[connection.provider],
         capabilities: connection.capabilities,
         isPrimary: connection.isPrimary,
         // Reset other fields to defaults
@@ -258,310 +265,23 @@ export default function ConnectionsClient({
 
   return (
     <div className="space-y-6">
-      {/* Add/Edit Form */}
-      {isFormOpen && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {editingConnection ? "Edit Connection" : "Add New Connection"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
-                {/* Provider Selection */}
-                <ProviderSelect
-                  control={form.control}
-                  value={currentProvider}
-                  onChange={handleProviderChange}
-                  disabled={!!editingConnection}
-                />
-
-                {/* Display Name */}
-                <FormField
-                  control={form.control}
-                  name="displayName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Display Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="My Calendar" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        A friendly name for this calendar connection
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Auth-specific fields */}
-                {!editingConnection && (
-                  <>
-                    {/* Basic Auth Fields */}
-                    {currentAuthMethod === "Basic" && (
-                      <>
-                        {needsServerUrl && (
-                          <FormField
-                            control={form.control}
-                            name="serverUrl"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Server URL</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="url"
-                                    placeholder="https://caldav.example.com"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        )}
-
-                        <FormField
-                          control={form.control}
-                          name="username"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Username</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={
-                                    currentProvider === "apple"
-                                      ? "Your Apple ID"
-                                      : "Username"
-                                  }
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Password</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="password"
-                                  placeholder={
-                                    currentProvider === "apple"
-                                      ? "App-specific password"
-                                      : "Password"
-                                  }
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="calendarUrl"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Calendar</FormLabel>
-                              {calendars.length > 0 ? (
-                                <Select
-                                  value={field.value}
-                                  onValueChange={field.onChange}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select a calendar" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {calendars.map((c) => (
-                                      <SelectItem key={c.url} value={c.url}>
-                                        {c.displayName}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <FormControl>
-                                  <Input
-                                    type="url"
-                                    placeholder="Leave empty to auto-discover"
-                                    {...field}
-                                  />
-                                </FormControl>
-                              )}
-                              <FormDescription>
-                                {calendars.length > 0
-                                  ? "Choose which calendar to use"
-                                  : "Specify a specific calendar URL if needed"}
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
-
-                    {/* OAuth Fields */}
-                    {currentAuthMethod === "Oauth" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="username"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email Address</FormLabel>
-                              <FormControl>
-                                <Input type="email" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="clientId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Client ID</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="clientSecret"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Client Secret</FormLabel>
-                              <FormControl>
-                                <Input type="password" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="refreshToken"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Refresh Token</FormLabel>
-                              <FormControl>
-                                <Input type="password" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
-                  </>
-                )}
-
-                {/* Capabilities */}
-                <CapabilitiesField control={form.control} />
-
-                {/* Primary Calendar */}
-                <FormField
-                  control={form.control}
-                  name="isPrimary"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Set as primary calendar</FormLabel>
-                        <FormDescription>
-                          New events will be created in the primary calendar by
-                          default
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Test Connection Status */}
-                {testStatus.message && (
-                  <Alert
-                    variant={testStatus.success ? "default" : "destructive"}
-                  >
-                    {testStatus.success ? (
-                      <CheckCircle2 className="size-4" />
-                    ) : (
-                      <XCircle className="size-4" />
-                    )}
-                    <AlertDescription>{testStatus.message}</AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Root Error Message */}
-                {form.formState.errors.root && (
-                  <Alert variant="destructive">
-                    <XCircle className="size-4" />
-                    <AlertDescription>
-                      {form.formState.errors.root.message}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Form Actions */}
-                <div className="flex gap-2">
-                  {!editingConnection && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleTestConnection}
-                      disabled={
-                        testStatus.testing || form.formState.isSubmitting
-                      }
-                    >
-                      {testStatus.testing ? "Testing..." : "Test Connection"}
-                    </Button>
-                  )}
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting
-                      ? "Saving..."
-                      : editingConnection
-                        ? "Update"
-                        : "Add Connection"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      setIsFormOpen(false);
-                      resetForm();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      )}
+      <ConnectionForm
+        isOpen={isFormOpen}
+        form={form}
+        currentProvider={currentProvider}
+        currentAuthMethod={currentAuthMethod}
+        needsServerUrl={needsServerUrl}
+        editingConnection={editingConnection}
+        calendars={calendars}
+        testStatus={testStatus}
+        onProviderChange={handleProviderChange}
+        onTestConnection={handleTestConnection}
+        onSubmit={onSubmit}
+        onCancel={() => {
+          setIsFormOpen(false);
+          resetForm();
+        }}
+      />
 
       {/* Add Connection Button */}
       {!isFormOpen && (

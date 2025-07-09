@@ -12,37 +12,24 @@ import {
   ConnectionData,
   ConnectionsClient,
 } from "@/features/connections";
+import { Suspense } from "react";
 
-export default async function ConnectionsPage() {
-  let connections = [];
+async function ConnectionsLoader() {
   try {
-    connections = await ConnectionData.getConnections();
+    const connections = await ConnectionData.getConnections();
+    return <ConnectionsClient initialConnections={connections} />;
   } catch {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mx-auto max-w-4xl">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-3xl">Calendar Connections</CardTitle>
-              <CardDescription>
-                Manage your calendar integrations and connections
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Alert variant="destructive">
-                <AlertCircle className="size-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>
-                  {"Failed to load connections"}
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <Alert variant="destructive">
+        <AlertCircle className="size-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{"Failed to load connections"}</AlertDescription>
+      </Alert>
     );
   }
+}
 
+export default function ConnectionsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-4xl">
@@ -55,7 +42,9 @@ export default async function ConnectionsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ConnectionsClient initialConnections={connections} />
+            <Suspense fallback={<p>Loading connections...</p>}>
+              <ConnectionsLoader />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

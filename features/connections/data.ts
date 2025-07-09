@@ -1,9 +1,13 @@
-import { listCalendarIntegrations } from '@/infrastructure/database/integrations';
+import {
+  listCalendarIntegrations,
+  isProviderType,
+  type ProviderType,
+} from '@/infrastructure/database/integrations';
 import { type CalendarCapability } from '@/types/constants';
 
 export interface ConnectionListItem {
   id: string;
-  provider: string;
+  provider: ProviderType;
   displayName: string;
   isPrimary: boolean;
   capabilities: CalendarCapability[];
@@ -15,7 +19,9 @@ export async function getConnections(): Promise<ConnectionListItem[]> {
   const integrations = await listCalendarIntegrations();
   return integrations.map((integration) => ({
     id: integration.id,
-    provider: integration.provider,
+    provider: isProviderType(integration.provider)
+      ? integration.provider
+      : 'caldav',
     displayName: integration.displayName,
     isPrimary: integration.isPrimary,
     capabilities: integration.config.capabilities,

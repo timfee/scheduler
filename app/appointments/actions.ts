@@ -2,7 +2,6 @@
 
 import { getPrimaryCalendarIntegration, createDAVClientFromIntegration } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { type DAVClient } from "tsdav";
 
 export async function listBusyTimesAction(from: string, to: string) {
   const integration = await getPrimaryCalendarIntegration();
@@ -10,7 +9,7 @@ export async function listBusyTimesAction(from: string, to: string) {
 
   const client = await createDAVClientFromIntegration(integration);
   const provider = createCalDavProvider(
-    client as unknown as DAVClient,
+    client,
     integration.config.calendarUrl ?? "",
   );
 

@@ -1,6 +1,13 @@
 import "tsconfig-paths/register";
-import { jest } from "@jest/globals";
+import { jest, beforeAll, afterAll, afterEach } from "@jest/globals";
 import { fetch, ProxyAgent, setGlobalDispatcher } from "undici";
+import { setupServer } from "msw/node";
+
+export const server = setupServer();
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 // Mock Next.js modules
 jest.mock('next/cache', () => ({

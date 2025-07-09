@@ -6,7 +6,7 @@ import {
   updateCalendarCapability,
   removeCalendar,
 } from "@/infrastructure/database/integrations";
-import { type CalendarCapability } from "@/types/constants";
+import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/types/constants";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
 
@@ -14,7 +14,11 @@ const addCalendarSchema = z.object({
   integrationId: z.string().uuid(),
   calendarUrl: z.string().url(),
   displayName: z.string().min(1),
-  capability: z.enum(["booking", "blocking_available", "blocking_busy"]),
+  capability: z.enum([
+    CALENDAR_CAPABILITY.BOOKING,
+    CALENDAR_CAPABILITY.BLOCKING_AVAILABLE,
+    CALENDAR_CAPABILITY.BLOCKING_BUSY,
+  ]),
 });
 
 export async function addCalendarAction(
@@ -35,7 +39,7 @@ export async function addCalendarAction(
       validated.integrationId,
       validated.calendarUrl,
       validated.displayName,
-      validated.capability as CalendarCapability,
+      validated.capability,
     );
 
     revalidatePath("/connections");
