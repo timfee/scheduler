@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CAPABILITY } from "@/types/constants";
+import { CALENDAR_CAPABILITY } from "@/types/constants";
 import {
   Card,
   CardContent,
@@ -69,13 +69,13 @@ export default function ConnectionsList({
             <div>
               <p className="mb-2 text-sm font-medium">Capabilities:</p>
               <div className="flex flex-wrap gap-2">
-                {connection.capabilities.includes(CAPABILITY.CONFLICT) && (
+                {connection.capabilities.includes(CALENDAR_CAPABILITY.BLOCKING_BUSY) && (
                   <Badge variant="secondary">Conflict Checking</Badge>
                 )}
-                {connection.capabilities.includes(CAPABILITY.AVAILABILITY) && (
+                {connection.capabilities.includes(CALENDAR_CAPABILITY.BLOCKING_AVAILABLE) && (
                   <Badge variant="secondary">Availability Checking</Badge>
                 )}
-                {connection.capabilities.includes(CAPABILITY.BOOKING) && (
+                {connection.capabilities.includes(CALENDAR_CAPABILITY.BOOKING) && (
                   <Badge variant="secondary">Booking</Badge>
                 )}
               </div>

@@ -11,7 +11,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { type Control } from "react-hook-form";
 
-import { CAPABILITY } from "@/types/constants";
+import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/types/constants";
 import { type ConnectionFormValues } from "./use-connection-form";
 
 interface CapabilitiesFieldProps {
@@ -38,11 +38,11 @@ export default function CapabilitiesField({ control }: CapabilitiesFieldProps) {
               <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                 <FormControl>
                   <Checkbox
-                    checked={field.value?.includes(CAPABILITY.CONFLICT)}
+                    checked={field.value?.includes(CALENDAR_CAPABILITY.BLOCKING_BUSY)}
                     onCheckedChange={(checked) => {
                       const updated = checked
-                        ? [...field.value, CAPABILITY.CONFLICT]
-                        : field.value?.filter((v: string) => v !== CAPABILITY.CONFLICT);
+                        ? [...field.value, CALENDAR_CAPABILITY.BLOCKING_BUSY]
+                        : field.value?.filter((v: CalendarCapability) => v !== CALENDAR_CAPABILITY.BLOCKING_BUSY);
                       field.onChange(updated);
                     }}
                   />
@@ -61,11 +61,11 @@ export default function CapabilitiesField({ control }: CapabilitiesFieldProps) {
               <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                 <FormControl>
                   <Checkbox
-                    checked={field.value?.includes(CAPABILITY.AVAILABILITY)}
+                    checked={field.value?.includes(CALENDAR_CAPABILITY.BLOCKING_AVAILABLE)}
                     onCheckedChange={(checked) => {
                       const updated = checked
-                        ? [...field.value, CAPABILITY.AVAILABILITY]
-                        : field.value?.filter((v: string) => v !== CAPABILITY.AVAILABILITY);
+                        ? [...field.value, CALENDAR_CAPABILITY.BLOCKING_AVAILABLE]
+                        : field.value?.filter((v: CalendarCapability) => v !== CALENDAR_CAPABILITY.BLOCKING_AVAILABLE);
                       field.onChange(updated);
                     }}
                   />
@@ -86,11 +86,11 @@ export default function CapabilitiesField({ control }: CapabilitiesFieldProps) {
               <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                 <FormControl>
                   <Checkbox
-                    checked={field.value?.includes(CAPABILITY.BOOKING)}
+                    checked={field.value?.includes(CALENDAR_CAPABILITY.BOOKING)}
                     onCheckedChange={(checked) => {
                       const updated = checked
-                        ? [...field.value, CAPABILITY.BOOKING]
-                        : field.value?.filter((v: string) => v !== CAPABILITY.BOOKING);
+                        ? [...field.value, CALENDAR_CAPABILITY.BOOKING]
+                        : field.value?.filter((v: CalendarCapability) => v !== CALENDAR_CAPABILITY.BOOKING);
                       field.onChange(updated);
                     }}
                   />

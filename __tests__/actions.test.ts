@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // Use Jest globals for lifecycle methods; import `jest` explicitly for mocking.
 import { jest } from '@jest/globals';
-import { CAPABILITY } from '../types/constants';
+import { CALENDAR_CAPABILITY } from '../types/constants';
 import { type DAVClient } from 'tsdav';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
@@ -58,7 +58,7 @@ describe('createConnectionAction validation', () => {
       username: '',
       password: '',
       serverUrl: 'https://x',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(result.success).toBe(false);
@@ -72,7 +72,7 @@ describe('createConnectionAction validation', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(result.success).toBe(false);
@@ -89,7 +89,7 @@ describe('createConnectionAction validation', () => {
       clientId: '',
       clientSecret: '',
       tokenUrl: '',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(result.success).toBe(false);
@@ -106,7 +106,7 @@ describe('createConnectionAction validation', () => {
       clientId: 'c',
       clientSecret: 's',
       tokenUrl: 'https://token',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(res.success).toBe(true);
@@ -121,7 +121,7 @@ describe('createConnectionAction validation', () => {
       authMethod: 'Basic',
       username: 'user',
       password: 'pass',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(res.success).toBe(true);
@@ -145,7 +145,7 @@ describe('testConnectionAction validation', () => {
       authMethod: 'Basic',
       username: '',
       password: '',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
     });
     expect(res.success).toBe(false);
     expect(res.error).toMatch('Username is required');
@@ -159,7 +159,7 @@ describe('testConnectionAction validation', () => {
       clientId: '',
       clientSecret: '',
       tokenUrl: '',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
     });
     expect(res.success).toBe(false);
     expect(res.error).toMatch('All OAuth fields are required');
@@ -170,7 +170,7 @@ describe('testConnectionAction validation', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
     });
     expect(res.success).toBe(true);
   });
@@ -184,7 +184,7 @@ describe('connection calendar helpers', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     expect(created.success).toBe(true);
@@ -204,7 +204,7 @@ describe('connection calendar helpers', () => {
       authMethod: 'Basic',
       username: 'u',
       password: 'p',
-      capabilities: [CAPABILITY.CONFLICT],
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
       isPrimary: false,
     });
     const details = await actions.getConnectionDetailsAction(created.data!.id);

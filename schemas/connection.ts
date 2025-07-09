@@ -1,9 +1,10 @@
 import * as z from "zod";
-import { CAPABILITY } from "@/types/constants";
+import { CALENDAR_CAPABILITY } from "@/types/constants";
 
 /**
  * Schema for connection form values used on both client and server.
- * - isPrimary is optional since server actions may omit it
+ * Includes optional `calendarUrl`, a list of `capabilities`, and an `isPrimary`
+ * flag to mark the default integration.
  */
 const baseSchema = z.object({
   provider: z.enum(["apple", "google", "fastmail", "nextcloud", "caldav"]),
@@ -20,9 +21,9 @@ const baseSchema = z.object({
   capabilities: z
     .array(
       z.enum([
-        CAPABILITY.CONFLICT,
-        CAPABILITY.AVAILABILITY,
-        CAPABILITY.BOOKING,
+        CALENDAR_CAPABILITY.BLOCKING_BUSY,
+        CALENDAR_CAPABILITY.BLOCKING_AVAILABLE,
+        CALENDAR_CAPABILITY.BOOKING,
       ]),
     )
     .min(1, "Select at least one capability"),

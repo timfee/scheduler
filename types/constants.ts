@@ -18,14 +18,5 @@ export const CALENDAR_CAPABILITY = {
   BLOCKING_AVAILABLE: "availability", // Busy times are actually available
   BLOCKING_BUSY: "blocking_busy", // Busy times block availability
 } as const;
-export type CalendarCapability = (typeof CALENDAR_CAPABILITY)[keyof typeof CALENDAR_CAPABILITY];
-
-// Legacy constant used by older code and tests
-export const CAPABILITY = {
-  CONFLICT: CALENDAR_CAPABILITY.BLOCKING_BUSY,
-  AVAILABILITY: CALENDAR_CAPABILITY.BLOCKING_AVAILABLE,
-  BOOKING: CALENDAR_CAPABILITY.BOOKING,
-} as const;
-export type Capability = (typeof CAPABILITY)[keyof typeof CAPABILITY];
-
-// Remove old CAPABILITY constant after migration
+export type CalendarCapability =
+  (typeof CALENDAR_CAPABILITY)[keyof typeof CALENDAR_CAPABILITY];

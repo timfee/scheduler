@@ -155,6 +155,33 @@ it('sets primary integration correctly', async () => {
   expect(first?.isPrimary).toBe(false);
 });
 
+it('clears primary integration when updated to false', async () => {
+  const integration = await createCalendarIntegration({
+    provider: 'google',
+    displayName: 'Primary',
+    config: {
+      authMethod: 'Oauth',
+      username: 'u',
+      refreshToken: 'r',
+      clientId: 'c',
+      clientSecret: 's',
+      tokenUrl: 'https://token',
+      serverUrl: '',
+      calendarUrl: undefined,
+      capabilities: [],
+    },
+    isPrimary: true,
+  });
+
+  let primary = await getPrimaryCalendarIntegration();
+  expect(primary?.id).toBe(integration.id);
+
+  await updateCalendarIntegration(integration.id, { isPrimary: false });
+
+  primary = await getPrimaryCalendarIntegration();
+  expect(primary).toBeNull();
+});
+
 it('deletes integration', async () => {
   const integration = await createCalendarIntegration({
     provider: 'caldav',
