@@ -85,11 +85,13 @@ export function mergeConfig(
       result.serverUrl = u.serverUrl;
     }
     if (u.calendarUrl !== undefined) {
+      credentialsChanged ||= u.calendarUrl !== existing.calendarUrl;
       result.calendarUrl = u.calendarUrl;
     }
   }
 
   if (u.capabilities !== undefined) {
+    credentialsChanged ||= u.capabilities !== existing.capabilities;
     result.capabilities = u.capabilities;
   }
 
