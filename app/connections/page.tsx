@@ -8,14 +8,16 @@ import {
 } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 
-import { listConnectionsAction } from "./actions";
-import ConnectionsClient from "./connections-client";
+import {
+  ConnectionData,
+  ConnectionsClient,
+} from "@/features/connections";
 
 export default async function ConnectionsPage() {
-  const result = await listConnectionsAction();
-
-  // Handle the case where the action failed
-  if (!result.success) {
+  let connections = [];
+  try {
+    connections = await ConnectionData.getConnections();
+  } catch {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-4xl">
@@ -31,7 +33,7 @@ export default async function ConnectionsPage() {
                 <AlertCircle className="size-4" />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>
-                  Failed to load connections: {result.error}
+                  {"Failed to load connections"}
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -40,9 +42,6 @@ export default async function ConnectionsPage() {
       </div>
     );
   }
-
-  // Safe to access data since we checked success
-  const connections = result.data ?? [];
 
   return (
     <div className="container mx-auto px-4 py-8">

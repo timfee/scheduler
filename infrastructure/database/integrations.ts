@@ -1,7 +1,7 @@
 import "server-only";
 
-import { db } from "@/lib/db";
-import { decrypt, encrypt } from "@/lib/db/encryption";
+import { db } from "@/infrastructure/database";
+import { decrypt, encrypt } from "@/infrastructure/database/encryption";
 import {
   calendarIntegrations,
   calendars,
@@ -9,7 +9,7 @@ import {
   type NewCalendarIntegration,
   type Calendar,
   type NewCalendar,
-} from "@/lib/db/schema";
+} from "@/infrastructure/database/schema";
 import { type CalendarCapability } from "@/types/constants";
 import { CalendarConnectionError } from "@/lib/errors";
 import { eq } from "drizzle-orm";

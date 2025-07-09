@@ -27,8 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 import {
   createConnectionAction,
@@ -39,19 +38,22 @@ import {
   listCalendarsAction,
   getConnectionDetailsAction,
   listCalendarsForConnectionAction,
+  listConnectionsAction,
   type CalendarOption,
   type ConnectionFormData,
-  type ConnectionListItem,
   type ProviderType,
-} from "./actions";
+} from "../actions";
+import { type ConnectionListItem } from "../data";
+import { userMessageFromError } from "@/features/shared/errors";
 import ProviderSelect from "./provider-select";
 import CapabilitiesField from "./capabilities-field";
 import ConnectionsList from "./connections-list";
+import { useConnectionStore } from "../stores/connection-store";
 import {
   useConnectionForm,
   type ConnectionFormValues,
   PROVIDER_AUTH_METHODS,
-} from "./use-connection-form";
+} from "../hooks/use-connection-form";
 
 interface ConnectionsClientProps {
   initialConnections: ConnectionListItem[];
@@ -61,7 +63,13 @@ interface ConnectionsClientProps {
 export default function ConnectionsClient({
   initialConnections,
 }: ConnectionsClientProps) {
-  const router = useRouter();
+  const {
+    connections,
+    setConnections,
+    addConnection,
+    updateConnection,
+    removeConnection,
+  } = useConnectionStore();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingConnection, setEditingConnection] =
     useState<ConnectionListItem | null>(null);
@@ -71,6 +79,11 @@ export default function ConnectionsClient({
     message?: string;
   }>({ testing: false });
   const [calendars, setCalendars] = useState<CalendarOption[]>([]);
+
+  // initialize store with data from server
+  useEffect(() => {
+    setConnections(initialConnections)
+  }, [initialConnections, setConnections])
 
   type FormValues = ConnectionFormValues;
   const {
@@ -115,20 +128,18 @@ export default function ConnectionsClient({
             capabilities: values.capabilities,
           };
 
-    const result = await testConnectionAction(values.provider, testData);
-    if (result.success) {
-      const calRes = await listCalendarsAction(values.provider, testData);
-      if (calRes.success) {
-        setCalendars(calRes.data ?? []);
-      }
+    try {
+      await testConnectionAction(values.provider, testData);
+      const calendars = await listCalendarsAction(values.provider, testData);
+      setCalendars(calendars);
+      setTestStatus({ testing: false, success: true, message: "Connection successful!" });
+    } catch (error) {
+      setTestStatus({
+        testing: false,
+        success: false,
+        message: userMessageFromError(error, "Connection failed"),
+      });
     }
-    setTestStatus({
-      testing: false,
-      success: result.success,
-      message: result.success
-        ? "Connection successful!"
-        : (result.error ?? "Connection failed"),
-    });
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -164,30 +175,15 @@ export default function ConnectionsClient({
             };
 
       if (editingConnection) {
-        const result = await updateConnectionAction(
-          editingConnection.id,
-          connectionData,
-        );
-        if (result.success) {
-          router.refresh();
-        } else {
-          form.setError("root", {
-            message: result.error ?? "Failed to update connection",
-          });
-        }
+        await updateConnectionAction(editingConnection.id, connectionData);
       } else {
-        const result = await createConnectionAction(connectionData);
-        if (result.success) {
-          router.refresh();
-        } else {
-          form.setError("root", {
-            message: result.error ?? "Failed to create connection",
-          });
-        }
+        await createConnectionAction(connectionData);
       }
-    } catch {
+      const updated = await listConnectionsAction();
+      setConnections(updated);
+    } catch (error) {
       form.setError("root", {
-        message: "An unexpected error occurred",
+        message: userMessageFromError(error, "An unexpected error occurred"),
       });
     }
   };
@@ -197,20 +193,22 @@ export default function ConnectionsClient({
       return;
     }
 
-    const result = await deleteConnectionAction(id);
-    if (result.success) {
-      router.refresh();
-    } else {
-      alert(result.error ?? "Failed to delete connection");
+    try {
+      await deleteConnectionAction(id);
+      const updated = await listConnectionsAction();
+      setConnections(updated);
+    } catch (error) {
+      alert(userMessageFromError(error, "Failed to delete connection"));
     }
   };
 
   const handleSetPrimary = async (id: string) => {
-    const result = await setPrimaryConnectionAction(id);
-    if (result.success) {
-      router.refresh();
-    } else {
-      alert(result.error ?? "Failed to set primary connection");
+    try {
+      await setPrimaryConnectionAction(id);
+      const updated = await listConnectionsAction();
+      setConnections(updated);
+    } catch (error) {
+      alert(userMessageFromError(error, "Failed to set primary connection"));
     }
   };
 
@@ -219,35 +217,36 @@ export default function ConnectionsClient({
     setIsFormOpen(true);
     setTestStatus({ testing: false });
 
-    const [details, calRes] = await Promise.all([
-      getConnectionDetailsAction(connection.id),
-      listCalendarsForConnectionAction(connection.id),
-    ]);
+    try {
+      const [details, calendars] = await Promise.all([
+        getConnectionDetailsAction(connection.id),
+        listCalendarsForConnectionAction(connection.id),
+      ]);
+      setCalendars(calendars);
+      const calendarUrl = details.calendarUrl ?? "";
 
-    if (calRes.success) {
-      setCalendars(calRes.data ?? []);
-    } else {
+      form.reset({
+        provider: connection.provider as ProviderType,
+        displayName: connection.displayName,
+        authMethod: PROVIDER_AUTH_METHODS[connection.provider as ProviderType],
+        capabilities: connection.capabilities,
+        isPrimary: connection.isPrimary,
+        // Reset other fields to defaults
+        username: "",
+        password: "",
+        serverUrl: "",
+        calendarUrl,
+        refreshToken: "",
+        clientId: "",
+        clientSecret: "",
+        tokenUrl: "https://accounts.google.com/o/oauth2/token",
+      });
+    } catch (error) {
       setCalendars([]);
+      form.setError("root", {
+        message: userMessageFromError(error, "Failed to load connection"),
+      });
     }
-
-    const calendarUrl = details.success ? details.data?.calendarUrl ?? "" : "";
-
-    form.reset({
-      provider: connection.provider as ProviderType,
-      displayName: connection.displayName,
-      authMethod: PROVIDER_AUTH_METHODS[connection.provider as ProviderType],
-      capabilities: connection.capabilities,
-      isPrimary: connection.isPrimary,
-      // Reset other fields to defaults
-      username: "",
-      password: "",
-      serverUrl: "",
-      calendarUrl,
-      refreshToken: "",
-      clientId: "",
-      clientSecret: "",
-      tokenUrl: "https://accounts.google.com/o/oauth2/token",
-    });
   };
 
   const resetForm = () => {
@@ -571,7 +570,7 @@ export default function ConnectionsClient({
 
       {/* Connections List */}
       <ConnectionsList
-        connections={initialConnections}
+        connections={connections}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onSetPrimary={handleSetPrimary}

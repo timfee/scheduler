@@ -1,7 +1,7 @@
 import Database, { type Database as DatabaseType } from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { createTables, dropTables } from "@/lib/db/migrations";
-import * as schema from "@/lib/db/schema";
+import { createTables, dropTables } from "@/infrastructure/database/migrations";
+import * as schema from "@/infrastructure/database/schema";
 
 export function createTestDb() {
   const sqlite = new Database(":memory:");

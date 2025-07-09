@@ -4,7 +4,6 @@ import {
   createCalendarIntegration,
   deleteCalendarIntegration,
   getCalendarIntegration,
-  listCalendarIntegrations,
   testCalendarConnection,
   prepareConfig,
   updateCalendarIntegration,
@@ -15,51 +14,40 @@ import {
   type ProviderType,
   type UpdateCalendarIntegrationInput,
   type CalendarOption,
-} from "@/lib/db/integrations";
+} from "@/infrastructure/database/integrations";
+import { getConnections } from '../data';
+import { userMessageFromError } from '@/features/shared/errors';
 import {
   buildConfigFromValues,
   mergeConfig,
-} from "@/lib/db/config-utils";
+} from "@/infrastructure/database/config-utils";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
   connectionConfigSchema,
-} from "@/schemas/connection";
-import { type CalendarCapability } from "@/types/constants";
+} from "@/features/connections/schemas/connection";
 import { revalidatePath } from "next/cache";
+import { type ConnectionListItem } from "../data";
 
 export type { ProviderType };
 export type { CalendarOption };
 
 export type ConnectionFormData = ConnectionFormValues;
 
-export interface ConnectionActionResult<T = undefined> {
-  success: boolean;
-  error?: string;
-  data?: T;
-}
 
 
-export interface ConnectionListItem {
-  id: string;
-  provider: string;
-  displayName: string;
-  isPrimary: boolean;
-  capabilities: CalendarCapability[];
-  createdAt: Date;
-  updatedAt: Date;
-}
+
 
 /**
  * Create a new calendar connection
  */
 export async function createConnectionAction(
   formData: ConnectionFormData,
-): Promise<ConnectionActionResult<{ id: string; displayName: string }>> {
+): Promise<{ id: string; displayName: string }> {
   try {
     const parsed = connectionFormSchema.safeParse(formData);
     if (!parsed.success) {
-      return { success: false, error: parsed.error.errors[0]?.message };
+      throw new Error(parsed.error.errors[0]?.message);
     }
 
     const values = parsed.data;
@@ -69,10 +57,7 @@ export async function createConnectionAction(
     // Test the connection first
     const testResult = await testCalendarConnection(config);
     if (!testResult.success) {
-      return {
-        success: false,
-        error: testResult.error ?? "Connection test failed",
-      };
+      throw new Error(testResult.error ?? "Connection test failed");
     }
 
     // Create the integration
@@ -88,18 +73,11 @@ export async function createConnectionAction(
     revalidatePath("/connections");
 
     return {
-      success: true,
-      data: {
-        id: integration.id,
-        displayName: integration.displayName,
-      },
+      id: integration.id,
+      displayName: integration.displayName,
     };
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to create connection",
-    };
+    throw new Error(userMessageFromError(error, "Failed to create connection"));
   }
 }
 
@@ -109,14 +87,11 @@ export async function createConnectionAction(
 export async function updateConnectionAction(
   id: string,
   formData: Partial<ConnectionFormData>,
-): Promise<ConnectionActionResult<{ id: string; displayName: string }>> {
+): Promise<{ id: string; displayName: string }> {
   try {
     const existing = await getCalendarIntegration(id);
     if (!existing) {
-      return {
-        success: false,
-        error: "Connection not found",
-      };
+      throw new Error("Connection not found");
     }
 
     const updateInput: UpdateCalendarIntegrationInput = {};
@@ -158,10 +133,7 @@ export async function updateConnectionAction(
       if (credentialsChanged) {
         const testResult = await testCalendarConnection(prepared);
         if (!testResult.success) {
-          return {
-            success: false,
-            error: testResult.error ?? "Connection test failed",
-          };
+          throw new Error(testResult.error ?? "Connection test failed");
         }
       }
 
@@ -170,89 +142,47 @@ export async function updateConnectionAction(
 
     const updated = await updateCalendarIntegration(id, updateInput);
     if (!updated) {
-      return {
-        success: false,
-        error: "Failed to update connection",
-      };
+      throw new Error("Failed to update connection");
     }
 
     revalidatePath("/connections");
 
     return {
-      success: true,
-      data: {
-        id: updated.id,
-        displayName: updated.displayName,
-      },
+      id: updated.id,
+      displayName: updated.displayName,
     };
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to update connection",
-    };
+    throw new Error(userMessageFromError(error, "Failed to update connection"));
   }
 }
 
 /**
  * Delete a calendar connection
  */
-export async function deleteConnectionAction(
-  id: string,
-): Promise<ConnectionActionResult<undefined>> {
+export async function deleteConnectionAction(id: string): Promise<void> {
   try {
     const deleted = await deleteCalendarIntegration(id);
     if (!deleted) {
-      return {
-        success: false,
-        error: "Connection not found",
-      };
+      throw new Error("Connection not found");
     }
 
     revalidatePath("/connections");
 
-    return {
-      success: true,
-    };
+    return;
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to delete connection",
-    };
+    throw new Error(userMessageFromError(error, "Failed to delete connection"));
   }
 }
 
 /**
  * List all calendar connections
  */
-export async function listConnectionsAction(): Promise<
-  ConnectionActionResult<ConnectionListItem[]>
-> {
+export async function listConnectionsAction(): Promise<ConnectionListItem[]> {
   try {
-    const integrations = await listCalendarIntegrations();
-
-    // Remove sensitive data before sending to client
-    const sanitized = integrations.map((integration) => ({
-      id: integration.id,
-      provider: integration.provider,
-      displayName: integration.displayName,
-      isPrimary: integration.isPrimary,
-      capabilities: integration.config.capabilities,
-      createdAt: integration.createdAt,
-      updatedAt: integration.updatedAt,
-    }));
-
-    return {
-      success: true,
-      data: sanitized,
-    };
+    const data = await getConnections();
+    return data;
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to list connections",
-    };
+    throw new Error(userMessageFromError(error, "Failed to list connections"));
   }
 }
 
@@ -262,7 +192,7 @@ export async function listConnectionsAction(): Promise<
 export async function testConnectionAction(
   provider: ProviderType,
   config: Partial<ConnectionFormData>,
-): Promise<ConnectionActionResult<undefined>> {
+): Promise<void> {
   try {
     const parsed = connectionConfigSchema.safeParse({
       provider,
@@ -271,23 +201,19 @@ export async function testConnectionAction(
       isPrimary: false,
     });
     if (!parsed.success) {
-      return { success: false, error: parsed.error.errors[0]?.message };
+      throw new Error(parsed.error.errors[0]?.message);
     }
 
     const raw = buildConfigFromValues(parsed.data);
     const testConfig = await prepareConfig(provider, raw);
 
     const result = await testCalendarConnection(testConfig);
-
-    return {
-      success: result.success,
-      error: result.error,
-    };
+    if (!result.success) {
+      throw new Error(result.error ?? "Connection test failed");
+    }
+    return;
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Connection test failed",
-    };
+    throw new Error(userMessageFromError(error, "Connection test failed"));
   }
 }
 
@@ -297,7 +223,7 @@ export async function testConnectionAction(
 export async function listCalendarsAction(
   provider: ProviderType,
   config: Partial<ConnectionFormData>,
-): Promise<ConnectionActionResult<CalendarOption[]>> {
+): Promise<CalendarOption[]> {
   try {
     const parsed = connectionConfigSchema.safeParse({
       provider,
@@ -306,7 +232,7 @@ export async function listCalendarsAction(
       isPrimary: false,
     });
     if (!parsed.success) {
-      return { success: false, error: parsed.error.errors[0]?.message };
+      throw new Error(parsed.error.errors[0]?.message);
     }
 
     const raw = buildConfigFromValues(parsed.data);
@@ -314,16 +240,9 @@ export async function listCalendarsAction(
 
     const client = await createDAVClientFromConfig(prepared);
     const calendars = await fetchCalendarOptions(client);
-
-    return {
-      success: true,
-      data: calendars,
-    };
+    return calendars;
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to list calendars",
-    };
+    throw new Error(userMessageFromError(error, "Failed to list calendars"));
   }
 }
 
@@ -336,23 +255,16 @@ export interface ConnectionDetails {
  */
 export async function getConnectionDetailsAction(
   id: string,
-): Promise<ConnectionActionResult<ConnectionDetails>> {
+): Promise<ConnectionDetails> {
   try {
     const integration = await getCalendarIntegration(id);
     if (!integration) {
-      return { success: false, error: "Connection not found" };
+      throw new Error("Connection not found");
     }
 
-    return {
-      success: true,
-      data: { calendarUrl: integration.config.calendarUrl },
-    };
+    return { calendarUrl: integration.config.calendarUrl };
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to load connection",
-    };
+    throw new Error(userMessageFromError(error, "Failed to load connection"));
   }
 }
 
@@ -361,26 +273,18 @@ export async function getConnectionDetailsAction(
  */
 export async function listCalendarsForConnectionAction(
   id: string,
-): Promise<ConnectionActionResult<CalendarOption[]>> {
+): Promise<CalendarOption[]> {
   try {
     const integration = await getCalendarIntegration(id);
     if (!integration) {
-      return { success: false, error: "Connection not found" };
+      throw new Error("Connection not found");
     }
 
     const client = await createDAVClientFromIntegration(integration);
     const calendars = await fetchCalendarOptions(client);
-
-    return {
-      success: true,
-      data: calendars,
-    };
+    return calendars;
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to list calendars",
-    };
+    throw new Error(userMessageFromError(error, "Failed to list calendars"));
   }
 }
 
@@ -389,28 +293,17 @@ export async function listCalendarsForConnectionAction(
  */
 export async function setPrimaryConnectionAction(
   id: string,
-): Promise<ConnectionActionResult<undefined>> {
+): Promise<void> {
   try {
     const updated = await updateCalendarIntegration(id, { isPrimary: true });
     if (!updated) {
-      return {
-        success: false,
-        error: "Connection not found",
-      };
+      throw new Error("Connection not found");
     }
 
     revalidatePath("/connections");
 
-    return {
-      success: true,
-    };
+    return;
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to set primary connection",
-    };
+    throw new Error(userMessageFromError(error, "Failed to set primary connection"));
   }
 }

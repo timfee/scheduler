@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/select";
 import { type Control } from "react-hook-form";
 
-import { type ProviderType } from "./actions";
-import { type ConnectionFormValues } from "./use-connection-form";
+import { type ProviderType } from "../actions";
+import { type ConnectionFormValues } from "../hooks/use-connection-form";
 
 interface ProviderSelectProps {
   control: Control<ConnectionFormValues>;
