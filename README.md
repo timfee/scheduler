@@ -46,12 +46,13 @@ Then open [http://localhost:3000](http://localhost:3000).
 ## Architecture
 
 - **app/**: Next.js server and client components, plus API routes.
-- **lib/**: Database utilities, encryption, and shared helpers.
-- **providers/**: Calendar provider implementations.
+- **features/**: Domain feature modules with components, actions, and hooks.
+- **infrastructure/**: Database access, encryption utilities, and provider integrations.
+- **lib/**: Miscellaneous shared helpers and validation.
 - **schemas/** and **types/**: Zod schemas and shared TypeScript types.
 - **test/** and **__tests__/**: Unit and integration tests.
 
-Server actions return `ConnectionActionResult` objects with `success`, `data`, and `error` fields rather than throwing. Under the hood, low level helpers may throw custom errors from `lib/errors.ts`; actions catch these and return user‑friendly messages.
+Server actions now throw `Error` objects on failure. Client components should catch these and display a user-friendly message using helpers from `features/shared/errors.ts`.
 
 ## Error handling
 

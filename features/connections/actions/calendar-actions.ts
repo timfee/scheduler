@@ -5,7 +5,7 @@ import {
   getCalendarsForIntegration,
   updateCalendarCapability,
   removeCalendar,
-} from "@/lib/db/integrations";
+} from "@/infrastructure/database/integrations";
 import { type CalendarCapability } from "@/types/constants";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
@@ -39,12 +39,11 @@ export async function addCalendarAction(
     );
 
     revalidatePath("/connections");
-    return { success: true, data: calendar };
+    return calendar;
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to add calendar",
-    };
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to add calendar",
+    );
   }
 }
 
@@ -56,12 +55,11 @@ export async function updateCalendarCapabilityAction(
     await updateCalendarCapability(calendarId, capability);
 
     revalidatePath("/connections");
-    return { success: true };
+    return;
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to update calendar",
-    };
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to update calendar",
+    );
   }
 }
 
@@ -70,27 +68,25 @@ export async function removeCalendarAction(calendarId: string) {
     const deleted = await removeCalendar(calendarId);
 
     if (!deleted) {
-      return { success: false, error: "Failed to remove calendar" };
+      throw new Error("Failed to remove calendar");
     }
 
     revalidatePath("/connections");
-    return { success: true };
+    return;
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to remove calendar",
-    };
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to remove calendar",
+    );
   }
 }
 
 export async function listCalendarsForIntegrationAction(integrationId: string) {
   try {
     const calendars = await getCalendarsForIntegration(integrationId);
-    return { success: true, data: calendars };
+    return calendars;
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to list calendars",
-    };
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to list calendars",
+    );
   }
 }

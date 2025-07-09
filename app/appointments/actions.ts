@@ -1,7 +1,7 @@
 "use server";
 
-import { getPrimaryCalendarIntegration, createDAVClientFromIntegration } from "@/lib/db/integrations";
-import { createCalDavProvider } from "@/providers/caldav";
+import { getPrimaryCalendarIntegration, createDAVClientFromIntegration } from "@/infrastructure/database/integrations";
+import { createCalDavProvider } from "@/infrastructure/providers/caldav";
 import { type DAVClient } from "tsdav";
 
 export async function listBusyTimesAction(from: string, to: string) {

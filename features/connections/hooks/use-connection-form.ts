@@ -2,11 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn, type Resolver } from "react-hook-form";
-import { type ProviderType } from "./actions";
+import { type ProviderType } from "../actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
-} from "@/schemas/connection";
+} from "../schemas/connection";
 import { type CalendarCapability } from "@/types/constants";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
@@ -17,7 +17,7 @@ const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   caldav: "Basic",
 };
 
-export { connectionFormSchema, type ConnectionFormValues } from "@/schemas/connection";
+export { connectionFormSchema, type ConnectionFormValues } from "../schemas/connection";
 
 export interface UseConnectionFormReturn {
   form: UseFormReturn<ConnectionFormValues, unknown, ConnectionFormValues>;

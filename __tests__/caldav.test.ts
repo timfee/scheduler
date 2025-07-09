@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // Use Jest's injected globals and import `jest` for mocking functions.
 import { jest } from '@jest/globals';
-import { createCalDavProvider } from '@/providers/caldav';
+import { createCalDavProvider } from '@/infrastructure/providers/caldav';
 import { ICAL_PROD_ID } from '@/types/constants';
 import { type DAVClient } from 'tsdav';
 

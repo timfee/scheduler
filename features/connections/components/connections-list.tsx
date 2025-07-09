@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { type ConnectionListItem } from "./actions";
+import { type ConnectionListItem } from "../data";
 
 interface ConnectionsListProps {
   connections: ConnectionListItem[];
