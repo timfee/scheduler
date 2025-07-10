@@ -6,7 +6,7 @@ import {
   updateCalendarCapability,
   removeCalendar,
 } from "@/infrastructure/database/integrations";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { mapErrorToUserMessage } from '@/lib/errors';
 import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/lib/types/constants";
 import { z } from "zod/v4";
@@ -44,6 +44,7 @@ export async function addCalendarAction(
     );
 
     revalidatePath("/connections");
+    revalidateTag("calendars");
     return calendar;
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to add calendar"));
@@ -79,7 +80,7 @@ export async function removeCalendarAction(calendarId: string) {
   }
 }
 
-export async function listIntegrationCalendars(integrationId: string) {
+export async function listCalendarsForIntegrationAction(integrationId: string) {
   try {
     const calendars = await getCalendarsForIntegration(integrationId);
     return calendars;

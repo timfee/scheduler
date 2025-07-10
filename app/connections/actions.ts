@@ -328,5 +328,5 @@ export {
   addCalendarAction,
   updateCalendarCapabilityAction,
   removeCalendarAction,
-  listIntegrationCalendars as listCalendarsForIntegrationAction,
+  listCalendarsForIntegrationAction,
 } from './calendar-actions';
