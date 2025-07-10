@@ -1,5 +1,23 @@
 import { describe, expect, it, beforeAll } from "@jest/globals";
 import { createHmac } from "crypto";
+import { z } from "zod";
+
+// Response schemas for type-safe API testing
+const successResponseSchema = z.object({
+  ok: z.literal(true),
+});
+
+const errorResponseSchema = z.object({
+  error: z.string(),
+});
+
+const apiResponseSchema = z.union([successResponseSchema, errorResponseSchema]);
+
+// Helper function to safely parse API responses
+async function parseApiResponse(response: Response) {
+  const data = await response.json() as unknown;
+  return apiResponseSchema.parse(data);
+}
 
 // Set up environment variables before importing modules
 beforeAll(() => {
@@ -30,7 +48,8 @@ describe("POST /api/webhooks/calendar", () => {
   }
 
   function createMockRequest(body: string, signature: string): Request {
-    return {
+    // Create a partial mock of Request that implements only the methods we need
+    const mockRequest = {
       headers: {
         get: (name: string) => {
           if (name === "x-webhook-signature") {
@@ -40,7 +59,10 @@ describe("POST /api/webhooks/calendar", () => {
         },
       },
       text: async () => body,
-    } as Request;
+    };
+    
+    // Return as Request - this is acceptable for testing as we're only mocking used methods
+    return mockRequest as Request;
   }
 
   it("should return 200 for valid signature", async () => {
@@ -48,7 +70,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, validSignature);
 
     const response = await POST(request);
-    const data = await response.json() as { ok: boolean };
+    const data = await parseApiResponse(response);
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ ok: true });
@@ -59,7 +81,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, `sha256=${validSignature}`);
 
     const response = await POST(request);
-    const data = await response.json() as { ok: boolean };
+    const data = await parseApiResponse(response);
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ ok: true });
@@ -70,7 +92,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, invalidSignature);
 
     const response = await POST(request);
-    const data = await response.json() as { error: string };
+    const data = await parseApiResponse(response);
 
     expect(response.status).toBe(401);
     expect(data).toEqual({ error: "Invalid webhook signature" });
@@ -80,7 +102,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, "");
 
     const response = await POST(request);
-    const data = await response.json() as { error: string };
+    const data = await parseApiResponse(response);
 
     expect(response.status).toBe(401);
     expect(data).toEqual({ error: "Invalid webhook signature" });
@@ -92,7 +114,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, invalidSignature);
 
     const response = await POST(request);
-    const data = await response.json() as { error: string };
+    const data = await parseApiResponse(response);
 
     expect(response.status).toBe(401);
     expect(data).toEqual({ error: "Invalid webhook signature" });
