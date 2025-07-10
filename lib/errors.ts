@@ -60,5 +60,5 @@ export function mapErrorToUserMessage(error: unknown): string {
     return 'An unexpected error occurred. Please try again.';
   }
 
-  return 'Something went wrong. Please try again.';
+  return 'An unexpected error occurred. Please try again.';
 }
