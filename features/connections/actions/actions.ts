@@ -21,7 +21,7 @@ import { db } from "@/infrastructure/database";
 import { calendarIntegrations } from "@/infrastructure/database/schema";
 import { eq } from "drizzle-orm";
 import { getConnections } from '../data';
-import { userMessageFromError } from '@/features/shared/errors';
+import { mapErrorToUserMessage } from '@/lib/errors';
 import {
   buildConfigFromValues,
   mergeConfig,
@@ -52,7 +52,7 @@ export async function createConnectionAction(
   try {
     const parsed = connectionFormSchema.safeParse(formData);
     if (!parsed.success) {
-      throw new Error(parsed.error.errors[0]?.message);
+      throw new Error(parsed.error.issues[0]?.message);
     }
 
     const values = parsed.data;
@@ -82,7 +82,7 @@ export async function createConnectionAction(
       displayName: integration.displayName,
     };
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to create connection"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to create connection"));
   }
 }
 
@@ -155,7 +155,7 @@ export async function updateConnectionAction(
       displayName: updated.displayName,
     };
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to update connection"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to update connection"));
   }
 }
 
@@ -174,7 +174,7 @@ export async function deleteConnectionAction(id: string): Promise<void> {
 
     return;
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to delete connection"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to delete connection"));
   }
 }
 
@@ -186,7 +186,7 @@ export async function listConnectionsAction(): Promise<ConnectionListItem[]> {
     const data = await getConnections();
     return data;
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to list connections"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to list connections"));
   }
 }
 
@@ -204,7 +204,7 @@ export async function testConnectionAction(
       displayName: "",
     });
     if (!parsed.success) {
-      throw new Error(parsed.error.errors[0]?.message);
+      throw new Error(parsed.error.issues[0]?.message);
     }
 
     const raw = buildConfigFromValues(parsed.data);
@@ -216,7 +216,7 @@ export async function testConnectionAction(
     }
     return;
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Connection test failed"));
+    throw new Error(mapErrorToUserMessage(error, "Connection test failed"));
   }
 }
 
@@ -234,7 +234,7 @@ export async function listCalendarsAction(
       displayName: "",
     });
     if (!parsed.success) {
-      throw new Error(parsed.error.errors[0]?.message);
+      throw new Error(parsed.error.issues[0]?.message);
     }
 
     const raw = buildConfigFromValues(parsed.data);
@@ -244,7 +244,7 @@ export async function listCalendarsAction(
     const calendars = await fetchCalendarOptions(client);
     return calendars;
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to list calendars"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to list calendars"));
   }
 }
 
@@ -266,7 +266,7 @@ export async function getConnectionDetailsAction(
 
     return { calendarUrl: integration.config.calendarUrl };
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to load connection"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to load connection"));
   }
 }
 
@@ -286,7 +286,7 @@ export async function listCalendarsForConnectionAction(
     const calendars = await fetchCalendarOptions(client);
     return calendars;
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to list calendars"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to list calendars"));
   }
 }
 
@@ -324,6 +324,6 @@ export async function updateCalendarOrderAction(
     revalidatePath("/connections");
     revalidateTag("calendars");
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to update order"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to update order"));
   }
 }

@@ -18,7 +18,7 @@ import {
   type ConnectionFormData,
 } from "../actions";
 import { type ConnectionListItem } from "../data";
-import { userMessageFromError } from "@/features/shared/errors";
+import { mapErrorToUserMessage } from "@/lib/errors";
 import ConnectionsList from "./connections-list";
 import {
   useConnectionForm,
@@ -113,7 +113,7 @@ export default function ConnectionsClient({
       setTestStatus({
         testing: false,
         success: false,
-        message: userMessageFromError(error, "Connection failed"),
+        message: mapErrorToUserMessage(error, "Connection failed"),
       });
     }
   };
@@ -183,7 +183,7 @@ export default function ConnectionsClient({
       setConnections(updated);
     } catch (error) {
       form.setError("root", {
-        message: userMessageFromError(error, "An unexpected error occurred"),
+        message: mapErrorToUserMessage(error, "An unexpected error occurred"),
       });
     }
   };
@@ -202,7 +202,7 @@ export default function ConnectionsClient({
       await deleteConnectionAction(id);
     } catch (error) {
       setConnections(previous);
-      alert(userMessageFromError(error, "Failed to delete connection"));
+      alert(mapErrorToUserMessage(error, "Failed to delete connection"));
     }
 
     const updated = await listConnectionsAction();
@@ -247,7 +247,7 @@ export default function ConnectionsClient({
     } catch (error) {
       setCalendars([]);
       form.setError("root", {
-        message: userMessageFromError(error, "Failed to load connection"),
+        message: mapErrorToUserMessage(error, "Failed to load connection"),
       });
     }
   };

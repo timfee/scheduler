@@ -1,6 +1,6 @@
 "use server";
 
-import { userMessageFromError } from "@/features/shared/errors";
+import { mapErrorToUserMessage } from "@/lib/errors";
 import {
   createDAVClientFromIntegration,
   getBookingCalendar,
@@ -93,6 +93,6 @@ export async function createBookingAction(formData: BookingFormData) {
       location: "",
     });
   } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to create booking"));
+    throw new Error(mapErrorToUserMessage(error, "Failed to create booking"));
   }
 }
