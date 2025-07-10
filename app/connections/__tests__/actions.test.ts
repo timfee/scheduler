@@ -248,6 +248,9 @@ describe('updateCalendarOrderAction', () => {
     expect(firstIndex).not.toBe(-1);
     expect(secondIndex).not.toBe(-1);
     
+    // Ensure second comes after first in the initial list
+    expect(secondIndex).toBeGreaterThan(firstIndex);
+    
     await actions.updateCalendarOrderAction(second.id, 'up');
     const reorderedList = await actions.listConnectionsAction();
     expect(reorderedList).toHaveLength(initialCount);
@@ -255,6 +258,11 @@ describe('updateCalendarOrderAction', () => {
     // Check that the items are still there
     expect(reorderedList.find(item => item.id === first.id)).toBeDefined();
     expect(reorderedList.find(item => item.id === second.id)).toBeDefined();
+    
+    // Verify the order actually changed - second should now be before first
+    const reorderedFirstIndex = reorderedList.findIndex(item => item.id === first.id);
+    const reorderedSecondIndex = reorderedList.findIndex(item => item.id === second.id);
+    expect(reorderedSecondIndex).toBeLessThan(reorderedFirstIndex);
   });
 });
 
