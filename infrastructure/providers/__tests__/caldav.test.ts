@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/unbound-method */
-/* eslint-disable @typescript-eslint/no-var-requires */
+ 
+ 
 // Use Jest's injected globals and import `jest` for mocking functions.
 import { jest } from '@jest/globals';
 import { createCalDavProvider } from '@/infrastructure/providers/caldav';

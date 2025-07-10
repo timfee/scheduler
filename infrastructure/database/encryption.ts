@@ -6,6 +6,13 @@ function validateEncryptionKey(key: string): boolean {
   return /^[0-9A-Fa-f]{64}$/.test(key);
 }
 
+/**
+ * Encrypt a plaintext string using AES-256-GCM.
+ *
+ * The encryption key is provided via the `ENCRYPTION_KEY` environment
+ * variable and must be a 64 character hex string.
+ * The returned format is `iv:authTag:ciphertext` all in hex.
+ */
 export function encrypt(text: string): string {
   try {
     if (!validateEncryptionKey(env.ENCRYPTION_KEY)) {
@@ -41,6 +48,12 @@ export function encrypt(text: string): string {
   }
 }
 
+/**
+ * Decrypt a value previously encrypted with {@link encrypt}.
+ *
+ * The input must be a string in the format `iv:authTag:ciphertext` using hex
+ * encoding. If the data cannot be decrypted an `EncryptionError` is thrown.
+ */
 export function decrypt(encryptedText: string): string {
   try {
     const parts = encryptedText.split(":");

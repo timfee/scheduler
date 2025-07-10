@@ -1,10 +1,10 @@
 "use server";
 
-import { getPrimaryCalendarIntegration, createDAVClientFromIntegration } from "@/infrastructure/database/integrations";
+import { getBookingCalendar, createDAVClientFromIntegration } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
 
 export async function listBusyTimesAction(from: string, to: string) {
-  const integration = await getPrimaryCalendarIntegration();
+  const integration = await getBookingCalendar();
   if (!integration) return [];
 
   const client = await createDAVClientFromIntegration(integration);

@@ -42,7 +42,6 @@ export function useConnectionForm(): UseConnectionFormReturn {
       clientSecret: "",
       tokenUrl: "https://accounts.google.com/o/oauth2/token",
       capabilities: [],
-      isPrimary: false,
     },
   });
 

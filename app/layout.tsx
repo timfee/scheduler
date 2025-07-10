@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import Navigation from "@/shared/ui/navigation";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,10 +32,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-background min-h-screen antialiased`}
       >
-        <div className="flex min-h-screen flex-col">
-          <Navigation />
-          <main className="bg-muted/50 flex-1">{children}</main>
-        </div>
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Navigation />
+            <main className="bg-muted/50 flex-1">{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

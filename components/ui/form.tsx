@@ -1,8 +1,7 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type * as LabelPrimitive from "@radix-ui/react-label";
+import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 import {
@@ -93,7 +92,7 @@ function FormLabel({
   const { error, formItemId } = useFormField();
 
   return (
-    <Label
+    <LabelPrimitive.Root
       data-slot="form-label"
       data-error={!!error}
       className={cn("data-[error=true]:text-destructive", className)}

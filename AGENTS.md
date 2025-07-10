@@ -4,5 +4,5 @@ Before committing changes, run:
 ```
 npx tsc -p tsconfig.json --noEmit
 npx eslint . --ext .js,.jsx,.ts,.tsx
-npm test --silent
+pnpm test --silent
 ```

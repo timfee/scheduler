@@ -59,10 +59,10 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
 ```markdown
 # TODO - Scheduler Refactoring & Feature Implementation
 
-## [ ] Phase 1: Clean Architecture & Remove Bloat
+## [x] Phase 1: Clean Architecture & Remove Bloat
 
-### [ ] Remove Unused Components
-- [ ] Run usage audit script:
+### [x] Remove Unused Components
+- [x] Run usage audit script:
   ```bash
   for component in components/ui/*.tsx; do
     name=$(basename "$component" .tsx)
@@ -70,44 +70,44 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     grep -r "from.*ui/$name" app/ features/ --include="*.tsx" --include="*.ts" | wc -l
   done
   ```
-- [ ] Delete components with 0 usage count
-- [ ] Create `components/ui/index.ts` with exports for remaining components
-- [ ] Remove shadcn/ui from package.json if no longer needed
+- [x] Delete components with 0 usage count
+- [x] Create `components/ui/index.ts` with exports for remaining components
+- [x] Remove shadcn/ui from package.json if no longer needed
 
 **Definition of Done**: 
 - UI components folder has only actively used components
 - No unused imports warnings from ESLint
 - Barrel export file created for remaining components
 
-### [ ] Remove URL Polyfill
-- [ ] Delete `url-polyfill.ts` file
-- [ ] Remove `import "./url-polyfill"` from `next.config.ts`
-- [ ] Search codebase for `url.parse` usage: `grep -r "url\.parse" --include="*.ts" --include="*.tsx"`
-- [ ] Replace any found instances with `new URL()` constructor
-- [ ] Run `pnpm test` to ensure CalDAV operations work
+### [x] Remove URL Polyfill
+ - [x] Delete `url-polyfill.ts` file
+ - [x] Remove `import "./url-polyfill"` from `next.config.ts`
+ - [x] Search codebase for `url.parse` usage: `grep -r "url\.parse" --include="*.ts" --include="*.tsx"`
+- [x] Replace any found instances with `new URL()` constructor
+- [x] Run `pnpm test` to ensure CalDAV operations work
 
 **Definition of Done**:
 - No url-polyfill.ts in codebase
 - No imports of url.parse
 - All tests pass
 
-## [ ] Phase 2: Fix Data Model
+## [x] Phase 2: Fix Data Model
 
-### [ ] Remove Primary Calendar Concept
-- [ ] Add display_order column to database:
+### [x] Remove Primary Calendar Concept
+- [x] Add display_order column to database:
   ```sql
   ALTER TABLE calendar_integrations ADD COLUMN display_order INTEGER DEFAULT 0;
   CREATE INDEX idx_integrations_order ON calendar_integrations(display_order);
   ```
-- [ ] Update `infrastructure/database/schema.ts`:
+- [x] Update `infrastructure/database/schema.ts`:
   ```typescript
   // Remove: isPrimary: integer("is_primary", { mode: "boolean" })
   // Add: displayOrder: integer("display_order").notNull().default(0)
   ```
-- [ ] Delete these functions from `infrastructure/database/integrations.ts`:
+- [x] Delete these functions from `infrastructure/database/integrations.ts`:
   - `getPrimaryCalendarIntegration()`
   - `setPrimaryConnectionAction()`
-- [ ] Create new capability-based selector in `infrastructure/database/integrations.ts`:
+- [x] Create new capability-based selector in `infrastructure/database/integrations.ts`:
   ```typescript
   export async function getBookingCalendar() {
     const calendars = await db
@@ -119,14 +119,14 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     return calendars[0] || null;
   }
   ```
-- [ ] Remove from UI components:
+- [x] Remove from UI components:
   - Primary badge in `ConnectionsList`
   - Set Primary button in `ConnectionsList`
   - isPrimary field from forms
-- [ ] Add calendar reordering:
-  - Add up/down arrow buttons to `ConnectionsList`
-  - Create `updateCalendarOrder` server action
-  - Update display_order when arrows clicked
+- [x] Add calendar reordering:
+  - [x] Add up/down arrow buttons to `ConnectionsList`
+  - [x] Create `updateCalendarOrder` server action
+  - [x] Update display_order when arrows clicked
 
 **Definition of Done**:
 - Database has display_order column, no is_primary column
@@ -134,14 +134,14 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
 - Calendars can be reordered via UI
 - Booking calendar selected by capability + order
 
-### [ ] Replace Zustand with React State
-- [ ] Delete `features/connections/stores/connection-store.ts`
-- [ ] Update `features/connections/components/connections-client.tsx`:
+### [x] Replace Zustand with React State
+- [x] Delete `features/connections/stores/connection-store.ts`
+- [x] Update `features/connections/components/connections-client.tsx`:
   ```typescript
   // Replace: const { connections, setConnections, ... } = useConnectionStore();
   // With: const [connections, setConnections] = useState(initialConnections);
   ```
-- [ ] Implement optimistic updates with React 19:
+- [x] Implement optimistic updates with React 19:
   ```typescript
   const [isPending, startTransition] = useTransition();
   
@@ -157,19 +157,19 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     }
   };
   ```
-- [ ] Remove zustand from package.json: `pnpm remove zustand`
-- [ ] Remove zustand devtools imports
+- [x] Remove zustand from package.json: `pnpm remove zustand`
+- [x] Remove zustand devtools imports
 
 **Definition of Done**:
 - No zustand imports anywhere
 - Optimistic updates work smoothly
 - Error states revert optimistic changes
 
-## [ ] Phase 3: Implement Parallel Routes Booking Flow
+## [x] Phase 3: Implement Parallel Routes Booking Flow
 
-### [ ] Setup nuqs for URL State
-- [ ] Install nuqs: `pnpm add nuqs`
-- [ ] Create `app/providers.tsx`:
+### [x] Setup nuqs for URL State
+- [x] Install nuqs: `pnpm add nuqs`
+- [x] Create `app/providers.tsx`:
   ```typescript
   'use client'
   import { NuqsAdapter } from 'nuqs/adapters/next/app'
@@ -178,10 +178,10 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     return <NuqsAdapter>{children}</NuqsAdapter>
   }
   ```
-- [ ] Update `app/layout.tsx` to wrap with Providers:
+ - [x] Update `app/layout.tsx` to wrap with Providers:
   ```typescript
   import { Providers } from './providers'
-  
+
   export default function RootLayout({ children }) {
     return (
       <html>
@@ -198,8 +198,8 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
 - Providers wrapper in place
 - Can use useQueryState in components
 
-### [ ] Create Parallel Routes Structure
-- [ ] Create folder structure:
+### [x] Create Parallel Routes Structure
+- [x] Create folder structure:
   ```
   app/
     (booking)/
@@ -218,7 +218,7 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
         loading.tsx
         error.tsx
   ```
-- [ ] Implement `app/(booking)/layout.tsx`:
+- [x] Implement `app/(booking)/layout.tsx`:
   ```typescript
   export default function BookingLayout({
     children,
@@ -241,16 +241,16 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     )
   }
   ```
-- [ ] Create loading states for each slot
-- [ ] Create error boundaries for each slot
+- [x] Create loading states for each slot
+- [x] Create error boundaries for each slot
 
 **Definition of Done**:
 - All parallel route folders exist
 - Layout renders all slots
 - Loading and error states work independently
 
-### [ ] Build Booking Components
-- [ ] Create `features/booking/hooks/use-booking-state.ts`:
+### [x] Build Booking Components
+- [x] Create `features/booking/hooks/use-booking-state.ts`:
   ```typescript
   import { parseAsString, parseAsIsoDateTime, useQueryStates } from 'nuqs'
   
@@ -264,20 +264,20 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     return useQueryStates(bookingParsers)
   }
   ```
-- [ ] Implement `@apptType/page.tsx`:
+- [x] Implement `@apptType/page.tsx`:
   - Fetch appointment types from database
   - Display as cards or list
   - Update URL when clicked using nuqs
-- [ ] Implement `@date/page.tsx`:
+- [x] Implement `@date/page.tsx`:
   - Show calendar only if type selected
   - Fetch availability for selected type
   - Highlight available dates
   - Update URL when date clicked
-- [ ] Implement `@time/page.tsx`:
+- [x] Implement `@time/page.tsx`:
   - Show time slots only if date selected
   - Fetch available times for type + date
   - Update URL when time clicked
-- [ ] Implement main booking `page.tsx`:
+- [x] Implement main booking `page.tsx`:
   - Show confirmation when all selected
   - Create booking form for user details
   - Server action to save booking
@@ -288,26 +288,26 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
 - Shareable URLs work
 - Booking can be completed
 
-## [ ] Phase 4: Testing & Performance
+## [x] Phase 4: Testing & Performance
 
-### [ ] Update Test Configuration
-- [ ] Edit `jest.config.ts`:
+### [x] Update Test Configuration
+- [x] Edit `jest.config.ts`:
   ```typescript
   testMatch: ["**/*.test.ts", "**/*.test.tsx"]
   ```
-- [ ] Move existing tests next to source:
+- [x] Move existing tests next to source:
   - `features/connections/__tests__/actions.test.ts` → `features/connections/actions/actions.test.ts`
   - Delete empty `__tests__` folders
-- [ ] Update relative imports in moved tests
-- [ ] Run `pnpm test` to verify all tests found
+- [x] Update relative imports in moved tests
+- [x] Run `pnpm test` to verify all tests found
 
 **Definition of Done**:
 - Tests can live next to source files
 - All existing tests still pass
 - No empty test folders
 
-### [ ] Optimize Next.js Patterns
-- [ ] Add caching to expensive queries:
+### [x] Optimize Next.js Patterns
+- [x] Add caching to expensive queries:
   ```typescript
   import { unstable_cache } from 'next/cache'
   
@@ -317,15 +317,15 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     { revalidate: 300, tags: ['calendars'] }
   )
   ```
-- [ ] Add Suspense boundaries to booking slots:
+- [x] Add Suspense boundaries to booking slots:
   ```typescript
   <Suspense fallback={<div>Loading times...</div>}>
     <TimeSlots date={selectedDate} />
   </Suspense>
   ```
-- [ ] Create proper loading.tsx files with skeletons
-- [ ] Add error.tsx files with reset functionality
-- [ ] Move webhooks to Route Handlers:
+  - [x] Create proper loading.tsx files with skeletons
+  - [x] Add error.tsx files with reset functionality
+- [x] Move webhooks to Route Handlers:
   ```typescript
   // app/api/webhooks/calendar/route.ts
   export async function POST(request: Request) {
@@ -351,8 +351,8 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
   grep -r "import.*from" --include="*.ts" --include="*.tsx" features/ > imports.txt
   # Manual review for unused exports
   ```
-- [ ] Delete identified unused exports
-- [ ] Remove these specific unused imports found in review:
+ - [ ] Delete identified unused exports
+ - [x] Remove these specific unused imports found in review:
   - `app/connections/page.tsx` - AlertTitle if unused
   - Any UI components with 0 usage from Phase 1
 - [ ] Consolidate duplicate type definitions:
@@ -365,8 +365,8 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
 - No duplicate type definitions
 - Each file exports only what's imported elsewhere
 
-### [ ] Add Documentation
-- [ ] Add JSDoc to complex functions:
+### [x] Add Documentation
+- [x] Add JSDoc to complex functions:
   ```typescript
   /**
    * Fetches available time slots for a given appointment type and date
@@ -378,15 +378,16 @@ Zustand is overkill for simple admin CRUD. Use React 19's built-in:
     // ...
   }
   ```
-- [ ] Document these specific functions:
+- [x] Document these specific functions:
   - `prepareConfig()` - explain well-known URL resolution
   - `getBookingCalendar()` - explain capability ordering
   - `encrypt()/decrypt()` - explain encryption format
   - All server actions - explain parameters and errors
-- [ ] Create README.md for each feature:
-  - `features/connections/README.md` - explain architecture
-  - `features/booking/README.md` - explain parallel routes flow
-- [ ] Update root README.md with:
+ - [x] Create README.md for each feature:
+- [x] `features/connections/README.md` - explain architecture
+- [x] `features/booking/README.md` - explain parallel routes flow
+- [x] `features/shared/README.md` - document shared helpers
+- [x] Update root README.md with:
   - Clear setup instructions
   - Environment variable requirements
   - Architecture overview

@@ -12,7 +12,7 @@ This feature manages calendar integrations for the scheduler application, allowi
   - **Conflict Checking**: Booked time is considered blocked
   - **Availability Checking**: Booked time is available unless explicitly blocked
   - **Booking**: Create new events in the calendar
-- **Primary Calendar**: Designate one calendar as the primary for booking new events
+
 
 ## Supported Providers
 
@@ -36,7 +36,7 @@ calendar_integrations (
   provider TEXT NOT NULL,           -- 'apple', 'google', 'fastmail', 'nextcloud', 'caldav'
   display_name TEXT NOT NULL,       -- User-friendly name
   encrypted_config TEXT NOT NULL,   -- Encrypted JSON configuration
-  is_primary INTEGER DEFAULT 0,     -- Boolean flag for primary calendar
+  display_order INTEGER DEFAULT 0,  -- Order for booking calendar selection
   created_at INTEGER NOT NULL,      -- Timestamp
   updated_at INTEGER NOT NULL       -- Timestamp
 )
@@ -198,9 +198,6 @@ listConnectionsAction()
 
 // Test calendar credentials
 testConnectionAction(provider: ProviderType, config: Partial<ConnectionFormData>)
-
-// Set a calendar as primary
-setPrimaryConnectionAction(id: string)
 ```
 
 ## Integration with tsdav

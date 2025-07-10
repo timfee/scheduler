@@ -25,7 +25,7 @@ const config: JestConfigWithTsJest = {
   preset: "ts-jest/presets/default-esm",
 
   testEnvironment: "node",
-  testMatch: ["**/__tests__/**/*.test.ts"],
+  testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   setupFilesAfterEnv: ["<rootDir>/test/setupEnv.ts"],
   roots: ["<rootDir>"],
   modulePaths: [compilerOptions.baseUrl],

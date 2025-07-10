@@ -1,6 +1,7 @@
 import "server-only";
 
 import { db } from "@/infrastructure/database";
+import { unstable_cache } from 'next/cache'
 import { decrypt, encrypt } from "@/infrastructure/database/encryption";
 import {
   calendarIntegrations,
@@ -12,7 +13,7 @@ import {
 } from "@/infrastructure/database/schema";
 import { type CalendarCapability } from "@/types/constants";
 import { CalendarConnectionError } from "@/lib/errors";
-import { eq } from "drizzle-orm";
+import { eq, sql, asc } from "drizzle-orm";
 import { createDAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
 
@@ -64,13 +65,12 @@ export interface CreateCalendarIntegrationInput {
   provider: ProviderType;
   displayName: string;
   config: CalendarIntegrationConfig;
-  isPrimary?: boolean;
 }
 
 export interface UpdateCalendarIntegrationInput {
   displayName?: string;
   config?: CalendarIntegrationConfig;
-  isPrimary?: boolean;
+  displayOrder?: number;
 }
 
 /**
@@ -88,8 +88,12 @@ export function resolveServerUrl(provider: ProviderType, customUrl?: string): st
 }
 
 /**
- * Ensure the config has a server and calendar URL. If missing, attempt
- * to resolve the well-known server URL and discover the first calendar.
+ * Prepare the configuration for a calendar integration.
+ *
+ * Resolves the well-known CalDAV server URL for the given provider and
+ * merges it with the user supplied configuration. Any missing server URL
+ * will be filled in automatically. Calendar discovery is no longer
+ * performed here as the user selects the calendar manually.
  */
 export async function prepareConfig(
   provider: ProviderType,
@@ -131,12 +135,18 @@ export async function createCalendarIntegration(
   // Encrypt the configuration
   const encryptedConfig = encrypt(JSON.stringify(configWithServerUrl));
 
+  const orderResult = db
+    .select({ maxOrder: sql<number>`max(display_order)` })
+    .from(calendarIntegrations)
+    .get();
+  const nextOrder = (orderResult?.maxOrder ?? 0) + 1;
+
   const newIntegration: NewCalendarIntegration = {
     id: uuid(),
     provider: input.provider,
     displayName: input.displayName,
     encryptedConfig,
-    isPrimary: input.isPrimary ?? false,
+    displayOrder: nextOrder,
     createdAt: now,
     updatedAt: now,
   };
@@ -201,7 +211,10 @@ export async function removeCalendar(calendarId: string): Promise<boolean> {
 export async function listCalendarIntegrations(): Promise<
   Array<CalendarIntegration & { config: CalendarIntegrationConfig }>
 > {
-  const integrations = await db.select().from(calendarIntegrations);
+  const integrations = await db
+    .select()
+    .from(calendarIntegrations)
+    .orderBy(asc(calendarIntegrations.displayOrder));
 
   return integrations.map((integration) => {
     let cfg: CalendarIntegrationConfig | Record<string, unknown> = {};
@@ -215,6 +228,28 @@ export async function listCalendarIntegrations(): Promise<
       config: cfg as CalendarIntegrationConfig,
     };
   });
+}
+
+export const getCachedCalendars = unstable_cache(
+  async () => listCalendarIntegrations(),
+  ['calendars'],
+  { revalidate: 300, tags: ['calendars'] }
+)
+
+/**
+ * Fetch the calendar integration used for bookings.
+ *
+ * Calendars are filtered by the `booking` capability and sorted by
+ * `displayOrder`. The first match is returned.
+ */
+export async function getBookingCalendar(): Promise<
+  (CalendarIntegration & { config: CalendarIntegrationConfig }) | null
+> {
+  const list = await listCalendarIntegrations();
+  const sorted = list
+    .filter((i) => i.config.capabilities.includes('booking'))
+    .sort((a, b) => a.displayOrder - b.displayOrder);
+  return sorted[0] ?? null;
 }
 
 /**
@@ -249,32 +284,6 @@ export async function getCalendarIntegration(
   }
 }
 
-export async function getPrimaryCalendarIntegration(): Promise<
-  (CalendarIntegration & { config: CalendarIntegrationConfig }) | null
-> {
-  const [integration] = await db
-    .select()
-    .from(calendarIntegrations)
-    .where(eq(calendarIntegrations.isPrimary, true))
-    .limit(1);
-
-  if (!integration) {
-    return null;
-  }
-
-  try {
-    const cfg = JSON.parse(decrypt(integration.encryptedConfig)) as CalendarIntegrationConfig;
-    return {
-      ...integration,
-      config: cfg,
-    };
-  } catch {
-    return {
-      ...integration,
-      config: {} as CalendarIntegrationConfig,
-    };
-  }
-}
 
 /**
  * Update a calendar integration
@@ -322,15 +331,10 @@ export async function updateCalendarIntegration(
     }
   }
 
-  if (input.isPrimary !== undefined) {
-    updates.isPrimary = input.isPrimary;
-    if (input.isPrimary) {
-      db.update(calendarIntegrations)
-        .set({ isPrimary: false })
-        .where(eq(calendarIntegrations.isPrimary, true))
-        .run();
-    }
+  if (input.displayOrder !== undefined) {
+    updates.displayOrder = input.displayOrder;
   }
+
   const result = db
     .update(calendarIntegrations)
     .set(updates)

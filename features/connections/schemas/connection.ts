@@ -3,8 +3,7 @@ import { CALENDAR_CAPABILITY } from "@/types/constants";
 
 /**
  * Schema for connection form values used on both client and server.
- * Includes optional `calendarUrl`, a list of `capabilities`, and an `isPrimary`
- * flag to mark the default integration.
+ * Includes optional `calendarUrl` and a list of `capabilities`.
  */
 const baseSchema = z.object({
   provider: z.enum(["apple", "google", "fastmail", "nextcloud", "caldav"]),
@@ -27,7 +26,6 @@ const baseSchema = z.object({
       ]),
     )
     .min(1, "Select at least one capability"),
-  isPrimary: z.boolean().optional().default(false),
 });
 
 function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
@@ -83,7 +81,6 @@ export type ConnectionFormValues = z.infer<typeof connectionFormSchema>;
 export const connectionConfigSchema = withValidations(
   baseSchema.omit({
     displayName: true,
-    isPrimary: true,
   }),
 );
 

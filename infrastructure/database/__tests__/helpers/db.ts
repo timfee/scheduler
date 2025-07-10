@@ -26,7 +26,7 @@ export async function createTestIntegration(
     provider: data.provider ?? "caldav",
     displayName: data.displayName ?? "Test Calendar",
     encryptedConfig: data.encryptedConfig ?? "encrypted",
-    isPrimary: data.isPrimary ?? false,
+    displayOrder: data.displayOrder ?? 0,
     createdAt: data.createdAt ?? new Date(),
     updatedAt: data.updatedAt ?? new Date(),
   };

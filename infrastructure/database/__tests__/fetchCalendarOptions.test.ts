@@ -1,7 +1,8 @@
 import { jest } from '@jest/globals';
-import { createDAVClient } from 'tsdav';
+import { type createDAVClient } from 'tsdav';
+import { type fetchCalendarOptions as FetchCalOpt } from '@/infrastructure/database/integrations';
 
-let fetchCalendarOptions: typeof import('@/infrastructure/database/integrations').fetchCalendarOptions;
+let fetchCalendarOptions: typeof FetchCalOpt;
 
 beforeAll(async () => {
   jest.resetModules();

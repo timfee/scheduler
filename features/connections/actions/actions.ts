@@ -10,6 +10,7 @@ import {
   createDAVClientFromConfig,
   createDAVClientFromIntegration,
   fetchCalendarOptions,
+  listCalendarIntegrations,
   isProviderType,
   type CreateCalendarIntegrationInput,
   type ProviderType,
@@ -66,7 +67,6 @@ export async function createConnectionAction(
       provider: values.provider,
       displayName: values.displayName,
       config,
-      isPrimary: values.isPrimary,
     };
 
     const integration = await createCalendarIntegration(input);
@@ -101,9 +101,6 @@ export async function updateConnectionAction(
       updateInput.displayName = formData.displayName;
     }
 
-    if (formData.isPrimary !== undefined) {
-      updateInput.isPrimary = formData.isPrimary;
-    }
 
     // Handle config updates
     const hasConfigUpdates = Object.keys(formData).some((key) =>
@@ -199,7 +196,6 @@ export async function testConnectionAction(
       provider,
       ...config,
       displayName: "",
-      isPrimary: false,
     });
     if (!parsed.success) {
       throw new Error(parsed.error.errors[0]?.message);
@@ -230,7 +226,6 @@ export async function listCalendarsAction(
       provider,
       ...config,
       displayName: "",
-      isPrimary: false,
     });
     if (!parsed.success) {
       throw new Error(parsed.error.errors[0]?.message);
@@ -290,21 +285,28 @@ export async function listCalendarsForConnectionAction(
 }
 
 /**
- * Set a connection as primary
+ * Update the display order of a connection
  */
-export async function setPrimaryConnectionAction(
+export async function updateCalendarOrderAction(
   id: string,
+  direction: "up" | "down",
 ): Promise<void> {
-  try {
-    const updated = await updateCalendarIntegration(id, { isPrimary: true });
-    if (!updated) {
-      throw new Error("Connection not found");
-    }
+  const list = await listCalendarIntegrations();
+  const index = list.findIndex((c: { id: string }) => c.id === id);
+  if (index === -1) throw new Error("Connection not found");
 
-    revalidatePath("/connections");
+  const newIndex = direction === "up" ? index - 1 : index + 1;
+  if (newIndex < 0 || newIndex >= list.length) return;
 
-    return;
-  } catch (error) {
-    throw new Error(userMessageFromError(error, "Failed to set primary connection"));
-  }
+  const current = list[index];
+  const target = list[newIndex];
+
+  await updateCalendarIntegration(target.id, {
+    displayOrder: current.displayOrder,
+  });
+  await updateCalendarIntegration(current.id, {
+    displayOrder: target.displayOrder,
+  });
+
+  revalidatePath("/connections");
 }
