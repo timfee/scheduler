@@ -17,6 +17,9 @@ import {
   type UpdateCalendarIntegrationInput,
   type CalendarOption,
 } from "@/infrastructure/database/integrations";
+import { db } from "@/infrastructure/database";
+import { calendarIntegrations } from "@/infrastructure/database/schema";
+import { eq } from "drizzle-orm";
 import { getConnections } from '../data';
 import { userMessageFromError } from '@/features/shared/errors';
 import {
@@ -301,11 +304,17 @@ export async function updateCalendarOrderAction(
   const current = list[index];
   const target = list[newIndex];
 
-  await updateCalendarIntegration(target.id, {
-    displayOrder: current.displayOrder,
-  });
-  await updateCalendarIntegration(current.id, {
-    displayOrder: target.displayOrder,
+  db.transaction((tx) => {
+    tx
+      .update(calendarIntegrations)
+      .set({ displayOrder: current.displayOrder })
+      .where(eq(calendarIntegrations.id, target.id))
+      .run();
+    tx
+      .update(calendarIntegrations)
+      .set({ displayOrder: target.displayOrder })
+      .where(eq(calendarIntegrations.id, current.id))
+      .run();
   });
 
   revalidatePath("/connections");
