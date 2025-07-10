@@ -51,8 +51,8 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when creating a connection', async () => {
-    const { createConnectionAction } = await import('../features/connections/actions/actions');
-    const { CALENDAR_CAPABILITY } = await import('../types/constants');
+    const { createConnectionAction } = await import('../app/connections/actions');
+    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
     const result = await createConnectionAction({
       provider: 'apple',
@@ -69,8 +69,8 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when deleting a connection', async () => {
-    const { createConnectionAction, deleteConnectionAction } = await import('../features/connections/actions/actions');
-    const { CALENDAR_CAPABILITY } = await import('../types/constants');
+    const { createConnectionAction, deleteConnectionAction } = await import('../app/connections/actions');
+    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
     // First create a connection
     const created = await createConnectionAction({
@@ -94,8 +94,8 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when updating a connection', async () => {
-    const { createConnectionAction, updateConnectionAction } = await import('../features/connections/actions/actions');
-    const { CALENDAR_CAPABILITY } = await import('../types/constants');
+    const { createConnectionAction, updateConnectionAction } = await import('../app/connections/actions');
+    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
     // First create a connection
     const created = await createConnectionAction({
@@ -121,8 +121,8 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when updating calendar order', async () => {
-    const { createConnectionAction, updateCalendarOrderAction } = await import('../features/connections/actions/actions');
-    const { CALENDAR_CAPABILITY } = await import('../types/constants');
+    const { createConnectionAction, updateCalendarOrderAction } = await import('../app/connections/actions');
+    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
     // First create two connections
     const _first = await createConnectionAction({

@@ -4,7 +4,7 @@ import { describe, it, expect, jest } from '@jest/globals'
 import ReactDOM from 'react-dom/test-utils'
 import { createRoot } from 'react-dom/client'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
-import { useBookingState } from '@/features/booking/hooks/use-booking-state'
+import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 
 // Polyfill TextEncoder for undici in jsdom environment
 

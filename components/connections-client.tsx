@@ -16,15 +16,15 @@ import {
   updateCalendarOrderAction,
   type CalendarOption,
   type ConnectionFormData,
-} from "../actions";
-import { type ConnectionListItem } from "../data";
+} from "@/app/connections/actions";
+import { type ConnectionListItem } from "@/app/connections/data";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import ConnectionsList from "./connections-list";
 import {
   useConnectionForm,
   type ConnectionFormValues,
   PROVIDER_AUTH_METHODS,
-} from "../hooks/use-connection-form";
+} from "@/app/connections/hooks/use-connection-form";
 
 interface ConnectionsClientProps {
   initialConnections: ConnectionListItem[];

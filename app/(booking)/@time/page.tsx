@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { addMinutes, format } from 'date-fns'
 import { listBusyTimesAction } from '@/app/appointments/actions'
-import { getAppointmentType } from '@/features/booking'
+import { getAppointmentType } from '@/app/(booking)/data'
 
 /**
  * Page segment that lists available time slots for a selected date.

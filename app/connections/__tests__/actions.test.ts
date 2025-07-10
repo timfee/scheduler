@@ -5,7 +5,7 @@ import { type Database as DatabaseType } from 'better-sqlite3';
 import { sql } from 'drizzle-orm';
 import * as schema from '../../../infrastructure/database/schema';
 import { createTestDb, cleanupTestDb } from '../../../infrastructure/database/__tests__/helpers/db';
-import { CALENDAR_CAPABILITY } from '../../../types/constants';
+import { CALENDAR_CAPABILITY } from '@/lib/types/constants';
 
 jest.mock('next/cache', () => ({
   revalidatePath: jest.fn(),
@@ -20,7 +20,7 @@ jest.mock('tsdav', () => ({
 }));
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-let actions: typeof import('./actions');
+let actions: typeof import('../actions');
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let integrations: typeof import('../../../infrastructure/database/integrations');
 let db: BetterSQLite3Database<typeof schema>;
@@ -42,7 +42,7 @@ beforeAll(async () => {
   ).unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
   integrations = await import('../../../infrastructure/database/integrations');
-  actions = await import('./actions');
+  actions = await import('../actions');
 });
 
 afterAll(() => {

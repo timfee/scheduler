@@ -6,7 +6,7 @@ import {
   getBookingCalendar,
 } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { DEFAULT_TIMEZONE } from "@/types/constants";
+import { DEFAULT_TIMEZONE } from "@/lib/types/constants";
 
 import { getAppointmentType } from "./data";
 import { bookingFormSchema, type BookingFormData } from "./schemas/booking";

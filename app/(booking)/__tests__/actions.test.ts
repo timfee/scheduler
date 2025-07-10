@@ -1,7 +1,7 @@
 import { beforeAll, afterEach, describe, expect, it, jest } from '@jest/globals'
 import { type BookingFormData } from '../schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
-import { type CalendarEvent } from '@/schemas/calendar-event'
+import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 
 let createBookingAction: (data: BookingFormData) => Promise<void>
 let clearRateLimiter: () => void
