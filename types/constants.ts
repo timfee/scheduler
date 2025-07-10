@@ -5,13 +5,6 @@ export const ICAL_PROD_ID = {
   product: "scheduler",
 } as const;
 
-export const PROVIDER_NAMES = {
-  GOOGLE: "google",
-  APPLE: "icloud",
-  CALDAV: "caldav",
-} as const;
-export type ProviderName = (typeof PROVIDER_NAMES)[keyof typeof PROVIDER_NAMES];
-
 // UPDATED: New capability model
 export const CALENDAR_CAPABILITY = {
   BOOKING: "booking", // Can create events in this calendar
