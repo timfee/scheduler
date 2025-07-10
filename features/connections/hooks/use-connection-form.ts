@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type UseFormReturn, type Resolver } from "react-hook-form";
+import { useForm, type UseFormReturn } from "react-hook-form";
 import { type ProviderType } from "../actions";
 import {
   connectionFormSchema,

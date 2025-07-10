@@ -294,28 +294,32 @@ export async function updateCalendarOrderAction(
   id: string,
   direction: "up" | "down",
 ): Promise<void> {
-  const list = await listCalendarIntegrations();
-  const index = list.findIndex((c: { id: string }) => c.id === id);
-  if (index === -1) throw new Error("Connection not found");
+  try {
+    const list = await listCalendarIntegrations();
+    const index = list.findIndex((c: { id: string }) => c.id === id);
+    if (index === -1) throw new Error("Connection not found");
 
-  const newIndex = direction === "up" ? index - 1 : index + 1;
-  if (newIndex < 0 || newIndex >= list.length) return;
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= list.length) return;
 
-  const current = list[index]!;
-  const target = list[newIndex]!;
+    const current = list[index]!;
+    const target = list[newIndex]!;
 
-  db.transaction((tx) => {
-    tx
-      .update(calendarIntegrations)
-      .set({ displayOrder: current.displayOrder })
-      .where(eq(calendarIntegrations.id, target.id))
-      .run();
-    tx
-      .update(calendarIntegrations)
-      .set({ displayOrder: target.displayOrder })
-      .where(eq(calendarIntegrations.id, current.id))
-      .run();
-  });
+    db.transaction((tx) => {
+      tx
+        .update(calendarIntegrations)
+        .set({ displayOrder: current.displayOrder })
+        .where(eq(calendarIntegrations.id, target.id))
+        .run();
+      tx
+        .update(calendarIntegrations)
+        .set({ displayOrder: target.displayOrder })
+        .where(eq(calendarIntegrations.id, current.id))
+        .run();
+    });
 
-  revalidatePath("/connections");
+    revalidatePath("/connections");
+  } catch (error) {
+    throw new Error(userMessageFromError(error, "Failed to update order"));
+  }
 }

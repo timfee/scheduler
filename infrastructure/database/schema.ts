@@ -37,6 +37,16 @@ export const apiCache = sqliteTable("api_cache", {
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
 });
 
+export const appointmentTypes = sqliteTable("appointment_types", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  durationMinutes: integer("duration_minutes").notNull(),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
+
 // Type exports
 export type CalendarIntegration = typeof calendarIntegrations.$inferSelect;
 export type NewCalendarIntegration = typeof calendarIntegrations.$inferInsert;
@@ -44,3 +54,5 @@ export type Calendar = typeof calendars.$inferSelect;
 export type NewCalendar = typeof calendars.$inferInsert;
 export type Preference = typeof preferences.$inferSelect;
 export type ApiCacheEntry = typeof apiCache.$inferSelect;
+export type AppointmentType = typeof appointmentTypes.$inferSelect;
+export type NewAppointmentType = typeof appointmentTypes.$inferInsert;

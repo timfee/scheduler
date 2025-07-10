@@ -36,7 +36,7 @@ describe('CalDav provider', () => {
     >;
   expect(mockCreate).toHaveBeenCalledTimes(1);
     expect(mockCreate.mock.calls[0]).toBeDefined();
-    const call = mockCreate.mock.calls[0]![0]!;
+    const call = mockCreate.mock.calls[0]![0];
     expect(call.iCalString).toContain('BEGIN:VCALENDAR');
     expect(call.iCalString).toContain('BEGIN:VEVENT');
     expect(call.iCalString).toContain(`SUMMARY:${input.title}`);
