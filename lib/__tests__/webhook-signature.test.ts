@@ -24,6 +24,24 @@ describe("verifyWebhookSignature", () => {
     expect(verifyWebhookSignature(testPayload, `sha256=${validSignature}`, testSecret)).toBe(true);
   });
 
+  it("should return true for valid signature with SHA256= prefix (uppercase)", () => {
+    const validSignature = createValidSignature(testPayload, testSecret);
+    
+    expect(verifyWebhookSignature(testPayload, `SHA256=${validSignature}`, testSecret)).toBe(true);
+  });
+
+  it("should return true for valid signature with whitespace", () => {
+    const validSignature = createValidSignature(testPayload, testSecret);
+    
+    expect(verifyWebhookSignature(testPayload, ` sha256=${validSignature} `, testSecret)).toBe(true);
+  });
+
+  it("should return true for valid signature with uppercase and whitespace", () => {
+    const validSignature = createValidSignature(testPayload, testSecret);
+    
+    expect(verifyWebhookSignature(testPayload, ` SHA256=${validSignature} `, testSecret)).toBe(true);
+  });
+
   it("should return false for invalid signature", () => {
     const invalidSignature = "invalid-signature";
     
