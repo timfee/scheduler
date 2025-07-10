@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { mapErrorToUserMessage, CalendarConnectionError, EncryptionError } from '../errors';
+import { mapErrorToUserMessage, CalendarConnectionError, EncryptionError, DEFAULT_ERROR_MESSAGE } from '../errors';
 
 describe('mapErrorToUserMessage', () => {
   it('should return specific message for CalendarConnectionError', () => {
@@ -14,34 +14,54 @@ describe('mapErrorToUserMessage', () => {
 
   it('should return consistent message for Error instances in development', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      writable: true,
+      configurable: true,
+    });
     
     const error = new Error('Test error message');
     expect(mapErrorToUserMessage(error)).toBe('Test error message');
     
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('should return consistent message for Error instances in production', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      writable: true,
+      configurable: true,
+    });
     
     const error = new Error('Test error message');
-    expect(mapErrorToUserMessage(error)).toBe('An unexpected error occurred. Please try again.');
+    expect(mapErrorToUserMessage(error)).toBe(DEFAULT_ERROR_MESSAGE);
     
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('should return consistent message for non-Error values (final fallback)', () => {
-    expect(mapErrorToUserMessage('string error')).toBe('An unexpected error occurred. Please try again.');
-    expect(mapErrorToUserMessage(null)).toBe('An unexpected error occurred. Please try again.');
-    expect(mapErrorToUserMessage(undefined)).toBe('An unexpected error occurred. Please try again.');
-    expect(mapErrorToUserMessage(123)).toBe('An unexpected error occurred. Please try again.');
+    expect(mapErrorToUserMessage('string error')).toBe(DEFAULT_ERROR_MESSAGE);
+    expect(mapErrorToUserMessage(null)).toBe(DEFAULT_ERROR_MESSAGE);
+    expect(mapErrorToUserMessage(undefined)).toBe(DEFAULT_ERROR_MESSAGE);
+    expect(mapErrorToUserMessage(123)).toBe(DEFAULT_ERROR_MESSAGE);
   });
 
   it('should use the same message for Error instances and final fallback', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      writable: true,
+      configurable: true,
+    });
     
     const errorInstanceMessage = mapErrorToUserMessage(new Error('Test error'));
     const finalFallbackMessage = mapErrorToUserMessage('non-error value');
@@ -49,6 +69,10 @@ describe('mapErrorToUserMessage', () => {
     // These should be consistent - this test will fail until we fix the inconsistency
     expect(errorInstanceMessage).toBe(finalFallbackMessage);
     
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 });

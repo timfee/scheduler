@@ -1,3 +1,6 @@
+// Shared error message constants
+export const DEFAULT_ERROR_MESSAGE = 'An unexpected error occurred. Please try again.';
+
 // Custom error classes for better error handling
 export class CalendarConnectionError extends Error {
   constructor(
@@ -57,8 +60,8 @@ export function mapErrorToUserMessage(error: unknown): string {
     if (process.env.NODE_ENV === 'development') {
       return error.message;
     }
-    return 'An unexpected error occurred. Please try again.';
+    return DEFAULT_ERROR_MESSAGE;
   }
 
-  return 'An unexpected error occurred. Please try again.';
+  return DEFAULT_ERROR_MESSAGE;
 }
