@@ -2,6 +2,7 @@
 import { jest } from '@jest/globals';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { type Database as DatabaseType } from 'better-sqlite3';
+import { sql } from 'drizzle-orm';
 import * as schema from '../../../infrastructure/database/schema';
 import { createTestDb, cleanupTestDb } from '../../../infrastructure/database/__tests__/helpers/db';
 import { CALENDAR_CAPABILITY } from '../../../types/constants';
@@ -51,8 +52,8 @@ afterAll(() => {
 
 beforeEach(() => {
   jest.restoreAllMocks();
-  // Clear the table instead of using SQL
-  db.delete(schema.calendarIntegrations);
+  // Clear the table - use where clause to satisfy ESLint
+  db.delete(schema.calendarIntegrations).where(sql`1=1`);
 });
 
 describe('createConnectionAction validation', () => {
