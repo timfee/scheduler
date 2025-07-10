@@ -20,8 +20,8 @@ import {
 import { db } from "@/infrastructure/database";
 import { calendarIntegrations } from "@/infrastructure/database/schema";
 import { eq } from "drizzle-orm";
-import { getConnections } from '../data';
-import { userMessageFromError } from '@/features/shared/errors';
+import { getConnections } from './data';
+import { userMessageFromError } from '@/lib/errors';
 import {
   buildConfigFromValues,
   mergeConfig,
@@ -30,9 +30,9 @@ import {
   connectionFormSchema,
   type ConnectionFormValues,
   connectionConfigSchema,
-} from "@/features/connections/schemas/connection";
+} from "@/lib/schemas/connection";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { type ConnectionListItem } from "../data";
+import { type ConnectionListItem } from "./data";
 
 export type { ProviderType };
 export type { CalendarOption };

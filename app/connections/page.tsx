@@ -8,10 +8,8 @@ import {
 } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 
-import {
-  ConnectionData,
-  ConnectionsClient,
-} from "@/features/connections";
+import * as ConnectionData from "./data";
+import ConnectionsClient from "@/components/connections-client";
 import { Suspense } from "react";
 
 async function ConnectionsLoader() {

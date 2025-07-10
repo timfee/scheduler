@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { listAppointmentTypes } from '@/features/booking/data'
+import { listAppointmentTypes } from '../data'
 
 export default async function AppointmentTypePage() {
   const types = await listAppointmentTypes()

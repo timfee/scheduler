@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals'
-import { type BookingFormData } from '@/features/booking'
+import { type BookingFormData } from '@/lib/schemas/booking'
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 
@@ -49,7 +49,7 @@ beforeAll(async () => {
   )
 
   ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
-    '@/features/booking/data',
+    '@/app/(booking)/data',
     () => ({
       getAppointmentType: jest.fn(async () => ({
         id: 'intro',
@@ -62,7 +62,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction } = await import('@/features/booking'))
+  ;({ createBookingAction } = await import('@/app/(booking)/actions'))
 })
 
 describe('booking flow integration', () => {

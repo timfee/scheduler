@@ -3,8 +3,8 @@ import {
   CalendarEventSchema,
   type CalendarEvent,
   type CalendarEventInput,
-} from "@/schemas/calendar-event";
-import { DEFAULT_TIMEZONE, ICAL_PROD_ID } from "@/types/constants";
+} from "@/lib/schemas/calendar-event";
+import { DEFAULT_TIMEZONE, ICAL_PROD_ID } from "@/lib/types/constants";
 import { formatISO, parseISO } from "date-fns";
 import { type createDAVClient } from "tsdav";
 import ical from "ical-generator";

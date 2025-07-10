@@ -62,3 +62,14 @@ export function mapErrorToUserMessage(error: unknown): string {
 
   return 'Something went wrong. Please try again.';
 }
+
+// Utility function for user-friendly error messages
+export function userMessageFromError(error: unknown, fallback: string): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  return fallback;
+}

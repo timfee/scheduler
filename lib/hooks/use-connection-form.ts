@@ -2,11 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import { type ProviderType } from "../actions";
+import { type ProviderType } from "@/app/connections/actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
-} from "../schemas/connection";
+} from "@/lib/schemas/connection";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   apple: "Basic",
@@ -16,7 +16,7 @@ const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   caldav: "Basic",
 };
 
-export { connectionFormSchema, type ConnectionFormValues } from "../schemas/connection";
+export { connectionFormSchema, type ConnectionFormValues } from "@/lib/schemas/connection";
 
 export interface UseConnectionFormReturn {
   form: UseFormReturn<ConnectionFormValues, unknown, ConnectionFormValues>;

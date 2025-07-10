@@ -1,5 +1,5 @@
 import { type CalendarIntegrationConfig, type BasicAuthConfig, type OAuthConfig } from "./integrations";
-import { type ConnectionConfigValues } from "@/features/connections/schemas/connection";
+import { type ConnectionConfigValues } from "@/lib/schemas/connection";
 
 /**
  * Build a CalendarIntegrationConfig from validated form values.

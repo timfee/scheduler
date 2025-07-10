@@ -6,9 +6,9 @@ import {
   updateCalendarCapability,
   removeCalendar,
 } from "@/infrastructure/database/integrations";
-import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/types/constants";
+import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/lib/types/constants";
 import { revalidatePath } from "next/cache";
-import { userMessageFromError } from "@/features/shared/errors";
+import { userMessageFromError } from "@/lib/errors";
 import { z } from "zod/v4";
 
 const addCalendarSchema = z.object({

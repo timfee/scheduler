@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { createBookingAction } from '@/features/booking'
-import { userMessageFromError } from '@/features/shared/errors'
+import { createBookingAction } from './actions'
+import { userMessageFromError } from '@/lib/errors'
 
 export default function BookingPage({ searchParams }: { searchParams: { type?: string; date?: string; time?: string } }) {
   const { type: appointmentType, date, time } = searchParams

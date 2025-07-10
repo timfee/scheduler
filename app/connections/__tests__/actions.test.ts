@@ -3,7 +3,7 @@ import { jest } from '@jest/globals';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import type * as schema from '../../../infrastructure/database/schema';
-import { CALENDAR_CAPABILITY } from '../../../types/constants';
+import { CALENDAR_CAPABILITY } from '@/lib/types/constants';
 
 jest.mock('next/cache', () => ({
   revalidatePath: jest.fn(),
@@ -18,7 +18,7 @@ jest.mock('tsdav', () => ({
 }));
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-let actions: typeof import('./actions');
+let actions: typeof import('../actions');
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let integrations: typeof import('../../../infrastructure/database/integrations');
 let db: BetterSQLite3Database<typeof schema>;
@@ -44,7 +44,7 @@ beforeAll(async () => {
   `);
 
   integrations = await import('../../../infrastructure/database/integrations');
-  actions = await import('./actions');
+  actions = await import('../actions');
 });
 
 beforeEach(() => {

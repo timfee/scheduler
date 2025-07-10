@@ -2,7 +2,7 @@
 
 import { getBookingCalendar, createDAVClientFromIntegration } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { userMessageFromError } from "@/features/shared/errors";
+import { userMessageFromError } from "@/lib/errors";
 
 export async function listBusyTimesAction(from: string, to: string) {
   try {

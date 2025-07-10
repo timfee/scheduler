@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { CALENDAR_CAPABILITY } from "@/types/constants";
+import { CALENDAR_CAPABILITY } from "@/lib/types/constants";
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { type ConnectionListItem } from "../data";
+import { type ConnectionListItem } from "@/app/connections/data";
 
 interface ConnectionsListProps {
   connections: ConnectionListItem[];
