@@ -34,7 +34,7 @@ beforeAll(async () => {
   sqlite = testDb.sqlite;
 
   // Provide the test database to integration helpers for ESM modules
-  (jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
+  jest.unstable_mockModule(
     '@/infrastructure/database',
     () => ({ db }),
   );

@@ -28,7 +28,7 @@ beforeAll(async () => {
     listBusyTimes: jest.fn(async () => []),
   }
 
-  ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
+  jest.unstable_mockModule(
     '@/infrastructure/database/integrations',
     () => ({
       getBookingCalendar: jest.fn(async () => ({
@@ -52,14 +52,14 @@ beforeAll(async () => {
     })
   )
 
-  ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
+  jest.unstable_mockModule(
     '@/infrastructure/providers/caldav',
     () => ({
       createCalDavProvider: jest.fn(() => provider),
     })
   )
 
-  ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
+  jest.unstable_mockModule(
     '@/app/(booking)/data',
     () => ({
       getAppointmentType: jest.fn(async () => ({
