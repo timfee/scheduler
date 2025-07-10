@@ -2,7 +2,7 @@
 import { jest } from '@jest/globals';
 import { createTestDb, cleanupTestDb } from './helpers/db';
 import { calendarIntegrations } from '@/infrastructure/database/schema';
-import { type CalendarCapability } from '../../../lib/types/constants';
+import { type CalendarCapability } from '@/lib/types/constants';
 import {
   type OAuthConfig,
   type createCalendarIntegration as createCal,
