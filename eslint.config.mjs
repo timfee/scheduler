@@ -62,6 +62,19 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-argument": "error",
       "@typescript-eslint/prefer-as-const": "error",
       "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      // Component organization rules
+      "import-x/no-restricted-paths": [
+        "error",
+        {
+          zones: [
+            {
+              target: "./components/!(ui|layout)/**",
+              from: "*",
+              message: "Only 'ui' and 'layout' directories are allowed under components/. Place shared components in the root components/ directory or create feature-specific components in features/*/components/",
+            },
+          ],
+        },
+      ],
     },
   },
   {
