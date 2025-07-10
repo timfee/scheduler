@@ -18,13 +18,12 @@ beforeAll(async () => {
   db = testDb.db;
   sqlite = testDb.sqlite;
 
-  (jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
+  jest.unstable_mockModule(
     '@/infrastructure/database',
     () => ({ db }),
   );
 
-
-  (jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
+  jest.unstable_mockModule(
     'next/cache',
     () => {
       let cached: unknown;

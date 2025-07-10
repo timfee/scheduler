@@ -40,11 +40,7 @@ beforeAll(async () => {
   sqlite = testDb.sqlite;
 
   // Mock the database module to use our test database
-  (
-    jest as unknown as {
-      unstable_mockModule: (p: string, f: () => unknown) => void;
-    }
-  ).unstable_mockModule("@/infrastructure/database", () => ({ db }));
+  jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
   integrations = await import('../../../infrastructure/database/integrations');
   actions = await import('../actions');
@@ -52,7 +48,7 @@ beforeAll(async () => {
 
 afterAll(() => {
   cleanupTestDb(sqlite);
-  (jest as unknown as { resetModules: () => void }).resetModules();
+  jest.resetModules();
 });
 
 beforeEach(() => {

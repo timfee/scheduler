@@ -15,18 +15,14 @@ beforeAll(async () => {
   const testDb = createTestDb();
   db = testDb.db;
   sqlite = testDb.sqlite;
-  (
-    jest as unknown as {
-      unstable_mockModule: (p: string, f: () => unknown) => void;
-    }
-  ).unstable_mockModule("@/infrastructure/database", () => ({ db }));
+  jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
   data = await import("../data");
 });
 
 afterAll(() => {
   cleanupTestDb(sqlite);
-  (jest as unknown as { resetModules: () => void }).resetModules();
+  jest.resetModules();
 });
 
 describe("booking data", () => {
