@@ -51,8 +51,8 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when creating a connection', async () => {
-    const { createConnectionAction } = await import('../app/connections/actions');
-    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
+    const { createConnectionAction } = await import('@/app/connections/actions');
+    const { CALENDAR_CAPABILITY } = await import('@/lib/types/constants');
     
     const result = await createConnectionAction({
       provider: 'apple',
