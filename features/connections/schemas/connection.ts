@@ -31,11 +31,8 @@ const baseSchema = z.object({
 function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
   return schema
     .refine(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (data: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      (data: z.infer<typeof baseSchema>) => {
         if (data.authMethod === "Basic") {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           return !!data.password;
         }
         return true;
