@@ -28,71 +28,98 @@ const baseSchema = z.object({
     .min(1, "Select at least one capability"),
 });
 
-function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
-  return schema
-    .refine(
-      (data: z.infer<typeof baseSchema>) => {
-        if (data.authMethod === "Basic") {
-          return !!data.password;
-        }
-        return true;
-      },
-      {
-        message: "Password is required for Basic authentication",
-        path: ["password"],
-      },
-    )
-    .refine(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (data: any) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          const provider = data.provider;
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          if (provider && ["nextcloud", "caldav"].includes(provider)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            return !!data.serverUrl;
-          }
-          return true;
-        },
-      {
-        message: "Server URL is required for this provider",
-        path: ["serverUrl"],
-      },
-    )
-    .refine(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (data: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        if (data.authMethod === "Oauth") {
-          return (
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            !!data.refreshToken &&
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            !!data.clientId &&
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            !!data.clientSecret &&
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            !!data.tokenUrl
-          );
-        }
-        return true;
-      },
-      {
-        message: "All OAuth fields are required",
-        path: ["refreshToken"],
-      },
-    );
-}
-
-export const connectionFormSchema = withValidations(baseSchema);
+export const connectionFormSchema = baseSchema
+  .refine(
+    (data) => {
+      if (data.authMethod === "Basic") {
+        return !!data.password;
+      }
+      return true;
+    },
+    {
+      message: "Password is required for Basic authentication",
+      path: ["password"],
+    },
+  )
+  .refine(
+    (data) => {
+      const provider = data.provider;
+      if (provider && ["nextcloud", "caldav"].includes(provider)) {
+        return !!data.serverUrl;
+      }
+      return true;
+    },
+    {
+      message: "Server URL is required for this provider",
+      path: ["serverUrl"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.authMethod === "Oauth") {
+        return (
+          !!data.refreshToken &&
+          !!data.clientId &&
+          !!data.clientSecret &&
+          !!data.tokenUrl
+        );
+      }
+      return true;
+    },
+    {
+      message: "All OAuth fields are required",
+      path: ["refreshToken"],
+    },
+  );
 
 export type ConnectionFormValues = z.infer<typeof connectionFormSchema>;
 
 // Schema for just the connection config (no display name or primary flag)
-export const connectionConfigSchema = withValidations(
-  baseSchema.omit({
+export const connectionConfigSchema = baseSchema
+  .omit({
     displayName: true,
-  }),
-);
+  })
+  .refine(
+    (data) => {
+      if (data.authMethod === "Basic") {
+        return !!data.password;
+      }
+      return true;
+    },
+    {
+      message: "Password is required for Basic authentication",
+      path: ["password"],
+    },
+  )
+  .refine(
+    (data) => {
+      const provider = data.provider;
+      if (provider && ["nextcloud", "caldav"].includes(provider)) {
+        return !!data.serverUrl;
+      }
+      return true;
+    },
+    {
+      message: "Server URL is required for this provider",
+      path: ["serverUrl"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.authMethod === "Oauth") {
+        return (
+          !!data.refreshToken &&
+          !!data.clientId &&
+          !!data.clientSecret &&
+          !!data.tokenUrl
+        );
+      }
+      return true;
+    },
+    {
+      message: "All OAuth fields are required",
+      path: ["refreshToken"],
+    },
+  );
 
 export type ConnectionConfigValues = z.infer<typeof connectionConfigSchema>;

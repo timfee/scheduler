@@ -1,10 +1,21 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals'
 import { type BookingFormData } from '@/features/booking'
-
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
+import { type CalDavProvider } from '@/infrastructure/providers/caldav'
+import { type CalendarEvent } from '@/schemas/calendar-event'
 
 let createBookingAction: (d: BookingFormData) => Promise<void>
-let provider: any
+let provider: Pick<CalDavProvider, 'listBusyTimes' | 'createAppointment'>
+
+const mockCalendarEvent: CalendarEvent = {
+  id: 'test-id',
+  title: 'Test Event',
+  startUtc: '2024-01-01T10:00:00.000Z',
+  endUtc: '2024-01-01T10:30:00.000Z',
+  createdUtc: '2024-01-01T09:00:00.000Z',
+  updatedUtc: '2024-01-01T09:00:00.000Z',
+  ownerTimeZone: 'UTC',
+  metadata: {},
+}
 
 beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: 'development' })
@@ -13,8 +24,8 @@ beforeAll(async () => {
   process.env.SQLITE_PATH = ':memory:'
 
   provider = {
-    createAppointment: jest.fn(async () => undefined) as any,
-    listBusyTimes: jest.fn(async () => []) as any,
+    createAppointment: jest.fn(async () => mockCalendarEvent),
+    listBusyTimes: jest.fn(async () => []),
   }
 
   ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
@@ -44,7 +55,7 @@ beforeAll(async () => {
   ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
     '@/infrastructure/providers/caldav',
     () => ({
-      createCalDavProvider: jest.fn(() => provider) as any,
+      createCalDavProvider: jest.fn(() => provider),
     })
   )
 

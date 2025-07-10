@@ -125,7 +125,7 @@ describe('Cache Invalidation', () => {
     const { CALENDAR_CAPABILITY } = await import('../types/constants');
     
     // First create two connections
-    const first = await createConnectionAction({
+    const _first = await createConnectionAction({
       provider: 'apple',
       displayName: 'First Calendar',
       authMethod: 'Basic',
