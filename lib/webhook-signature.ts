@@ -22,7 +22,7 @@ export function verifyWebhookSignature(
   const expectedSignature = hmac.digest("hex");
 
   // Compare with provided signature (remove any 'sha256=' prefix if present)
-  const providedSignature = signature.replace(/^sha256=/, "");
+  const providedSignature = signature.trim().replace(/^sha256=/i, "");
 
   // Use timing-safe comparison to prevent timing attacks
   if (expectedSignature.length !== providedSignature.length) {
