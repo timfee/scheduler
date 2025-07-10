@@ -3,21 +3,33 @@ import { jest, beforeAll, afterAll, afterEach } from "@jest/globals";
 import { TextDecoder, TextEncoder } from "util";
 import { ReadableStream, TransformStream } from 'node:stream/web';
 import { MessageChannel, MessagePort } from 'worker_threads';
+
+// polyfill web APIs for test environment
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).TextEncoder = TextEncoder;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).TextDecoder = TextDecoder;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).ReadableStream = ReadableStream;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).TransformStream = TransformStream;
 // polyfill MessageChannel/MessagePort used by undici
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).MessageChannel = MessageChannel;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).MessagePort = MessagePort;
+
 const { fetch, ProxyAgent, setGlobalDispatcher, Response, Request, Headers } = await import("undici");
+// Assign fetch globally so tests can perform network requests
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+(globalThis as any).fetch = fetch as unknown as typeof globalThis.fetch;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).Response = Response;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).Request = Request;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).Headers = Headers;
+
 const { setupServer } = await import("msw/node");
 
 export const server = setupServer();

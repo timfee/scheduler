@@ -7,11 +7,7 @@ import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { useBookingState } from '@/features/booking/hooks/use-booking-state'
 
 // Polyfill TextEncoder for undici in jsdom environment
-import { TextEncoder, TextDecoder } from 'util'
-// @ts-expect-error jsdom provides no TextEncoder
-global.TextEncoder = TextEncoder
-// @ts-expect-error jsdom provides no TextDecoder
-global.TextDecoder = TextDecoder
+
 
 const mockUseSearchParams = jest.fn()
 jest.mock('next/navigation', () => ({ useSearchParams: mockUseSearchParams }))
