@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/unbound-method */
-/* eslint-disable @typescript-eslint/no-var-requires */
+ 
+ 
 // Use Jest's injected globals and import `jest` for mocking functions.
 import { jest } from '@jest/globals';
 import { createCalDavProvider } from '@/infrastructure/providers/caldav';
@@ -35,7 +35,8 @@ describe('CalDav provider', () => {
       (arg: { iCalString: string }) => Promise<unknown>
     >;
   expect(mockCreate).toHaveBeenCalledTimes(1);
-  const call = mockCreate.mock.calls[0][0];
+    expect(mockCreate.mock.calls[0]).toBeDefined();
+    const call = mockCreate.mock.calls[0]![0]!;
     expect(call.iCalString).toContain('BEGIN:VCALENDAR');
     expect(call.iCalString).toContain('BEGIN:VEVENT');
     expect(call.iCalString).toContain(`SUMMARY:${input.title}`);

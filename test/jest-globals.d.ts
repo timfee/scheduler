@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 import '@jest/globals';
 declare global {
   const beforeAll: typeof import('@jest/globals').beforeAll;

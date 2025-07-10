@@ -6,9 +6,7 @@ export const calendarIntegrations = sqliteTable("calendar_integrations", {
   provider: text("provider").notNull(), // 'caldav', 'google', 'outlook'
   displayName: text("display_name").notNull(),
   encryptedConfig: text("encrypted_config").notNull(),
-  isPrimary: integer("is_primary", { mode: "boolean" })
-    .notNull()
-    .default(false),
+  displayOrder: integer("display_order").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });

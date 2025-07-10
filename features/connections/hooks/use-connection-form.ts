@@ -28,7 +28,7 @@ export interface UseConnectionFormReturn {
 
 export function useConnectionForm(): UseConnectionFormReturn {
   const form = useForm<ConnectionFormValues>({
-    resolver: zodResolver(connectionFormSchema) as Resolver<ConnectionFormValues>,
+    resolver: zodResolver(connectionFormSchema),
     defaultValues: {
       provider: "apple",
       displayName: "",
@@ -42,7 +42,6 @@ export function useConnectionForm(): UseConnectionFormReturn {
       clientSecret: "",
       tokenUrl: "https://accounts.google.com/o/oauth2/token",
       capabilities: [],
-      isPrimary: false,
     },
   });
 

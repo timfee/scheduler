@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
@@ -263,24 +262,7 @@ export default function ConnectionForm({
             {/* Capabilities */}
             <CapabilitiesField control={form.control} />
 
-            {/* Primary */}
-            <FormField
-              control={form.control}
-              name="isPrimary"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Primary</FormLabel>
-                    <FormDescription>
-                      Use this connection for booking new appointments
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
+
 
             {/* Calendars fetched after testing */}
             {testStatus.success && calendars.length > 0 && (

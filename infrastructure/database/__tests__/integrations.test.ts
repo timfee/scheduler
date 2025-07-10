@@ -1,18 +1,26 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 // Use Jest globals for lifecycle hooks and import `jest` for mocking
 import { jest } from '@jest/globals';
 import { createTestDb, cleanupTestDb } from './helpers/db';
 import { calendarIntegrations } from '@/infrastructure/database/schema';
 import { type CalendarCapability } from '../../../types/constants';
-import { type OAuthConfig } from '../integrations';
+import {
+  type OAuthConfig,
+  type createCalendarIntegration as createCal,
+  type updateCalendarIntegration as updateCal,
+  type listCalendarIntegrations as listCals,
+  type getCalendarIntegration as getCal,
+  type getBookingCalendar as getBookingCal,
+  type getCalendarIntegrationsByCapability as getByCap,
+  type deleteCalendarIntegration as deleteCal,
+} from '../integrations';
 
-let createCalendarIntegration: typeof import('../integrations').createCalendarIntegration;
-let updateCalendarIntegration: typeof import('../integrations').updateCalendarIntegration;
-let listCalendarIntegrations: typeof import('../integrations').listCalendarIntegrations;
-let getCalendarIntegration: typeof import('../integrations').getCalendarIntegration;
-let getPrimaryCalendarIntegration: typeof import('../integrations').getPrimaryCalendarIntegration;
-let getCalendarIntegrationsByCapability: typeof import('../integrations').getCalendarIntegrationsByCapability;
-let deleteCalendarIntegration: typeof import('../integrations').deleteCalendarIntegration;
+let createCalendarIntegration: typeof createCal;
+let updateCalendarIntegration: typeof updateCal;
+let listCalendarIntegrations: typeof listCals;
+let getCalendarIntegration: typeof getCal;
+let getBookingCalendar: typeof getBookingCal;
+let getCalendarIntegrationsByCapability: typeof getByCap;
+let deleteCalendarIntegration: typeof deleteCal;
 let db: ReturnType<typeof createTestDb>['db'];
 let sqlite: ReturnType<typeof createTestDb>['sqlite'];
 
@@ -36,7 +44,7 @@ beforeAll(async () => {
   updateCalendarIntegration = integrations.updateCalendarIntegration;
   listCalendarIntegrations = integrations.listCalendarIntegrations;
   getCalendarIntegration = integrations.getCalendarIntegration;
-  getPrimaryCalendarIntegration = integrations.getPrimaryCalendarIntegration;
+  getBookingCalendar = integrations.getBookingCalendar;
   getCalendarIntegrationsByCapability = integrations.getCalendarIntegrationsByCapability;
   deleteCalendarIntegration = integrations.deleteCalendarIntegration;
 });
@@ -79,7 +87,6 @@ it('creates and retrieves integration with decrypted config', async () => {
     provider: 'google',
     displayName: 'Google Cal',
     config,
-    isPrimary: false,
   });
 
   const fetched = await getCalendarIntegration(integration.id);
@@ -118,8 +125,8 @@ it('updates integration and merges config', async () => {
   expect((updated?.config as OAuthConfig).refreshToken).toBe('r2');
 });
 
-it('sets primary integration correctly', async () => {
-  const a = await createCalendarIntegration({
+it('selects booking calendar by display order', async () => {
+  const first = await createCalendarIntegration({
     provider: 'google',
     displayName: 'A',
     config: {
@@ -131,10 +138,10 @@ it('sets primary integration correctly', async () => {
       tokenUrl: 'https://token',
       serverUrl: '',
       calendarUrl: undefined,
-      capabilities: [],
+      capabilities: ['booking'],
     },
   });
-  const b = await createCalendarIntegration({
+  const second = await createCalendarIntegration({
     provider: 'caldav',
     displayName: 'B',
     config: {
@@ -143,43 +150,15 @@ it('sets primary integration correctly', async () => {
       password: 'p',
       serverUrl: 'https://cal.example',
       calendarUrl: undefined,
-      capabilities: [],
+      capabilities: ['booking'],
     },
   });
 
-  await updateCalendarIntegration(b.id, { isPrimary: true });
-
-  const primary = await getPrimaryCalendarIntegration();
-  expect(primary?.id).toBe(b.id);
-  const first = await getCalendarIntegration(a.id);
-  expect(first?.isPrimary).toBe(false);
-});
-
-it('clears primary integration when updated to false', async () => {
-  const integration = await createCalendarIntegration({
-    provider: 'google',
-    displayName: 'Primary',
-    config: {
-      authMethod: 'Oauth',
-      username: 'u',
-      refreshToken: 'r',
-      clientId: 'c',
-      clientSecret: 's',
-      tokenUrl: 'https://token',
-      serverUrl: '',
-      calendarUrl: undefined,
-      capabilities: [],
-    },
-    isPrimary: true,
-  });
-
-  let primary = await getPrimaryCalendarIntegration();
-  expect(primary?.id).toBe(integration.id);
-
-  await updateCalendarIntegration(integration.id, { isPrimary: false });
-
-  primary = await getPrimaryCalendarIntegration();
-  expect(primary).toBeNull();
+  const booking = await getBookingCalendar();
+  expect(booking?.id).toBe(first.id);
+  await updateCalendarIntegration(first.id, { displayOrder: 3 });
+  const after = await getBookingCalendar();
+  expect(after?.id).toBe(second.id);
 });
 
 it('deletes integration', async () => {

@@ -6,16 +6,24 @@ function validateEncryptionKey(key: string): boolean {
   return /^[0-9A-Fa-f]{64}$/.test(key);
 }
 
+/**
+ * Encrypt a plaintext string using AES-256-GCM.
+ *
+ * The encryption key is provided via the `ENCRYPTION_KEY` environment
+ * variable and must be a 64 character hex string.
+ * The returned format is `iv:authTag:ciphertext` all in hex.
+ */
 export function encrypt(text: string): string {
   try {
-    if (!validateEncryptionKey(env.ENCRYPTION_KEY)) {
+    const key = env.ENCRYPTION_KEY;
+    if (!key || !validateEncryptionKey(key)) {
       throw new EncryptionError("Invalid encryption key format", "INVALID_KEY");
     }
 
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv(
       "aes-256-gcm",
-      Buffer.from(env.ENCRYPTION_KEY, "hex"),
+      Buffer.from(key, "hex"),
       iv,
     );
 
@@ -41,6 +49,12 @@ export function encrypt(text: string): string {
   }
 }
 
+/**
+ * Decrypt a value previously encrypted with {@link encrypt}.
+ *
+ * The input must be a string in the format `iv:authTag:ciphertext` using hex
+ * encoding. If the data cannot be decrypted an `EncryptionError` is thrown.
+ */
 export function decrypt(encryptedText: string): string {
   try {
     const parts = encryptedText.split(":");
@@ -52,10 +66,18 @@ export function decrypt(encryptedText: string): string {
     }
 
     const [ivHex, authTagHex, encrypted] = parts;
+    if (!ivHex || !authTagHex || !encrypted) {
+      throw new EncryptionError("Invalid encrypted data format", "DECRYPT_FAILED");
+    }
+
+    const key = env.ENCRYPTION_KEY;
+    if (!key || !validateEncryptionKey(key)) {
+      throw new EncryptionError("Invalid encryption key format", "INVALID_KEY");
+    }
 
     const decipher = crypto.createDecipheriv(
       "aes-256-gcm",
-      Buffer.from(env.ENCRYPTION_KEY, "hex"),
+      Buffer.from(key, "hex"),
       Buffer.from(ivHex, "hex"),
     );
 

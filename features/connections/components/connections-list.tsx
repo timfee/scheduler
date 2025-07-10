@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { CALENDAR_CAPABILITY } from "@/types/constants";
 import {
   Card,
@@ -16,14 +17,14 @@ interface ConnectionsListProps {
   connections: ConnectionListItem[];
   onEdit: (connection: ConnectionListItem) => void;
   onDelete: (id: string) => void;
-  onSetPrimary: (id: string) => void;
+  onMove: (id: string, direction: "up" | "down") => void;
 }
 
 export default function ConnectionsList({
   connections,
   onEdit,
   onDelete,
-  onSetPrimary,
+  onMove,
 }: ConnectionsListProps) {
   if (connections.length === 0) {
     return <p className="text-muted-foreground">No calendar connections yet.</p>;
@@ -38,20 +39,26 @@ export default function ConnectionsList({
               <div>
                 <CardTitle className="flex items-center gap-2">
                   {connection.displayName}
-                  {connection.isPrimary && <Badge variant="default">Primary</Badge>}
                 </CardTitle>
                 <CardDescription>Provider: {connection.provider}</CardDescription>
               </div>
               <div className="flex gap-2">
-                {!connection.isPrimary && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onSetPrimary(connection.id)}
-                  >
-                    Set Primary
-                  </Button>
-                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onMove(connection.id, "up")}
+                  aria-label="Move up"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onMove(connection.id, "down")}
+                  aria-label="Move down"
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => onEdit(connection)}>
                   Edit
                 </Button>

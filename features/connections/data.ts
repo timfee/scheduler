@@ -9,7 +9,6 @@ export interface ConnectionListItem {
   id: string;
   provider: ProviderType;
   displayName: string;
-  isPrimary: boolean;
   capabilities: CalendarCapability[];
   createdAt: Date;
   updatedAt: Date;
@@ -23,7 +22,6 @@ export async function getConnections(): Promise<ConnectionListItem[]> {
       ? integration.provider
       : 'caldav',
     displayName: integration.displayName,
-    isPrimary: integration.isPrimary,
     capabilities: integration.config.capabilities,
     createdAt: integration.createdAt,
     updatedAt: integration.updatedAt,

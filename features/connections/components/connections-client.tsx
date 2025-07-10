@@ -2,25 +2,24 @@
 
 import { Button } from "@/components/ui/button";
 import ConnectionForm from "./connection-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 
 import {
   createConnectionAction,
   deleteConnectionAction,
-  setPrimaryConnectionAction,
   testConnectionAction,
   updateConnectionAction,
   listCalendarsAction,
   getConnectionDetailsAction,
   listCalendarsForConnectionAction,
   listConnectionsAction,
+  updateCalendarOrderAction,
   type CalendarOption,
   type ConnectionFormData,
 } from "../actions";
 import { type ConnectionListItem } from "../data";
 import { userMessageFromError } from "@/features/shared/errors";
 import ConnectionsList from "./connections-list";
-import { useConnectionStore } from "../stores/connection-store";
 import {
   useConnectionForm,
   type ConnectionFormValues,
@@ -35,13 +34,18 @@ interface ConnectionsClientProps {
 export default function ConnectionsClient({
   initialConnections,
 }: ConnectionsClientProps) {
-  const {
-    connections,
-    setConnections,
-    addConnection,
-    updateConnection,
-    removeConnection,
-  } = useConnectionStore();
+  const [connections, setConnections] = useState<ConnectionListItem[]>(
+    initialConnections
+  );
+  const addConnection = (item: ConnectionListItem) =>
+    setConnections((prev) => [...prev, item]);
+  const updateConnection = (item: ConnectionListItem) =>
+    setConnections((prev) =>
+      prev.map((c) => (c.id === item.id ? item : c))
+    );
+  const removeConnection = (id: string) =>
+    setConnections((prev) => prev.filter((c) => c.id !== id));
+  const [, startTransition] = useTransition();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingConnection, setEditingConnection] =
     useState<ConnectionListItem | null>(null);
@@ -52,10 +56,10 @@ export default function ConnectionsClient({
   }>({ testing: false });
   const [calendars, setCalendars] = useState<CalendarOption[]>([]);
 
-  // initialize store with data from server
+  // sync state with server-provided data
   useEffect(() => {
-    setConnections(initialConnections)
-  }, [initialConnections, setConnections])
+    setConnections(initialConnections);
+  }, [initialConnections]);
 
   type FormValues = ConnectionFormValues;
   const {
@@ -128,7 +132,6 @@ export default function ConnectionsClient({
               serverUrl: values.serverUrl,
               calendarUrl: values.calendarUrl,
               capabilities: values.capabilities,
-              isPrimary: values.isPrimary,
             }
           : {
               provider: values.provider,
@@ -143,7 +146,6 @@ export default function ConnectionsClient({
               serverUrl: values.serverUrl,
               calendarUrl: values.calendarUrl,
               capabilities: values.capabilities,
-              isPrimary: values.isPrimary,
             };
 
       if (editingConnection) {
@@ -165,7 +167,6 @@ export default function ConnectionsClient({
           id: tempId,
           provider: connectionData.provider,
           displayName: connectionData.displayName,
-          isPrimary: connectionData.isPrimary ?? false,
           capabilities: connectionData.capabilities,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -192,32 +193,28 @@ export default function ConnectionsClient({
       return;
     }
 
-    const existing = connections.find((c) => c.id === id);
-    if (existing) removeConnection(id);
+    const previous = connections;
+    startTransition(() => {
+      setConnections((prev) => prev.filter((c) => c.id !== id));
+    });
+
     try {
       await deleteConnectionAction(id);
     } catch (error) {
-      if (existing) addConnection(existing);
+      setConnections(previous);
       alert(userMessageFromError(error, "Failed to delete connection"));
     }
+
     const updated = await listConnectionsAction();
     setConnections(updated);
   };
 
-  const handleSetPrimary = async (id: string) => {
-    const prev = [...connections];
-    setConnections(
-      connections.map((c) => ({ ...c, isPrimary: c.id === id })),
-    );
-    try {
-      await setPrimaryConnectionAction(id);
-    } catch (error) {
-      setConnections(prev);
-      alert(userMessageFromError(error, "Failed to set primary connection"));
-    }
+  const handleMove = async (id: string, direction: "up" | "down") => {
+    await updateCalendarOrderAction(id, direction);
     const updated = await listConnectionsAction();
     setConnections(updated);
   };
+
 
   const handleEdit = async (connection: ConnectionListItem) => {
     setEditingConnection(connection);
@@ -237,7 +234,6 @@ export default function ConnectionsClient({
         displayName: connection.displayName,
         authMethod: PROVIDER_AUTH_METHODS[connection.provider],
         capabilities: connection.capabilities,
-        isPrimary: connection.isPrimary,
         // Reset other fields to defaults
         username: "",
         password: "",
@@ -293,7 +289,7 @@ export default function ConnectionsClient({
         connections={connections}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onSetPrimary={handleSetPrimary}
+        onMove={handleMove}
       />
     </div>
   );

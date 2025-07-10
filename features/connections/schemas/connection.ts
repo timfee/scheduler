@@ -3,8 +3,7 @@ import { CALENDAR_CAPABILITY } from "@/types/constants";
 
 /**
  * Schema for connection form values used on both client and server.
- * Includes optional `calendarUrl`, a list of `capabilities`, and an `isPrimary`
- * flag to mark the default integration.
+ * Includes optional `calendarUrl` and a list of `capabilities`.
  */
 const baseSchema = z.object({
   provider: z.enum(["apple", "google", "fastmail", "nextcloud", "caldav"]),
@@ -27,7 +26,6 @@ const baseSchema = z.object({
       ]),
     )
     .min(1, "Select at least one capability"),
-  isPrimary: z.boolean().optional().default(false),
 });
 
 function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
@@ -45,12 +43,13 @@ function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
       },
     )
     .refine(
-      (data: z.infer<z.ZodObject<S>>) => {
-        if (["nextcloud", "caldav"].includes(data.provider)) {
-          return !!data.serverUrl;
-        }
-        return true;
-      },
+        (data: z.infer<z.ZodObject<S>>) => {
+          const provider = data.provider;
+          if (provider && ["nextcloud", "caldav"].includes(provider)) {
+            return !!data.serverUrl;
+          }
+          return true;
+        },
       {
         message: "Server URL is required for this provider",
         path: ["serverUrl"],
@@ -83,7 +82,6 @@ export type ConnectionFormValues = z.infer<typeof connectionFormSchema>;
 export const connectionConfigSchema = withValidations(
   baseSchema.omit({
     displayName: true,
-    isPrimary: true,
   }),
 );
 
