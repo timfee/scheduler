@@ -7,7 +7,7 @@
     "email": "tim@timfeeley.com"
   },
   "scripts": {
-    "build": "next build",
+    "build": "pnpm db:init && next build",
     "db:generate": "drizzle-kit generate:sqlite && drizzle-kit generate:pg",
     "db:init": "tsx scripts/init-db.ts",
     "db:push": "drizzle-kit push:sqlite",
