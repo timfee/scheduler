@@ -3,6 +3,7 @@ import React from 'react'
 import { describe, it, expect, jest } from '@jest/globals'
 import ReactDOM from 'react-dom/test-utils'
 import { createRoot } from 'react-dom/client'
+import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { useBookingState } from '@/features/booking/hooks/use-booking-state'
 
 // Polyfill TextEncoder for undici in jsdom environment
@@ -36,20 +37,23 @@ class Boundary extends React.Component<React.PropsWithChildren> {
   }
 }
 
-describe.skip('booking flow parallel routes', () => {
+describe('booking flow parallel routes', () => {
   it('URL state updates correctly', () => {
     const params = new URLSearchParams()
-    const setParams = jest.fn()
-    mockUseSearchParams.mockReturnValue([params, setParams])
+    mockUseSearchParams.mockReturnValue([params, jest.fn()])
     const div = document.createElement('div')
     ReactDOM.act(() => {
-      createRoot(div).render(<TestComponent />)
+      createRoot(div).render(
+        <NuqsTestingAdapter>
+          <TestComponent />
+        </NuqsTestingAdapter>
+      )
     })
     const button = div.querySelector('button')!
     ReactDOM.act(() => {
       button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
-    expect(setParams).toHaveBeenCalled()
+    expect(div.textContent).toContain('intro')
   })
 
   it('slots render independently', () => {
@@ -60,14 +64,16 @@ describe.skip('booking flow parallel routes', () => {
     }
     function App() {
       return (
-        <>
-          <Boundary>
-            <Slot />
-          </Boundary>
-          <Boundary>
-            <Slot fail />
-          </Boundary>
-        </>
+        <NuqsTestingAdapter>
+          <>
+            <Boundary>
+              <Slot />
+            </Boundary>
+            <Boundary>
+              <Slot fail />
+            </Boundary>
+          </>
+        </NuqsTestingAdapter>
       )
     }
     const div = document.createElement('div')
