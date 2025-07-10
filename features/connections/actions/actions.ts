@@ -31,7 +31,7 @@ import {
   type ConnectionFormValues,
   connectionConfigSchema,
 } from "@/features/connections/schemas/connection";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type ConnectionListItem } from "../data";
 
 export type { ProviderType };
@@ -75,6 +75,7 @@ export async function createConnectionAction(
     const integration = await createCalendarIntegration(input);
 
     revalidatePath("/connections");
+    revalidateTag("calendars");
 
     return {
       id: integration.id,
@@ -147,6 +148,7 @@ export async function updateConnectionAction(
     }
 
     revalidatePath("/connections");
+    revalidateTag("calendars");
 
     return {
       id: updated.id,
@@ -168,6 +170,7 @@ export async function deleteConnectionAction(id: string): Promise<void> {
     }
 
     revalidatePath("/connections");
+    revalidateTag("calendars");
 
     return;
   } catch (error) {
@@ -319,6 +322,7 @@ export async function updateCalendarOrderAction(
     });
 
     revalidatePath("/connections");
+    revalidateTag("calendars");
   } catch (error) {
     throw new Error(userMessageFromError(error, "Failed to update order"));
   }
