@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createBookingAction } from '@/features/booking'
+import { userMessageFromError } from '@/features/shared/errors'
 
 export default function BookingPage({ searchParams }: { searchParams: { type?: string; date?: string; time?: string } }) {
   const { type, date, time } = searchParams
@@ -8,18 +9,18 @@ export default function BookingPage({ searchParams }: { searchParams: { type?: s
     return <p className="text-muted-foreground">Select a type, date, and time.</p>
   }
 
-  const t = type
-  const d = date
-  const ti = time
-
   async function book(formData: FormData) {
     'use server'
-    const rawName = formData.get('name')
-    const rawEmail = formData.get('email')
-    if (typeof rawName !== 'string' || typeof rawEmail !== 'string') {
-      throw new Error('Invalid form submission')
+    try {
+      const rawName = formData.get('name')
+      const rawEmail = formData.get('email')
+      if (typeof rawName !== 'string' || typeof rawEmail !== 'string') {
+        throw new Error('Invalid form submission')
+      }
+      await createBookingAction({ type: type!, date: date!, time: time!, name: rawName, email: rawEmail })
+    } catch (error) {
+      throw new Error(userMessageFromError(error, 'Failed to submit booking'))
     }
-    await createBookingAction({ type: t, date: d, time: ti, name: rawName, email: rawEmail })
   }
 
   return (

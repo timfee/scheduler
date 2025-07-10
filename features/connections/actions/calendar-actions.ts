@@ -8,6 +8,7 @@ import {
 } from "@/infrastructure/database/integrations";
 import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/types/constants";
 import { revalidatePath } from "next/cache";
+import { userMessageFromError } from "@/features/shared/errors";
 import { z } from "zod/v4";
 
 const addCalendarSchema = z.object({
@@ -45,9 +46,7 @@ export async function addCalendarAction(
     revalidatePath("/connections");
     return calendar;
   } catch (error) {
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to add calendar",
-    );
+    throw new Error(userMessageFromError(error, "Failed to add calendar"));
   }
 }
 
@@ -61,9 +60,7 @@ export async function updateCalendarCapabilityAction(
     revalidatePath("/connections");
     return;
   } catch (error) {
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to update calendar",
-    );
+    throw new Error(userMessageFromError(error, "Failed to update calendar"));
   }
 }
 
@@ -78,9 +75,7 @@ export async function removeCalendarAction(calendarId: string) {
     revalidatePath("/connections");
     return;
   } catch (error) {
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to remove calendar",
-    );
+    throw new Error(userMessageFromError(error, "Failed to remove calendar"));
   }
 }
 
@@ -89,8 +84,6 @@ export async function listCalendarsForIntegrationAction(integrationId: string) {
     const calendars = await getCalendarsForIntegration(integrationId);
     return calendars;
   } catch (error) {
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to list calendars",
-    );
+    throw new Error(userMessageFromError(error, "Failed to list calendars"));
   }
 }

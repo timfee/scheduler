@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -22,7 +22,7 @@ async function ConnectionsLoader() {
     return (
       <Alert variant="destructive">
         <AlertCircle className="size-4" />
-        <AlertTitle>Error</AlertTitle>
+        <div className="font-medium">Error</div>
         <AlertDescription>{"Failed to load connections"}</AlertDescription>
       </Alert>
     );

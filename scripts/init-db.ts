@@ -5,7 +5,7 @@ import { createTables } from "../infrastructure/database/migrations";
 import * as schema from "../infrastructure/database/schema";
 
 function initDb() {
-  console.log("Initializing database...");
+  // Initialize database
 
   // Create database connection
   const sqlite = new Database("scheduler.db");
@@ -13,7 +13,6 @@ function initDb() {
 
   try {
     createTables(db);
-    console.log("Database initialized successfully!");
 
     // Insert default preferences if they don't exist
     const existingPrefs = db
@@ -30,7 +29,6 @@ function initDb() {
           updatedAt: new Date(),
         })
         .run();
-      console.log("Default preferences added.");
     }
   } catch (error) {
     console.error("Error initializing database:", error);

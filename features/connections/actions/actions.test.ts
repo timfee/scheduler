@@ -1,7 +1,6 @@
 // Use Jest globals for lifecycle methods; import `jest` explicitly for mocking.
 import { jest } from '@jest/globals';
 import { CALENDAR_CAPABILITY } from '../../../types/constants';
-import { type DAVClient } from 'tsdav';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import type * as schema from '../../../infrastructure/database/schema';

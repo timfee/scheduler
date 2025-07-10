@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { sql } from 'drizzle-orm';
 import { createTestDb, cleanupTestDb, createTestIntegration } from './helpers/db';
-import type { getCachedCalendars as GetCachedCalendars } from '../integrations';
+import  { type getCachedCalendars as GetCachedCalendars } from '../integrations';
 
 let getCachedCalendars: typeof GetCachedCalendars;
 let db: ReturnType<typeof createTestDb>['db'];
@@ -58,10 +58,10 @@ beforeEach(() => {
 
 it('caches calendar list between calls', async () => {
   await createTestIntegration(db, { id: 'a', displayName: 'A' });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
+   
   const first = await getCachedCalendars();
   await createTestIntegration(db, { id: 'b', displayName: 'B' });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
+   
   const second = await getCachedCalendars();
   expect(first).toEqual(second);
 });

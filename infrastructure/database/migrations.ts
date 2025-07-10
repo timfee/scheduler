@@ -43,12 +43,25 @@ export function createTables<T extends Record<string, unknown>>(db: BetterSQLite
     )
   `);
 
+  db.run(sql`
+    CREATE TABLE IF NOT EXISTS appointment_types (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      duration_minutes INTEGER NOT NULL,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    )
+  `);
+
   // Create indexes
   db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendar_integrations_provider ON calendar_integrations(provider)`);
   db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendar_integrations_display_order ON calendar_integrations(display_order)`);
   db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendars_integration_id ON calendars(integration_id)`);
   db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendars_capability ON calendars(capability)`);
   db.run(sql`CREATE INDEX IF NOT EXISTS idx_api_cache_expires_at ON api_cache(expires_at)`);
+  db.run(sql`CREATE INDEX IF NOT EXISTS idx_appointment_types_active ON appointment_types(is_active)`);
 }
 
 export function dropTables<T extends Record<string, unknown>>(db: BetterSQLite3Database<T>) {
@@ -56,4 +69,5 @@ export function dropTables<T extends Record<string, unknown>>(db: BetterSQLite3D
   db.run(sql`DROP TABLE IF EXISTS preferences`);
   db.run(sql`DROP TABLE IF EXISTS calendars`);
   db.run(sql`DROP TABLE IF EXISTS calendar_integrations`);
+  db.run(sql`DROP TABLE IF EXISTS appointment_types`);
 }

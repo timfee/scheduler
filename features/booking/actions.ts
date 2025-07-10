@@ -1,20 +1,18 @@
 "use server";
 
-import { getBookingCalendar, createDAVClientFromIntegration } from "@/infrastructure/database/integrations";
+import { userMessageFromError } from "@/features/shared/errors";
+import {
+  createDAVClientFromIntegration,
+  getBookingCalendar,
+} from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { getAppointmentType } from "./data";
 import { DEFAULT_TIMEZONE } from "@/types/constants";
-import { z } from "zod/v4";
 
-const bookingFormSchema = z.object({
-  type: z.string(),
-  date: z.string().regex(/\d{4}-\d{2}-\d{2}/, "Invalid date"),
-  time: z.string(),
-  name: z.string().min(1),
-  email: z.string().email(),
-});
+import { getAppointmentType } from "./data";
+import { bookingFormSchema, type BookingFormData } from "./schemas/booking";
 
-export type BookingFormData = z.infer<typeof bookingFormSchema>;
+// Simple in-memory rate limiter keyed by email address
+const lastBookingAt = new Map<string, number>();
 
 /**
  * Server action to create a booking on the configured calendar.
@@ -23,33 +21,46 @@ export type BookingFormData = z.infer<typeof bookingFormSchema>;
  * booking calendar and then creates the event via CalDAV.
  */
 export async function createBookingAction(formData: BookingFormData) {
-  const { type, date, time, name, email } = bookingFormSchema.parse(formData);
+  try {
+    const { type, date, time, name, email } = bookingFormSchema.parse(formData);
 
-  const apptType = await getAppointmentType(type);
-  if (!apptType) {
-    throw new Error("Invalid appointment type");
+    const now = Date.now();
+    const last = lastBookingAt.get(email) ?? 0;
+    if (now - last < 60_000) {
+      throw new Error("Too many booking attempts. Please wait a minute.");
+    }
+    lastBookingAt.set(email, now);
+
+    const apptType = await getAppointmentType(type);
+    if (!apptType) {
+      throw new Error("Invalid appointment type");
+    }
+
+    const start = new Date(`${date}T${time}:00Z`);
+    const end = new Date(
+      start.getTime() + apptType.durationMinutes * 60 * 1000,
+    );
+
+    const integration = await getBookingCalendar();
+    if (!integration) {
+      throw new Error("No booking calendar configured");
+    }
+
+    const client = await createDAVClientFromIntegration(integration);
+    const provider = createCalDavProvider(
+      client,
+      integration.config.calendarUrl ?? "",
+    );
+
+    await provider.createAppointment({
+      title: `${apptType.name} - ${name}`,
+      description: `Scheduled via booking form for ${email}`,
+      startUtc: start.toISOString(),
+      endUtc: end.toISOString(),
+      ownerTimeZone: DEFAULT_TIMEZONE,
+      location: "",
+    });
+  } catch (error) {
+    throw new Error(userMessageFromError(error, "Failed to create booking"));
   }
-
-  const start = new Date(`${date}T${time}:00Z`);
-  const end = new Date(start.getTime() + apptType.durationMinutes * 60 * 1000);
-
-  const integration = await getBookingCalendar();
-  if (!integration) {
-    throw new Error("No booking calendar configured");
-  }
-
-  const client = await createDAVClientFromIntegration(integration);
-  const provider = createCalDavProvider(
-    client,
-    integration.config.calendarUrl ?? ""
-  );
-
-  await provider.createAppointment({
-    title: `${apptType.name} - ${name}`,
-    description: `Scheduled via booking form for ${email}`,
-    startUtc: start.toISOString(),
-    endUtc: end.toISOString(),
-    ownerTimeZone: DEFAULT_TIMEZONE,
-    location: "",
-  });
 }
