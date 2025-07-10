@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { sql } from 'drizzle-orm';
 import { createTestDb, cleanupTestDb, createTestIntegration } from './helpers/db';
-import  { type getCachedCalendars as GetCachedCalendars } from '../integrations';
+import { type getCachedCalendars as GetCachedCalendars } from '../integrations';
 
 let getCachedCalendars: typeof GetCachedCalendars;
 let db: ReturnType<typeof createTestDb>['db'];
