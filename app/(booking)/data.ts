@@ -25,17 +25,21 @@ export const listAppointmentTypes = unstable_cache(
 /**
  * Look up a specific appointment type by id.
  */
-export const getAppointmentType = unstable_cache(
-  async (id: string): Promise<AppointmentType | null> => {
-    const result = await db
-      .select()
-      .from(appointmentTypes)
-      .where(eq(appointmentTypes.id, id));
-    return result[0] ?? null;
-  },
-  ['appointment-type'],
-  { 
-    revalidate: 3600, // Cache for 1 hour
-    tags: ['appointment-types']
-  }
-);
+const cachedGetAppointmentType = async (id: string): Promise<AppointmentType | null> => {
+  const result = await db
+    .select()
+    .from(appointmentTypes)
+    .where(eq(appointmentTypes.id, id));
+  return result[0] ?? null;
+};
+
+export const getAppointmentType = (id: string) => {
+  return unstable_cache(
+    () => cachedGetAppointmentType(id),
+    [`appointment-type-${id}`],
+    { 
+      revalidate: 3600, // Cache for 1 hour
+      tags: ['appointment-types']
+    }
+  )();
+};

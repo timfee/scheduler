@@ -5,26 +5,30 @@ import { getBookingCalendar, createDAVClientFromIntegration } from "@/infrastruc
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
 import { mapErrorToUserMessage } from "@/lib/errors";
 
-export const listBusyTimesAction = unstable_cache(
-  async (from: string, to: string) => {
-    try {
-      const integration = await getBookingCalendar();
-      if (!integration) return [];
+const cachedListBusyTimes = async (from: string, to: string) => {
+  try {
+    const integration = await getBookingCalendar();
+    if (!integration) return [];
 
-      const client = await createDAVClientFromIntegration(integration);
-      const provider = createCalDavProvider(
-        client,
-        integration.config.calendarUrl ?? "",
-      );
+    const client = await createDAVClientFromIntegration(integration);
+    const provider = createCalDavProvider(
+      client,
+      integration.config.calendarUrl ?? "",
+    );
 
-      return provider.listBusyTimes({ from, to });
-    } catch (error) {
-      throw new Error(mapErrorToUserMessage(error, "Failed to list busy times"));
-    }
-  },
-  ['busy-times'],
-  { 
-    revalidate: 300, // Cache for 5 minutes
-    tags: ['busy-times']
+    return provider.listBusyTimes({ from, to });
+  } catch (error) {
+    throw new Error(mapErrorToUserMessage(error, "Failed to list busy times"));
   }
-);
+};
+
+export const listBusyTimesAction = (from: string, to: string) => {
+  return unstable_cache(
+    () => cachedListBusyTimes(from, to),
+    [`busy-times-${from}-${to}`],
+    { 
+      revalidate: 300, // Cache for 5 minutes
+      tags: ['busy-times']
+    }
+  )();
+};

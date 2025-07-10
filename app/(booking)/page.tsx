@@ -6,6 +6,7 @@ import { BookingProgress } from '@/components/booking-progress'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { createBookingAction } from '@/app/(booking)/actions'
 import { mapErrorToUserMessage } from '@/lib/errors'
+import { formatDateForBooking } from '@/lib/utils'
 
 export default function BookingPage() {
   const { type: appointmentType, date, time, progress, isComplete } = useBookingState()
@@ -33,7 +34,7 @@ export default function BookingPage() {
       }
       await createBookingAction({ 
         type: appointmentType, 
-        date: date?.toISOString().split('T')[0] ?? '', 
+        date: date ? formatDateForBooking(date) : '', 
         time: time, 
         name: rawName, 
         email: rawEmail 
@@ -49,7 +50,7 @@ export default function BookingPage() {
       <p className="font-medium">You selected:</p>
       <ul className="list-disc pl-4 mb-4">
         <li>Type: {appointmentType}</li>
-        <li>Date: {date?.toISOString().split('T')[0]}</li>
+        <li>Date: {date ? formatDateForBooking(date) : ''}</li>
         <li>Time: {time}</li>
       </ul>
       <form action={book} className="space-y-2">

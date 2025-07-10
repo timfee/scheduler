@@ -13,11 +13,18 @@ const mockUseSearchParams = jest.fn()
 jest.mock('next/navigation', () => ({ useSearchParams: mockUseSearchParams }))
 
 function TestComponent() {
-  const { type, updateBookingStep } = useBookingState()
+  const { type, date, time, progress, isComplete, updateBookingStep } = useBookingState()
   return (
     <div>
-      <span>{type}</span>
-      <button onClick={() => updateBookingStep({ type: 'intro' })}>set</button>
+      <span data-testid="type">{type}</span>
+      <span data-testid="date">{date?.toISOString() ?? ''}</span>
+      <span data-testid="time">{time}</span>
+      <span data-testid="progress">{progress}</span>
+      <span data-testid="complete">{isComplete ? 'true' : 'false'}</span>
+      <button onClick={() => updateBookingStep({ type: 'intro' })}>set type</button>
+      <button onClick={() => updateBookingStep({ date: new Date('2024-01-01') })}>set date</button>
+      <button onClick={() => updateBookingStep({ time: '10:00' })}>set time</button>
+      <button onClick={() => updateBookingStep({ type: 'intro', date: new Date('2024-01-01'), time: '10:00' })}>set all</button>
     </div>
   )
 }
@@ -34,7 +41,7 @@ class Boundary extends React.Component<React.PropsWithChildren> {
 }
 
 describe('booking flow parallel routes', () => {
-  it('URL state updates correctly', () => {
+  it('URL state updates correctly for type', () => {
     const params = new URLSearchParams()
     mockUseSearchParams.mockReturnValue([params, jest.fn()])
     const div = document.createElement('div')
@@ -49,7 +56,58 @@ describe('booking flow parallel routes', () => {
     ReactDOM.act(() => {
       button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
-    expect(div.textContent).toContain('intro')
+    expect(div.querySelector('[data-testid="type"]')?.textContent).toBe('intro')
+  })
+
+  it('tracks progress correctly', () => {
+    const params = new URLSearchParams()
+    mockUseSearchParams.mockReturnValue([params, jest.fn()])
+    const div = document.createElement('div')
+    ReactDOM.act(() => {
+      createRoot(div).render(
+        <NuqsTestingAdapter>
+          <TestComponent />
+        </NuqsTestingAdapter>
+      )
+    })
+    
+    // Initially progress should be 0
+    expect(div.querySelector('[data-testid="progress"]')?.textContent).toBe('0')
+    expect(div.querySelector('[data-testid="complete"]')?.textContent).toBe('false')
+    
+    // Set type - progress should be 1
+    const setTypeButton = div.querySelector('button')!
+    ReactDOM.act(() => {
+      setTypeButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+    expect(div.querySelector('[data-testid="progress"]')?.textContent).toBe('1')
+    expect(div.querySelector('[data-testid="complete"]')?.textContent).toBe('false')
+  })
+
+  it('completes booking when all fields are set', () => {
+    const params = new URLSearchParams()
+    mockUseSearchParams.mockReturnValue([params, jest.fn()])
+    const div = document.createElement('div')
+    ReactDOM.act(() => {
+      createRoot(div).render(
+        <NuqsTestingAdapter>
+          <TestComponent />
+        </NuqsTestingAdapter>
+      )
+    })
+    
+    // Set all fields at once
+    const setAllButton = div.querySelectorAll('button')[3]
+    if (setAllButton) {
+      ReactDOM.act(() => {
+        setAllButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      })
+    }
+    
+    expect(div.querySelector('[data-testid="progress"]')?.textContent).toBe('3')
+    expect(div.querySelector('[data-testid="complete"]')?.textContent).toBe('true')
+    expect(div.querySelector('[data-testid="type"]')?.textContent).toBe('intro')
+    expect(div.querySelector('[data-testid="time"]')?.textContent).toBe('10:00')
   })
 
   it('slots render independently', () => {
