@@ -6,9 +6,9 @@ import {
   updateCalendarCapability,
   removeCalendar,
 } from "@/infrastructure/database/integrations";
-import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/types/constants";
-import { revalidatePath } from "next/cache";
-import { mapErrorToUserMessage } from "@/lib/errors";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { mapErrorToUserMessage } from '@/lib/errors';
+import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/lib/types/constants";
 import { z } from "zod/v4";
 
 const addCalendarSchema = z.object({
@@ -44,6 +44,7 @@ export async function addCalendarAction(
     );
 
     revalidatePath("/connections");
+    revalidateTag("calendars");
     return calendar;
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to add calendar"));

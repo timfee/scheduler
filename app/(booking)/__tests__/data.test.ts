@@ -5,7 +5,7 @@ import {
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { sql } from "drizzle-orm";
 
-import type * as bookingData from "./data";
+import type * as bookingData from "../data";
 
 let db: ReturnType<typeof createTestDb>["db"];
 let sqlite: ReturnType<typeof createTestDb>["sqlite"];
@@ -21,7 +21,7 @@ beforeAll(async () => {
     }
   ).unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
-  data = await import("./data");
+  data = await import("../data");
 });
 
 afterAll(() => {

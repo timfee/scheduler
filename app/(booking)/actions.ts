@@ -6,7 +6,7 @@ import {
   getBookingCalendar,
 } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { DEFAULT_TIMEZONE } from "@/types/constants";
+import { DEFAULT_TIMEZONE } from "@/lib/types/constants";
 
 import { getAppointmentType } from "./data";
 import { bookingFormSchema, type BookingFormData } from "./schemas/booking";
@@ -28,11 +28,6 @@ function cleanupOldEntries() {
       lastBookingAt.delete(email);
     }
   });
-}
-
-// Export for testing purposes
-export function clearRateLimiter() {
-  lastBookingAt.clear();
 }
 
 /**
@@ -95,4 +90,9 @@ export async function createBookingAction(formData: BookingFormData) {
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to create booking"));
   }
+}
+
+// Export for testing purposes
+export function clearRateLimiter() {
+  lastBookingAt.clear();
 }

@@ -20,7 +20,7 @@ import {
 import { db } from "@/infrastructure/database";
 import { calendarIntegrations } from "@/infrastructure/database/schema";
 import { eq } from "drizzle-orm";
-import { getConnections } from '../data';
+import { getConnections } from './data';
 import { mapErrorToUserMessage } from '@/lib/errors';
 import {
   buildConfigFromValues,
@@ -30,18 +30,14 @@ import {
   connectionFormSchema,
   type ConnectionFormValues,
   connectionConfigSchema,
-} from "@/features/connections/schemas/connection";
+} from "./schemas/connection";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { type ConnectionListItem } from "../data";
+import { type ConnectionListItem } from "./data";
 
 export type { ProviderType };
 export type { CalendarOption };
 
 export type ConnectionFormData = ConnectionFormValues;
-
-
-
-
 
 /**
  * Create a new calendar connection
@@ -104,7 +100,6 @@ export async function updateConnectionAction(
     if (formData.displayName !== undefined) {
       updateInput.displayName = formData.displayName;
     }
-
 
     // Handle config updates
     const hasConfigUpdates = Object.keys(formData).some((key) =>
@@ -327,3 +322,11 @@ export async function updateCalendarOrderAction(
     throw new Error(mapErrorToUserMessage(error, "Failed to update order"));
   }
 }
+
+// Re-export calendar management actions
+export {
+  addCalendarAction,
+  updateCalendarCapabilityAction,
+  removeCalendarAction,
+  listCalendarsForIntegrationAction,
+} from './calendar-actions';

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { createBookingAction } from '@/features/booking'
+import { createBookingAction } from '@/app/(booking)/actions'
 import { mapErrorToUserMessage } from '@/lib/errors'
 
 export default function BookingPage({ searchParams }: { searchParams: { type?: string; date?: string; time?: string } }) {

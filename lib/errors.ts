@@ -64,5 +64,5 @@ export function mapErrorToUserMessage(error: unknown, fallback?: string): string
     return error;
   }
 
-  return fallback ?? 'Something went wrong. Please try again.';
+  return fallback ?? 'An unexpected error occurred. Please try again.';
 }

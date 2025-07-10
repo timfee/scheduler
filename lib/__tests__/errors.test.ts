@@ -32,6 +32,6 @@ describe('mapErrorToUserMessage', () => {
 
   it('should handle unknown error without fallback', () => {
     const result = mapErrorToUserMessage({ weird: 'object' });
-    expect(result).toBe('Something went wrong. Please try again.');
+    expect(result).toBe('An unexpected error occurred. Please try again.');
   });
 });

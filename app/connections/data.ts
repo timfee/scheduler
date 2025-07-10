@@ -3,7 +3,7 @@ import {
   isProviderType,
   type ProviderType,
 } from '@/infrastructure/database/integrations';
-import { type CalendarCapability } from '@/types/constants';
+import { type CalendarCapability } from '@/lib/types/constants';
 
 export interface ConnectionListItem {
   id: string;

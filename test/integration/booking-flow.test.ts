@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals'
-import { type BookingFormData } from '@/features/booking'
+import { type BookingFormData } from '@/app/(booking)/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
-import { type CalendarEvent } from '@/schemas/calendar-event'
+import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 
 let createBookingAction: (d: BookingFormData) => Promise<void>
 let provider: Pick<CalDavProvider, 'listBusyTimes' | 'createAppointment'>
@@ -60,7 +60,7 @@ beforeAll(async () => {
   )
 
   ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
-    '@/features/booking/data',
+    '@/app/(booking)/data',
     () => ({
       getAppointmentType: jest.fn(async () => ({
         id: 'intro',
@@ -73,7 +73,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction } = await import('@/features/booking'))
+  ;({ createBookingAction } = await import('@/app/(booking)/actions'))
 })
 
 describe('booking flow integration', () => {
