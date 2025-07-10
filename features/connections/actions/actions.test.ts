@@ -3,6 +3,7 @@ import { jest } from '@jest/globals';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import type * as schema from '../../../infrastructure/database/schema';
+import { CALENDAR_CAPABILITY } from '../../../types/constants';
 
 jest.mock('next/cache', () => ({
   revalidatePath: jest.fn(),
