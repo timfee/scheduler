@@ -31,8 +31,11 @@ const baseSchema = z.object({
 function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
   return schema
     .refine(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (data: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (data.authMethod === "Basic") {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           return !!data.password;
         }
         return true;
@@ -43,9 +46,13 @@ function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
       },
     )
     .refine(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (data: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           const provider = data.provider;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           if (provider && ["nextcloud", "caldav"].includes(provider)) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             return !!data.serverUrl;
           }
           return true;
@@ -56,12 +63,18 @@ function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
       },
     )
     .refine(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (data: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (data.authMethod === "Oauth") {
           return (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             !!data.refreshToken &&
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             !!data.clientId &&
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             !!data.clientSecret &&
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             !!data.tokenUrl
           );
         }

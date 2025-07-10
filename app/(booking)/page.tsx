@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createBookingAction } from '@/features/booking'
-import { userMessageFromError } from '@/features/shared/errors'
+import { mapErrorToUserMessage } from '@/lib/errors'
 
 export default function BookingPage({ searchParams }: { searchParams: { type?: string; date?: string; time?: string } }) {
   const { type: appointmentType, date, time } = searchParams
@@ -19,7 +19,7 @@ export default function BookingPage({ searchParams }: { searchParams: { type?: s
       }
       await createBookingAction({ type: appointmentType!, date: date!, time: time!, name: rawName, email: rawEmail })
     } catch (error) {
-      throw new Error(userMessageFromError(error, 'Failed to submit booking'))
+      throw new Error(mapErrorToUserMessage(error, 'Failed to submit booking'))
     }
   }
 

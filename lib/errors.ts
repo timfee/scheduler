@@ -26,7 +26,7 @@ export const ok = <T>(data: T): Result<T> => ({ success: true, data });
 export const err = <E = Error>(error: E): Result<never, E> => ({ success: false, error });
 
 // Convert errors to user-friendly messages
-export function mapErrorToUserMessage(error: unknown): string {
+export function mapErrorToUserMessage(error: unknown, fallback?: string): string {
   if (error instanceof CalendarConnectionError) {
     switch (error.code) {
       case 'AUTH_FAILED':
@@ -57,8 +57,12 @@ export function mapErrorToUserMessage(error: unknown): string {
     if (process.env.NODE_ENV === 'development') {
       return error.message;
     }
-    return 'An unexpected error occurred. Please try again.';
+    return fallback ?? 'An unexpected error occurred. Please try again.';
   }
 
-  return 'Something went wrong. Please try again.';
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return fallback ?? 'Something went wrong. Please try again.';
 }

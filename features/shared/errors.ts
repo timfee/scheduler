@@ -1,9 +1,2 @@
-export function userMessageFromError(error: unknown, fallback: string): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "string") {
-    return error;
-  }
-  return fallback;
-}
+// This file is intentionally left empty as the error handling utilities
+// have been moved to lib/errors.ts to align with the documentation.
