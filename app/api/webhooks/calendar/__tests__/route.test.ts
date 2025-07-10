@@ -1,4 +1,4 @@
-import { describe, expect, it, jest, beforeAll } from "@jest/globals";
+import { describe, expect, it, beforeAll } from "@jest/globals";
 import { createHmac } from "crypto";
 
 // Set up environment variables before importing modules
@@ -48,7 +48,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, validSignature);
 
     const response = await POST(request);
-    const data = await response.json();
+    const data = await response.json() as { ok: boolean };
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ ok: true });
@@ -59,7 +59,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, `sha256=${validSignature}`);
 
     const response = await POST(request);
-    const data = await response.json();
+    const data = await response.json() as { ok: boolean };
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ ok: true });
@@ -70,7 +70,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, invalidSignature);
 
     const response = await POST(request);
-    const data = await response.json();
+    const data = await response.json() as { error: string };
 
     expect(response.status).toBe(401);
     expect(data).toEqual({ error: "Invalid webhook signature" });
@@ -80,7 +80,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, "");
 
     const response = await POST(request);
-    const data = await response.json();
+    const data = await response.json() as { error: string };
 
     expect(response.status).toBe(401);
     expect(data).toEqual({ error: "Invalid webhook signature" });
@@ -92,7 +92,7 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, invalidSignature);
 
     const response = await POST(request);
-    const data = await response.json();
+    const data = await response.json() as { error: string };
 
     expect(response.status).toBe(401);
     expect(data).toEqual({ error: "Invalid webhook signature" });
