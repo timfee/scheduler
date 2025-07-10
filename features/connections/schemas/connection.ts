@@ -43,12 +43,13 @@ function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
       },
     )
     .refine(
-      (data: z.infer<z.ZodObject<S>>) => {
-        if (["nextcloud", "caldav"].includes(data.provider)) {
-          return !!data.serverUrl;
-        }
-        return true;
-      },
+        (data: z.infer<z.ZodObject<S>>) => {
+          const provider = data.provider;
+          if (provider && ["nextcloud", "caldav"].includes(provider)) {
+            return !!data.serverUrl;
+          }
+          return true;
+        },
       {
         message: "Server URL is required for this provider",
         path: ["serverUrl"],

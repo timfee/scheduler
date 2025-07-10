@@ -301,8 +301,8 @@ export async function updateCalendarOrderAction(
   const newIndex = direction === "up" ? index - 1 : index + 1;
   if (newIndex < 0 || newIndex >= list.length) return;
 
-  const current = list[index];
-  const target = list[newIndex];
+  const current = list[index]!;
+  const target = list[newIndex]!;
 
   db.transaction((tx) => {
     tx

@@ -15,7 +15,7 @@ jest.mock('tsdav', () => ({
     fetchCalendars: jest.fn<() => Promise<{ url: string }[]>>().mockResolvedValue([
       { url: 'https://calendar.local/cal1' },
     ]),
-  } as unknown as DAVClient)),
+  })),
 }));
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -125,8 +125,9 @@ describe('createConnectionAction validation', () => {
     });
     expect(res).toBeDefined();
     const [integration] = await integrations.listCalendarIntegrations();
-    expect(integration.config.serverUrl).toBe('https://caldav.icloud.com');
-    expect(integration.config.calendarUrl).toBeUndefined();
+    expect(integration).toBeDefined();
+    expect(integration!.config.serverUrl).toBe('https://caldav.icloud.com');
+    expect(integration!.config.calendarUrl).toBeUndefined();
   });
 });
 
@@ -227,7 +228,9 @@ describe('updateCalendarOrderAction', () => {
 
     await actions.updateCalendarOrderAction(second.id, 'up');
     const list = await actions.listConnectionsAction();
-    expect(list[0].id).toBe(second.id);
-    expect(list[1].id).toBe(first.id);
+    expect(list[0]).toBeDefined();
+    expect(list[1]).toBeDefined();
+    expect(list[0]!.id).toBe(second.id);
+    expect(list[1]!.id).toBe(first.id);
   });
 });

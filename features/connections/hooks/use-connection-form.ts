@@ -28,7 +28,7 @@ export interface UseConnectionFormReturn {
 
 export function useConnectionForm(): UseConnectionFormReturn {
   const form = useForm<ConnectionFormValues>({
-    resolver: zodResolver(connectionFormSchema) as Resolver<ConnectionFormValues>,
+    resolver: zodResolver(connectionFormSchema),
     defaultValues: {
       provider: "apple",
       displayName: "",
