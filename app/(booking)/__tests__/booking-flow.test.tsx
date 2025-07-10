@@ -13,11 +13,11 @@ const mockUseSearchParams = jest.fn()
 jest.mock('next/navigation', () => ({ useSearchParams: mockUseSearchParams }))
 
 function TestComponent() {
-  const [state, setState] = useBookingState()
+  const { type, updateBookingStep } = useBookingState()
   return (
     <div>
-      <span>{state.type}</span>
-      <button onClick={() => setState({ type: 'intro' })}>set</button>
+      <span>{type}</span>
+      <button onClick={() => updateBookingStep({ type: 'intro' })}>set</button>
     </div>
   )
 }

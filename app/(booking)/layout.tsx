@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { AppointmentTypeSkeleton, DateSkeleton, TimeSkeleton } from '@/components/booking-skeletons'
 
 export default function BookingLayout({
   children,
@@ -12,10 +13,12 @@ export default function BookingLayout({
   time: React.ReactNode
 }) {
   return (
-    <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-      <Suspense fallback={<p>Loading types...</p>}>{apptType}</Suspense>
-      <Suspense fallback={<p>Loading dates...</p>}>{date}</Suspense>
-      <Suspense fallback={<p>Loading times...</p>}>{time}</Suspense>
+    <div className="container mx-auto p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Suspense fallback={<AppointmentTypeSkeleton />}>{apptType}</Suspense>
+        <Suspense fallback={<DateSkeleton />}>{date}</Suspense>
+        <Suspense fallback={<TimeSkeleton />}>{time}</Suspense>
+      </div>
       {children}
     </div>
   )

@@ -1,41 +1,60 @@
-import Link from 'next/link'
+'use client'
+
 import { addMinutes, format } from 'date-fns'
 import { listBusyTimesAction } from '@/app/appointments/actions'
 import { getAppointmentType } from '@/app/(booking)/data'
+import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
+import { useEffect, useState } from 'react'
 
-/**
- * Page segment that lists available time slots for a selected date.
- */
+export default function TimePage() {
+  const { type, date, updateBookingStep } = useBookingState()
+  const [slots, setSlots] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
 
-export default async function TimePage({ searchParams }: { searchParams: { type?: string; date?: string; time?: string } }) {
-  if (!searchParams.type || !searchParams.date) {
+  useEffect(() => {
+    if (!type || !date) return
+
+    setLoading(true)
+    
+    void Promise.all([
+      getAppointmentType(type),
+      listBusyTimesAction(
+        new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).toISOString(),
+        new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59).toISOString()
+      )
+    ]).then(([apptType, busy]) => {
+      if (!apptType) {
+        setSlots([])
+        return
+      }
+
+      const dateStr = format(date, 'yyyy-MM-dd')
+      const businessStart = new Date(`${dateStr}T09:00:00Z`)
+      const businessEnd = new Date(`${dateStr}T17:00:00Z`)
+
+      const availableSlots: string[] = []
+      for (let t = businessStart; t < businessEnd; t = addMinutes(t, apptType.durationMinutes)) {
+        const start = t
+        const end = addMinutes(start, apptType.durationMinutes)
+        const overlap = busy.some(b => {
+          const bStart = new Date(b.startUtc)
+          const bEnd = new Date(b.endUtc)
+          return bStart < end && bEnd > start
+        })
+        if (!overlap) {
+          availableSlots.push(format(start, 'HH:mm'))
+        }
+      }
+      setSlots(availableSlots)
+    }).finally(() => setLoading(false))
+  }, [type, date])
+
+  if (!type || !date) {
     return <p className="text-muted-foreground">Select a date first.</p>
   }
 
-  const apptType = await getAppointmentType(searchParams.type)
-  if (!apptType) {
-    return <p className="text-muted-foreground">Invalid appointment type.</p>
-  }
-
-  const dayStart = new Date(`${searchParams.date}T00:00:00Z`)
-  const dayEnd = new Date(`${searchParams.date}T23:59:59Z`)
-  const busy = await listBusyTimesAction(dayStart.toISOString(), dayEnd.toISOString())
-
-  const businessStart = new Date(`${searchParams.date}T09:00:00Z`)
-  const businessEnd = new Date(`${searchParams.date}T17:00:00Z`)
-
-  const slots: string[] = []
-  for (let t = businessStart; t < businessEnd; t = addMinutes(t, apptType.durationMinutes)) {
-    const start = t
-    const end = addMinutes(start, apptType.durationMinutes)
-    const overlap = busy.some(b => {
-      const bStart = new Date(b.startUtc)
-      const bEnd = new Date(b.endUtc)
-      return bStart < end && bEnd > start
-    })
-    if (!overlap) {
-      slots.push(format(start, 'HH:mm'))
-    }
+  if (loading) {
+    return <div className="space-y-2">Loading available times...</div>
   }
 
   if (slots.length === 0) {
@@ -43,14 +62,20 @@ export default async function TimePage({ searchParams }: { searchParams: { type?
   }
 
   return (
-    <ul className="space-y-2">
-      {slots.map((t) => (
-        <li key={t}>
-          <Link href={{ query: { type: searchParams.type, date: searchParams.date, time: t } }}>
-            {t}
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <div>
+      <h2 className="font-medium mb-3">Select Time</h2>
+      <ul className="space-y-2">
+        {slots.map((t) => (
+          <li key={t}>
+            <button
+              onClick={() => updateBookingStep({ time: t })}
+              className="w-full text-left p-2 hover:bg-gray-100 rounded border"
+            >
+              {t}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
