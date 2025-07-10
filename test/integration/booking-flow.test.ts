@@ -60,7 +60,7 @@ beforeAll(async () => {
   )
 
   ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
-    '@/features/booking/data',
+    '@/app/(booking)/data',
     () => ({
       getAppointmentType: jest.fn(async () => ({
         id: 'intro',

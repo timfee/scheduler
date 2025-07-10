@@ -30,11 +30,6 @@ function cleanupOldEntries() {
   });
 }
 
-// Export for testing purposes
-export function clearRateLimiter() {
-  lastBookingAt.clear();
-}
-
 /**
  * Server action to create a booking on the configured calendar.
  *
@@ -95,4 +90,9 @@ export async function createBookingAction(formData: BookingFormData) {
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to create booking"));
   }
+}
+
+// Export for testing purposes
+export function clearRateLimiter() {
+  lastBookingAt.clear();
 }
