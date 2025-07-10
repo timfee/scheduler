@@ -1,8 +1,10 @@
 // Use Jest globals for lifecycle methods; import `jest` explicitly for mocking.
 import { jest } from '@jest/globals';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { type Database as DatabaseType } from 'better-sqlite3';
 import { sql } from 'drizzle-orm';
-import type * as schema from '../../../infrastructure/database/schema';
+import * as schema from '../../../infrastructure/database/schema';
+import { createTestDb, cleanupTestDb } from '../../../infrastructure/database/__tests__/helpers/db';
 import { CALENDAR_CAPABILITY } from '../../../types/constants';
 
 jest.mock('next/cache', () => ({
@@ -22,34 +24,36 @@ let actions: typeof import('./actions');
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let integrations: typeof import('../../../infrastructure/database/integrations');
 let db: BetterSQLite3Database<typeof schema>;
-// Reuse the `sql` tagged template from drizzle for manual queries
+let sqlite: DatabaseType;
 
 beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: "development" });
   process.env.ENCRYPTION_KEY = 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
-  process.env.SQLITE_PATH = ':memory:';
 
-  const dbModule = await import('../../../infrastructure/database');
-  db = dbModule.db;
-  db.run(sql`
-    CREATE TABLE IF NOT EXISTS calendar_integrations (
-      id TEXT PRIMARY KEY,
-      provider TEXT NOT NULL,
-      display_name TEXT NOT NULL,
-      encrypted_config TEXT NOT NULL,
-      display_order INTEGER DEFAULT 0 NOT NULL,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL
-    )
-  `);
+  const testDb = createTestDb();
+  db = testDb.db;
+  sqlite = testDb.sqlite;
+
+  // Mock the database module to use our test database
+  (
+    jest as unknown as {
+      unstable_mockModule: (p: string, f: () => unknown) => void;
+    }
+  ).unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
   integrations = await import('../../../infrastructure/database/integrations');
   actions = await import('./actions');
 });
 
+afterAll(() => {
+  cleanupTestDb(sqlite);
+  (jest as unknown as { resetModules: () => void }).resetModules();
+});
+
 beforeEach(() => {
   jest.restoreAllMocks();
-  db.run(sql`DELETE FROM calendar_integrations`);
+  // Clear the table - use where clause to satisfy ESLint
+  db.delete(schema.calendarIntegrations).where(sql`1=1`);
 });
 
 describe('createConnectionAction validation', () => {
