@@ -14,6 +14,27 @@ import { bookingFormSchema, type BookingFormData } from "./schemas/booking";
 // Simple in-memory rate limiter keyed by email address
 const lastBookingAt = new Map<string, number>();
 
+// Cleanup old rate limit entries to prevent memory growth
+// Remove entries older than 2 minutes (rate limit is 1 minute)
+const CLEANUP_THRESHOLD = 2 * 60 * 1000; // 2 minutes in milliseconds
+
+function cleanupOldEntries() {
+  const now = Date.now();
+  const cutoff = now - CLEANUP_THRESHOLD;
+  
+  // Use forEach instead of for...of for better compatibility
+  lastBookingAt.forEach((timestamp, email) => {
+    if (timestamp < cutoff) {
+      lastBookingAt.delete(email);
+    }
+  });
+}
+
+// Export for testing purposes
+export function clearRateLimiter() {
+  lastBookingAt.clear();
+}
+
 /**
  * Server action to create a booking on the configured calendar.
  *
@@ -24,6 +45,9 @@ export async function createBookingAction(formData: BookingFormData) {
   try {
     const { type, date, time, name, email } = bookingFormSchema.parse(formData);
 
+    // Clean up old entries before rate limit check
+    cleanupOldEntries();
+    
     const now = Date.now();
     const last = lastBookingAt.get(email) ?? 0;
     if (now - last < 60_000) {
