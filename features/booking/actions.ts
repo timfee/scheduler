@@ -52,6 +52,14 @@ export async function createBookingAction(formData: BookingFormData) {
       integration.config.calendarUrl ?? "",
     );
 
+    const conflicts = await provider.listBusyTimes({
+      from: start.toISOString(),
+      to: end.toISOString(),
+    });
+    if (conflicts.length > 0) {
+      throw new Error("Selected time is not available");
+    }
+
     await provider.createAppointment({
       title: `${apptType.name} - ${name}`,
       description: `Scheduled via booking form for ${email}`,

@@ -1,7 +1,17 @@
 import "tsconfig-paths/register";
 import { jest, beforeAll, afterAll, afterEach } from "@jest/globals";
-import { fetch, ProxyAgent, setGlobalDispatcher } from "undici";
-import { setupServer } from "msw/node";
+import { TextDecoder, TextEncoder } from "util";
+import { ReadableStream } from 'node:stream/web';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+(globalThis as any).TextEncoder = TextEncoder;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+(globalThis as any).TextDecoder = TextDecoder;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+(globalThis as any).ReadableStream = ReadableStream;
+const { fetch, ProxyAgent, setGlobalDispatcher, Response } = await import("undici");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+(globalThis as any).Response = Response;
+const { setupServer } = await import("msw/node");
 
 export const server = setupServer();
 

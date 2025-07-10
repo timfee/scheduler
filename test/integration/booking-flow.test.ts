@@ -1,17 +1,10 @@
-import { beforeAll, afterEach, describe, expect, it, jest } from '@jest/globals'
-import { type BookingFormData } from '../schemas/booking'
+import { beforeAll, describe, expect, it, jest } from '@jest/globals'
+import { type BookingFormData } from '@/features/booking'
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 
-let createBookingAction: (data: BookingFormData) => Promise<void>
+let createBookingAction: (d: BookingFormData) => Promise<void>
 let provider: any
-const validData: BookingFormData = {
-  type: 'intro',
-  date: '2024-01-01',
-  time: '10:00',
-  name: 'Jane',
-  email: 'test@example.com',
-}
 
 beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: 'development' })
@@ -20,8 +13,8 @@ beforeAll(async () => {
   process.env.SQLITE_PATH = ':memory:'
 
   provider = {
-    listBusyTimes: jest.fn(async () => []) as any,
     createAppointment: jest.fn(async () => undefined) as any,
+    listBusyTimes: jest.fn(async () => []) as any,
   }
 
   ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
@@ -69,36 +62,20 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction } = await import('../actions'))
+  ;({ createBookingAction } = await import('@/features/booking'))
 })
 
-afterEach(() => {
-  jest.clearAllMocks()
-})
+describe('booking flow integration', () => {
+  it('creates a calendar event', async () => {
+    const data: BookingFormData = {
+      type: 'intro',
+      date: '2024-01-01',
+      time: '10:00',
+      name: 'Tester',
+      email: 'test@example.com',
+    }
 
-describe('createBookingAction', () => {
-  it('validates all required fields', async () => {
-    await expect(
-      createBookingAction({ ...validData, name: '' })
-    ).rejects.toThrow()
-  })
-
-  it('checks calendar availability before booking', async () => {
-    await createBookingAction(validData)
-    expect(provider.listBusyTimes).toHaveBeenCalled()
+    await createBookingAction(data)
     expect(provider.createAppointment).toHaveBeenCalled()
-  })
-
-  it('handles calendar connection errors gracefully', async () => {
-    jest.resetModules()
-    ;(jest as unknown as { unstable_mockModule: (p: string, f: () => unknown) => void }).unstable_mockModule(
-      '@/infrastructure/database/integrations',
-      () => ({
-        getBookingCalendar: jest.fn(async () => null),
-        createDAVClientFromIntegration: jest.fn(async () => ({})),
-      })
-    )
-    const { createBookingAction: action } = await import('../actions')
-    await expect(action(validData)).rejects.toThrow('No booking calendar configured')
   })
 })

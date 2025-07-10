@@ -3,6 +3,10 @@ import { addMinutes, format } from 'date-fns'
 import { listBusyTimesAction } from '@/app/appointments/actions'
 import { getAppointmentType } from '@/features/booking'
 
+/**
+ * Page segment that lists available time slots for a selected date.
+ */
+
 export default async function TimePage({ searchParams }: { searchParams: { type?: string; date?: string; time?: string } }) {
   if (!searchParams.type || !searchParams.date) {
     return <p className="text-muted-foreground">Select a date first.</p>

@@ -2,6 +2,10 @@ import { addDays, format, startOfDay } from 'date-fns'
 import Link from 'next/link'
 import { listBusyTimesAction } from '@/app/appointments/actions'
 
+/**
+ * Page segment that lists selectable booking dates.
+ */
+
 export default async function DatePage({ searchParams }: { searchParams: { type?: string; date?: string } }) {
   if (!searchParams.type) {
     return <p className="text-muted-foreground">Select a type first.</p>
