@@ -1,3 +1,4 @@
+import { describe, expect, it } from "@jest/globals";
 import { mapErrorToUserMessage, CalendarConnectionError, EncryptionError } from '../errors';
 
 describe('mapErrorToUserMessage', () => {
