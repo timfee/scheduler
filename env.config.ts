@@ -14,6 +14,10 @@ export default defineEnv({
       .string()
       .default("scheduler.db")
       .describe("Filesystem path to the SQLite database"),
+    WEBHOOK_SECRET: z
+      .string()
+      .min(32, "Must be at least 32 characters")
+      .describe("Secret key for webhook signature verification"),
   },
   shared: {
     NODE_ENV: z.enum(["development", "production"]).default("development"),
@@ -30,5 +34,6 @@ export default defineEnv({
     NODE_ENV: process.env.NODE_ENV,
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
     SQLITE_PATH: process.env.SQLITE_PATH,
+    WEBHOOK_SECRET: process.env.WEBHOOK_SECRET,
   },
 });
