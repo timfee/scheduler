@@ -52,7 +52,7 @@ export async function createConnectionAction(
   try {
     const parsed = connectionFormSchema.safeParse(formData);
     if (!parsed.success) {
-      throw new Error(parsed.error.errors[0]?.message);
+      throw new Error(parsed.error.issues[0]?.message);
     }
 
     const values = parsed.data;
@@ -201,7 +201,7 @@ export async function testConnectionAction(
       displayName: "",
     });
     if (!parsed.success) {
-      throw new Error(parsed.error.errors[0]?.message);
+      throw new Error(parsed.error.issues[0]?.message);
     }
 
     const raw = buildConfigFromValues(parsed.data);
@@ -231,7 +231,7 @@ export async function listCalendarsAction(
       displayName: "",
     });
     if (!parsed.success) {
-      throw new Error(parsed.error.errors[0]?.message);
+      throw new Error(parsed.error.issues[0]?.message);
     }
 
     const raw = buildConfigFromValues(parsed.data);

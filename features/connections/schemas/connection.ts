@@ -31,7 +31,7 @@ const baseSchema = z.object({
 function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
   return schema
     .refine(
-      (data: z.infer<z.ZodObject<S>>) => {
+      (data: any) => {
         if (data.authMethod === "Basic") {
           return !!data.password;
         }
@@ -43,7 +43,7 @@ function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
       },
     )
     .refine(
-        (data: z.infer<z.ZodObject<S>>) => {
+        (data: any) => {
           const provider = data.provider;
           if (provider && ["nextcloud", "caldav"].includes(provider)) {
             return !!data.serverUrl;
@@ -56,7 +56,7 @@ function withValidations<S extends z.ZodRawShape>(schema: z.ZodObject<S>) {
       },
     )
     .refine(
-      (data: z.infer<z.ZodObject<S>>) => {
+      (data: any) => {
         if (data.authMethod === "Oauth") {
           return (
             !!data.refreshToken &&
