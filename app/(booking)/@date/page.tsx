@@ -1,41 +1,65 @@
+'use client'
+
 import { addDays, format, startOfDay } from 'date-fns'
-import Link from 'next/link'
 import { listBusyTimesAction } from '@/app/appointments/actions'
+import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
+import { useEffect, useState } from 'react'
 
-/**
- * Page segment that lists selectable booking dates.
- */
+export default function DatePage() {
+  const { type, updateBookingStep } = useBookingState()
+  const [busyDates, setBusyDates] = useState<Set<string>>(new Set())
+  const [loading, setLoading] = useState(false)
 
-export default async function DatePage({ searchParams }: { searchParams: { type?: string; date?: string } }) {
-  if (!searchParams.type) {
+  useEffect(() => {
+    if (!type) return
+
+    setLoading(true)
+    const today = startOfDay(new Date())
+    const from = today
+    const to = addDays(today, 5)
+
+    void listBusyTimesAction(
+      format(from, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+      format(to, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+    ).then(busy => {
+      setBusyDates(new Set(busy.map(b => b.startUtc.slice(0, 10))))
+    }).finally(() => setLoading(false))
+  }, [type])
+
+  if (!type) {
     return <p className="text-muted-foreground">Select a type first.</p>
   }
 
+  if (loading) {
+    return <div className="space-y-2">Loading available dates...</div>
+  }
+
   const today = startOfDay(new Date())
-  const from = today
-  const to = addDays(today, 5)
-
-  const busy = await listBusyTimesAction(
-    format(from, "yyyy-MM-dd'T'HH:mm:ssXXX"),
-    format(to, "yyyy-MM-dd'T'HH:mm:ssXXX"),
-  )
-  const busyDates = new Set(busy.map(b => b.startUtc.slice(0, 10)))
-
   const days = Array.from({ length: 5 }).map((_, i) => addDays(today, i))
 
   return (
-    <ul className="space-y-2">
-      {days.map((d) => {
-        const iso = format(d, 'yyyy-MM-dd')
-        return (
-          <li key={iso}>
-            <Link href={{ query: { type: searchParams.type, date: iso } }}>
-              {format(d, 'MMM d')}
-              {busyDates.has(iso) ? ' (busy)' : ''}
-            </Link>
-          </li>
-        )
-      })}
-    </ul>
+    <div>
+      <h2 className="font-medium mb-3">Select Date</h2>
+      <ul className="space-y-2">
+        {days.map((d) => {
+          const iso = format(d, 'yyyy-MM-dd')
+          const isBusy = busyDates.has(iso)
+          return (
+            <li key={iso}>
+              <button
+                onClick={() => updateBookingStep({ date: d })}
+                className={`w-full text-left p-2 rounded border hover:bg-gray-100 ${
+                  isBusy ? 'opacity-50' : ''
+                }`}
+                disabled={isBusy}
+              >
+                {format(d, 'MMM d')}
+                {isBusy ? ' (busy)' : ''}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
   )
 }

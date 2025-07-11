@@ -1,12 +1,27 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { BookingProgress } from '@/components/booking-progress'
+import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { createBookingAction } from '@/app/(booking)/actions'
 import { mapErrorToUserMessage } from '@/lib/errors'
+import { formatDateForBooking } from '@/lib/utils'
 
-export default function BookingPage({ searchParams }: { searchParams: { type?: string; date?: string; time?: string } }) {
-  const { type: appointmentType, date, time } = searchParams
-  if (!appointmentType || !date || !time) {
-    return <p className="text-muted-foreground">Select a type, date, and time.</p>
+export default function BookingPage() {
+  const { type: appointmentType, date, time, progress, isComplete } = useBookingState()
+  
+  if (!isComplete) {
+    return (
+      <div className="col-span-full mt-6">
+        <BookingProgress progress={progress} />
+        <p className="text-muted-foreground">
+          {progress === 0 && "Select an appointment type to begin."}
+          {progress === 1 && "Choose a date for your appointment."}
+          {progress === 2 && "Pick a time slot that works for you."}
+        </p>
+      </div>
+    )
   }
 
   async function book(formData: FormData) {
@@ -17,18 +32,31 @@ export default function BookingPage({ searchParams }: { searchParams: { type?: s
       if (typeof rawName !== 'string' || typeof rawEmail !== 'string') {
         throw new Error('Invalid form submission')
       }
-      await createBookingAction({ type: appointmentType!, date: date!, time: time!, name: rawName, email: rawEmail })
+      
+      // Validate all required booking fields are present
+      if (!appointmentType || !date || !time) {
+        throw new Error('Missing required booking information')
+      }
+      
+      await createBookingAction({ 
+        type: appointmentType, 
+        date: typeof date === 'string' ? date : date instanceof Date ? formatDateForBooking(date) : '', 
+        time: time, 
+        name: rawName, 
+        email: rawEmail 
+      })
     } catch (error) {
       throw new Error(mapErrorToUserMessage(error, 'Failed to submit booking'))
     }
   }
 
   return (
-    <div>
+    <div className="col-span-full mt-6">
+      <BookingProgress progress={TOTAL_STEPS} />
       <p className="font-medium">You selected:</p>
       <ul className="list-disc pl-4 mb-4">
         <li>Type: {appointmentType}</li>
-        <li>Date: {date}</li>
+        <li>Date: {date ? formatDateForBooking(date) : ''}</li>
         <li>Time: {time}</li>
       </ul>
       <form action={book} className="space-y-2">

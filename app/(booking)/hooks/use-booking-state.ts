@@ -7,5 +7,23 @@ export const bookingParsers = {
 }
 
 export function useBookingState() {
-  return useQueryStates(bookingParsers)
+  const [state, setState] = useQueryStates(bookingParsers)
+
+  const updateBookingStep = (updates: Partial<typeof state>) => {
+    setState(updates).catch((error) => {
+      console.error('Failed to update booking state:', error)
+    })
+  }
+
+  const progress = [state.type, state.date, state.time].filter(Boolean).length
+  const isComplete = Boolean(state.type && state.date && state.time)
+
+  return {
+    ...state,
+    updateBookingStep,
+    isComplete,
+    progress,
+    // Keep backward compatibility
+    setState,
+  }
 }
