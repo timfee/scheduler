@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EventTypeManager } from "@/components/admin/event-types";
+import { EventTypeManager } from "@/app/admin/event-types/_components";
 
 export default function AdminEventTypesPage() {
   return (

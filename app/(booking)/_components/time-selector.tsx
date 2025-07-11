@@ -1,6 +1,6 @@
 'use client'
 
-import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
+import { useBookingState } from '@/app/(booking)/_hooks/use-booking-state'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useCallback } from 'react'
 

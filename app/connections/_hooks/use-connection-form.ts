@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import { type ProviderType } from "../actions";
+import { type ProviderType } from "../_server/actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
@@ -51,7 +51,7 @@ export function useConnectionForm(): UseConnectionFormReturn {
   const needsServerUrl = ["nextcloud", "caldav"].includes(currentProvider);
 
   const handleProviderChange = (provider: ProviderType) => {
-    const authMethod = PROVIDER_AUTH_METHODS[provider];
+    const authMethod = PROVIDER_AUTH_METHODS[provider] as "Basic" | "Oauth";
     form.setValue("authMethod", authMethod);
 
     if (authMethod === "Basic") {

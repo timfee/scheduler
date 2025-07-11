@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { type Control } from "react-hook-form";
 
 import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/lib/types/constants";
-import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
+import { type ConnectionFormValues } from "@/app/connections/_hooks/use-connection-form";
 
 interface CapabilitiesFieldProps {
   control: Control<ConnectionFormValues>;

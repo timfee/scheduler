@@ -13,17 +13,17 @@ import {
   listConnectionsAction,
   updateCalendarOrderAction,
   type ConnectionFormData,
-} from "@/app/connections/actions";
-import { type ConnectionListItem } from "@/app/connections/data";
+} from "@/app/connections/_server/actions";
+import { type ConnectionListItem } from "@/app/connections/_server/data";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import ConnectionsList from "./connections-list";
 import {
   useConnectionForm,
   type ConnectionFormValues,
   PROVIDER_AUTH_METHODS,
-} from "@/app/connections/hooks/use-connection-form";
+} from "@/app/connections/_hooks/use-connection-form";
 import { buildConnectionFormData, DEFAULT_GOOGLE_TOKEN_URL } from "@/app/connections/utils/form-data-builder";
-import { useTestConnection } from "@/app/connections/hooks/use-test-connection";
+import { useTestConnection } from "@/app/connections/_hooks/use-test-connection";
 
 interface ConnectionsClientProps {
   initialConnections: ConnectionListItem[];

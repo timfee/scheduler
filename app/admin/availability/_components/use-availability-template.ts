@@ -1,6 +1,6 @@
 import { useState, useEffect, useTransition } from "react";
 import { type WeeklyAvailability, type DayOfWeek } from "@/lib/schemas/availability";
-import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/actions";
+import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/_server/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
 
 const DEFAULT_AVAILABILITY: WeeklyAvailability = {

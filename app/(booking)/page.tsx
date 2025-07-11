@@ -2,9 +2,9 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { BookingProgress } from '@/app/(booking)/components/booking-progress'
-import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
-import { createBookingAction } from '@/app/(booking)/actions'
+import { BookingProgress } from '@/app/(booking)/_components/booking-progress'
+import { useBookingState } from '@/app/(booking)/_hooks/use-booking-state'
+import { createBookingAction } from '@/app/(booking)/_server/actions'
 import { mapErrorToUserMessage } from '@/lib/errors'
 import { formatDateForBooking } from '@/lib/utils'
 

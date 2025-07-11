@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AvailabilityTemplate } from "@/components/admin/availability";
+import { AvailabilityTemplate } from "@/app/admin/availability/_components";
 
 export default function AdminAvailabilityPage() {
   return (

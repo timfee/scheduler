@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { AdminNavigation } from '@/components/admin/navigation';
+import { AdminNavigation } from '@/app/admin/_components/navigation';
 
 interface AdminLayoutProps {
   children: ReactNode;

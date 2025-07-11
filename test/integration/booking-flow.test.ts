@@ -57,7 +57,7 @@ beforeAll(async () => {
     createCalDavProvider: jest.fn(() => provider),
   }));
 
-  jest.unstable_mockModule("@/app/(booking)/data", () => ({
+  jest.unstable_mockModule("@/app/(booking)/_server/data", () => ({
     getAppointmentType: jest.fn(async () => ({
       id: "intro",
       name: "Intro",
@@ -67,7 +67,7 @@ beforeAll(async () => {
       updatedAt: 0,
     })),
   }));
-  ({ createBookingAction } = await import("@/app/(booking)/actions"));
+  ({ createBookingAction } = await import("@/app/(booking)/_server/actions"));
 });
 
 describe("booking flow integration", () => {

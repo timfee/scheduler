@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 
 import { Plus, Trash2, Clock, Loader2 } from "lucide-react";
 import { type WeeklyAvailability, type TimeSlot } from "@/lib/schemas/availability";
-import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/actions";
+import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/_server/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
 
 // Generate unique ID for slots

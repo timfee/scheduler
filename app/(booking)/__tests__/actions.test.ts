@@ -63,7 +63,7 @@ beforeAll(async () => {
   )
 
   jest.unstable_mockModule(
-    '@/app/(booking)/data',
+    '@/app/(booking)/_server/data',
     () => ({
       getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
         id: 'intro',
@@ -74,7 +74,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction, clearRateLimiter } = await import('@/app/(booking)/actions'))
+  ;({ createBookingAction, clearRateLimiter } = await import('@/app/(booking)/_server/actions'))
 })
 
 afterEach(() => {
@@ -102,7 +102,7 @@ describe('createBookingAction', () => {
         createDAVClientFromIntegration: jest.fn(async () => ({})),
       })
     )
-    const { createBookingAction: action } = await import('@/app/(booking)/actions')
+    const { createBookingAction: action } = await import('@/app/(booking)/_server/actions')
     await expect(action(validData)).rejects.toThrow('No booking calendar configured')
   })
 
@@ -177,7 +177,7 @@ describe('createBookingAction', () => {
     try {
       // Re-import the module to trigger the setInterval call
       jest.resetModules()
-      await import('@/app/(booking)/actions')
+      await import('@/app/(booking)/_server/actions')
       
       // Verify that setInterval was called with the cleanup function and 5 minute interval
       expect(setIntervalSpy).toHaveBeenCalledWith(
