@@ -13,6 +13,9 @@ import { type WeeklyAvailability } from "@/lib/schemas/availability";
 import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
 
+// Generate unique ID for slots
+const generateSlotId = () => `slot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
 type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 
 const DAYS: { key: DayOfWeek; label: string }[] = [
@@ -26,11 +29,11 @@ const DAYS: { key: DayOfWeek; label: string }[] = [
 ];
 
 const DEFAULT_AVAILABILITY: WeeklyAvailability = {
-  monday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  tuesday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  wednesday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  thursday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  friday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
+  monday: { enabled: true, slots: [{ id: generateSlotId(), start: "09:00", end: "17:00" }] },
+  tuesday: { enabled: true, slots: [{ id: generateSlotId(), start: "09:00", end: "17:00" }] },
+  wednesday: { enabled: true, slots: [{ id: generateSlotId(), start: "09:00", end: "17:00" }] },
+  thursday: { enabled: true, slots: [{ id: generateSlotId(), start: "09:00", end: "17:00" }] },
+  friday: { enabled: true, slots: [{ id: generateSlotId(), start: "09:00", end: "17:00" }] },
   saturday: { enabled: false, slots: [] },
   sunday: { enabled: false, slots: [] },
 };
@@ -41,6 +44,22 @@ export function AvailabilityTemplate() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // Ensure slots have unique IDs
+  const ensureSlotIds = (availability: WeeklyAvailability): WeeklyAvailability => {
+    const updated = { ...availability };
+    Object.keys(updated).forEach(day => {
+      const dayKey = day as keyof WeeklyAvailability;
+      updated[dayKey] = {
+        ...updated[dayKey],
+        slots: updated[dayKey].slots.map(slot => ({
+          ...slot,
+          id: slot.id ?? generateSlotId()
+        }))
+      };
+    });
+    return updated;
+  };
+
   // Load existing availability template on component mount
   useEffect(() => {
     const loadTemplate = async () => {
@@ -49,7 +68,7 @@ export function AvailabilityTemplate() {
         setError(null);
         const template = await loadAvailabilityTemplateAction();
         if (template) {
-          setAvailability(template);
+          setAvailability(ensureSlotIds(template));
         }
       } catch (error) {
         console.error("Failed to load availability template:", error);
@@ -68,7 +87,7 @@ export function AvailabilityTemplate() {
       [day]: {
         ...prev[day],
         enabled: !prev[day].enabled,
-        slots: !prev[day].enabled ? [{ start: "09:00", end: "17:00" }] : prev[day].slots
+        slots: !prev[day].enabled ? [{ id: generateSlotId(), start: "09:00", end: "17:00" }] : prev[day].slots
       }
     }));
   };
@@ -78,28 +97,28 @@ export function AvailabilityTemplate() {
       ...prev,
       [day]: {
         ...prev[day],
-        slots: [...prev[day].slots, { start: "09:00", end: "17:00" }]
+        slots: [...prev[day].slots, { id: generateSlotId(), start: "09:00", end: "17:00" }]
       }
     }));
   };
 
-  const removeSlot = (day: DayOfWeek, index: number) => {
+  const removeSlot = (day: DayOfWeek, slotId: string) => {
     setAvailability(prev => ({
       ...prev,
       [day]: {
         ...prev[day],
-        slots: prev[day].slots.filter((_, i) => i !== index)
+        slots: prev[day].slots.filter(slot => slot.id !== slotId)
       }
     }));
   };
 
-  const updateSlot = (day: DayOfWeek, index: number, field: 'start' | 'end', value: string) => {
+  const updateSlot = (day: DayOfWeek, slotId: string, field: 'start' | 'end', value: string) => {
     setAvailability(prev => ({
       ...prev,
       [day]: {
         ...prev[day],
-        slots: prev[day].slots.map((slot, i) => 
-          i === index ? { ...slot, [field]: value } : slot
+        slots: prev[day].slots.map(slot => 
+          slot.id === slotId ? { ...slot, [field]: value } : slot
         )
       }
     }));
@@ -158,36 +177,36 @@ export function AvailabilityTemplate() {
               {availability[key].enabled && (
                 <CardContent className="pt-0">
                   <div className="space-y-3">
-                    {availability[key].slots.map((slot, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    {availability[key].slots.map((slot) => (
+                      <div key={slot.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-2">
-                          <Label htmlFor={`${key}-${index}-start`} className="text-sm font-medium">
+                          <Label htmlFor={`${key}-${slot.id}-start`} className="text-sm font-medium">
                             From
                           </Label>
                           <Input
-                            id={`${key}-${index}-start`}
+                            id={`${key}-${slot.id}-start`}
                             type="time"
                             value={slot.start}
-                            onChange={(e) => updateSlot(key, index, 'start', e.target.value)}
+                            onChange={(e) => updateSlot(key, slot.id!, 'start', e.target.value)}
                             className="w-32"
                           />
                         </div>
                         <div className="flex items-center gap-2">
-                          <Label htmlFor={`${key}-${index}-end`} className="text-sm font-medium">
+                          <Label htmlFor={`${key}-${slot.id}-end`} className="text-sm font-medium">
                             To
                           </Label>
                           <Input
-                            id={`${key}-${index}-end`}
+                            id={`${key}-${slot.id}-end`}
                             type="time"
                             value={slot.end}
-                            onChange={(e) => updateSlot(key, index, 'end', e.target.value)}
+                            onChange={(e) => updateSlot(key, slot.id!, 'end', e.target.value)}
                             className="w-32"
                           />
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeSlot(key, index)}
+                          onClick={() => removeSlot(key, slot.id!)}
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
