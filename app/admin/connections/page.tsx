@@ -1,7 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-import { getConnections } from "../../connections/data";
+import { getConnections } from "@/app/connections/data";
 import { ConnectionsClient } from "@/components/admin/connections";
 import { Suspense } from "react";
 
