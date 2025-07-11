@@ -4,6 +4,7 @@ import { addDays, format, startOfDay } from 'date-fns'
 import { listBusyTimesAction } from '@/app/appointments/actions'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { useEffect, useState } from 'react'
+import { DateSkeleton } from '@/components/booking-skeletons'
 
 export default function DatePage() {
   const { type, updateBookingStep } = useBookingState()
@@ -31,7 +32,7 @@ export default function DatePage() {
   }
 
   if (loading) {
-    return <div className="space-y-2">Loading available dates...</div>
+    return <DateSkeleton />
   }
 
   const today = startOfDay(new Date())
