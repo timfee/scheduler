@@ -29,7 +29,7 @@ jest.mock('@/env.config', () => ({
 }));
 
 // Mock the booking action
-jest.mock('@/app/(booking)/_server/actions', () => ({
+jest.mock('@/app/(booking)/server/actions', () => ({
   createBookingAction: mockCreateBookingAction,
 }));
 
