@@ -1,4 +1,5 @@
 import { addMinutes, format } from 'date-fns';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 export interface BusyTime {
   startUtc: string;
@@ -24,13 +25,10 @@ export interface AvailabilityOptions {
 export function calculateAvailableSlots(options: AvailabilityOptions): string[] {
   const { date, durationMinutes, businessHours, busyTimes } = options;
   
-  // Parse business hours
-  const [startHour, startMinute] = businessHours.start.split(':').map(Number);
-  const [endHour, endMinute] = businessHours.end.split(':').map(Number);
-  
-  // Create business hours in the user's local timezone
-  const businessStart = new Date(`${date}T${businessHours.start}:00`);
-  const businessEnd = new Date(`${date}T${businessHours.end}:00`);
+  // Create business hours in the specified timezone, then convert to UTC for calculation
+  const timezone = businessHours.timezone ?? 'UTC';
+  const businessStart = fromZonedTime(`${date}T${businessHours.start}:00`, timezone);
+  const businessEnd = fromZonedTime(`${date}T${businessHours.end}:00`, timezone);
   
   const availableSlots: string[] = [];
   
@@ -49,7 +47,6 @@ export function calculateAvailableSlots(options: AvailabilityOptions): string[] 
     }
     
     // Convert slot times to UTC for comparison with busy times
-    // Since busy times are in UTC, we need to convert local slot times to UTC
     const slotStartUTC = slotStart.toISOString().replace(/\.000Z$/, 'Z');
     const slotEndUTC = slotEnd.toISOString().replace(/\.000Z$/, 'Z');
     
@@ -63,8 +60,9 @@ export function calculateAvailableSlots(options: AvailabilityOptions): string[] 
     });
     
     if (!hasOverlap) {
-      // Display time in user's local timezone
-      availableSlots.push(format(slotStart, 'HH:mm'));
+      // Display time in the business timezone for user readability
+      const zonedSlotStart = toZonedTime(slotStart, timezone);
+      availableSlots.push(format(zonedSlotStart, 'HH:mm'));
     }
   }
   
@@ -75,7 +73,7 @@ export function calculateAvailableSlots(options: AvailabilityOptions): string[] 
  * Get business hours for a specific date
  * In a real implementation, this would check the availability template
  */
-export function getBusinessHoursForDate(date: string): BusinessHours {
+export function getBusinessHoursForDate(_date: string): BusinessHours {
   // Default business hours - in a real app this would come from the availability template
   return {
     start: '09:00',
