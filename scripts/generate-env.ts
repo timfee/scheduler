@@ -42,16 +42,25 @@ NODE_ENV=development
   if (existsSync(envPath) && !forceOverwrite) {
     console.log("⚠️  .env.example already exists");
     console.log("Generated values:");
-    console.log(`ENCRYPTION_KEY=${generateEncryptionKey()}`);
-    console.log(`WEBHOOK_SECRET=${generateWebhookSecret()}`);
-  } else {
-    writeFileSync(envPath, envContent);
-    console.log("✅ Generated .env.example with secure values");
-    console.log("📝 Copy .env.example to .env.local and customize as needed");
+
+    const envPath = join(process.cwd(), ".env.example");
+
+    if (existsSync(envPath) && !forceOverwrite) {
+      console.log("⚠️  .env.example already exists");
+      console.log("Generated values:");
+      console.log(`ENCRYPTION_KEY=${generateEncryptionKey()}`);
+      console.log(`WEBHOOK_SECRET=${generateWebhookSecret()}`);
+    } else {
+      writeFileSync(envPath, envContent);
+
+      console.log("✅ Generated .env.example with secure values");
+      console.log("📝 Copy .env.example to .env.local and customize as needed");
+    }
   }
 }
 
 // Display individual values for manual setup
+
 console.log("🔐 Environment Variable Generator");
 console.log("================================");
 console.log("");

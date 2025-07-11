@@ -6,6 +6,7 @@ import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { useCallback, useEffect, useState } from 'react'
 import { AppointmentTypeSkeleton } from '@/app/(booking)/components/booking-skeletons'
 
+
 export default function AppointmentTypePage() {
   const { updateBookingStep } = useBookingState()
   const [types, setTypes] = useState<Awaited<ReturnType<typeof listAppointmentTypes>>>([])

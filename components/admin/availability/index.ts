@@ -1,0 +1,1 @@
+export { AvailabilityTemplate } from "./availability-template";
