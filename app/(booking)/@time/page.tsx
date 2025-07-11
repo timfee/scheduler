@@ -1,45 +1,21 @@
-"use client";
-
-import { TimeSkeleton } from "@/app/(booking)/components/booking-skeletons";
 import { getAppointmentType } from "@/app/(booking)/data";
-import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
 import { listBusyTimesAction } from "@/app/appointments/actions";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { addMinutes, format } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { TimeSelector } from "./time-selector";
 
-export default function TimePage() {
-  const { type, date, updateBookingStep } = useBookingState();
-  const [slots, setSlots] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default async function TimePage({
+  searchParams
+}: {
+  searchParams: { type?: string; date?: string; time?: string }
+}) {
+  if (!searchParams.type || !searchParams.date) {
+    return <p className="text-muted-foreground">Select a date first.</p>;
+  }
 
-  const handleSelectTime = useCallback(
-    (time: string) => {
-      updateBookingStep({ time });
-    },
-    [updateBookingStep],
-  );
-
-  const handleButtonClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      const button = event.currentTarget;
-      const time = button.dataset.time;
-      if (time) {
-        handleSelectTime(time);
-      }
-    },
-    [handleSelectTime],
-  );
-
-  useEffect(() => {
-    if (!type || !date) return;
-
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
-      getAppointmentType(type),
+  const date = new Date(searchParams.date);
+  
+  try {
+    const [apptType, busy] = await Promise.all([
+      getAppointmentType(searchParams.type),
       listBusyTimesAction(
         new Date(
           date.getFullYear(),
@@ -58,92 +34,25 @@ export default function TimePage() {
           59,
         ).toISOString(),
       ),
-    ])
-      .then(([apptType, busy]) => {
-        if (!apptType) {
-          setSlots([]);
-          return;
-        }
+    ]);
 
-        const dateStr = format(date, "yyyy-MM-dd");
+    if (!apptType) {
+      return <p className="text-muted-foreground">Invalid appointment type.</p>;
+    }
 
-        // Create business hours in the user's local timezone (9 AM to 5 PM in their timezone)
-        const businessStart = new Date(`${dateStr}T09:00:00`);
-        const businessEnd = new Date(`${dateStr}T17:00:00`);
-
-        const availableSlots: string[] = [];
-        for (
-          let t = businessStart;
-          t < businessEnd;
-          t = addMinutes(t, apptType.durationMinutes)
-        ) {
-          const start = t;
-          const end = addMinutes(start, apptType.durationMinutes);
-
-          // Convert start/end to UTC for comparison with busy times
-          const startUTC = new Date(
-            start.getTime() - start.getTimezoneOffset() * 60000,
-          );
-          const endUTC = new Date(
-            end.getTime() - end.getTimezoneOffset() * 60000,
-          );
-
-          const overlap = busy.some((b) => {
-            const bStart = new Date(b.startUtc);
-            const bEnd = new Date(b.endUtc);
-            return bStart < endUTC && bEnd > startUTC;
-          });
-          if (!overlap) {
-            // Display time in user's local timezone
-            availableSlots.push(format(start, "HH:mm"));
-          }
-        }
-        setSlots(availableSlots);
-      })
-      .catch((error) => {
-        console.error("Failed to load time slots:", error);
-        setError("Unable to load available times. Please try again.");
-        setSlots([]);
-      })
-      .finally(() => setLoading(false));
-  }, [type, date]);
-
-  if (!type || !date) {
-    return <p className="text-muted-foreground">Select a date first.</p>;
-  }
-
-  if (loading) {
-    return <TimeSkeleton />;
-  }
-
-  if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
+      <div>
+        <h2 className="mb-3 font-medium">Select Time</h2>
+        <TimeSelector 
+          date={date}
+          appointmentType={apptType}
+          busyTimes={busy}
+          selectedTime={searchParams.time}
+        />
+      </div>
     );
+  } catch (error) {
+    console.error("Failed to load time slots:", error);
+    return <p className="text-muted-foreground">Unable to load available times. Please try again.</p>;
   }
-
-  if (slots.length === 0) {
-    return <p className="text-muted-foreground">No times available</p>;
-  }
-
-  return (
-    <div>
-      <h2 className="mb-3 font-medium">Select Time</h2>
-      <ul className="space-y-2">
-        {slots.map((t) => (
-          <li key={t}>
-            <button
-              onClick={handleButtonClick}
-              data-time={t}
-              className="w-full rounded border p-2 text-left hover:bg-gray-100"
-            >
-              {t}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
 }
