@@ -3,13 +3,26 @@
 import { addDays, format, startOfDay } from 'date-fns'
 import { listBusyTimesAction } from '@/app/appointments/actions'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DateSkeleton } from '@/components/booking-skeletons'
 
 export default function DatePage() {
   const { type, updateBookingStep } = useBookingState()
   const [busyDates, setBusyDates] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
+
+  const handleSelectDate = useCallback((date: Date) => {
+    updateBookingStep({ date })
+  }, [updateBookingStep])
+
+  const handleButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
+    const dateStr = button.dataset.date;
+    if (dateStr) {
+      const date = new Date(dateStr);
+      handleSelectDate(date);
+    }
+  }, [handleSelectDate]);
 
   useEffect(() => {
     if (!type) return
@@ -48,7 +61,8 @@ export default function DatePage() {
           return (
             <li key={iso}>
               <button
-                onClick={() => updateBookingStep({ date: d })}
+                onClick={handleButtonClick}
+                data-date={d.toISOString()}
                 className={`w-full text-left p-2 rounded border hover:bg-gray-100 ${
                   isBusy ? 'opacity-50' : ''
                 }`}

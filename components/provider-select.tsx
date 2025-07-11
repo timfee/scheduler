@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import {
   FormField,
   FormItem,
@@ -32,37 +33,45 @@ export default function ProviderSelect({
   onChange,
   disabled,
 }: ProviderSelectProps) {
+  const handleValueChange = useCallback((provider: ProviderType) => {
+    onChange(provider);
+  }, [onChange]);
+
   return (
     <FormField
       control={control}
       name="provider"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Provider</FormLabel>
-          <Select
-            value={value}
-            onValueChange={(provider: ProviderType) => {
-              field.onChange(provider);
-              onChange(provider);
-            }}
-            disabled={disabled}
-          >
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a provider" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="apple">Apple iCloud</SelectItem>
-              <SelectItem value="google">Google Calendar</SelectItem>
-              <SelectItem value="fastmail">Fastmail</SelectItem>
-              <SelectItem value="nextcloud">Nextcloud</SelectItem>
-              <SelectItem value="caldav">Generic CalDAV</SelectItem>
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )}
+      render={({ field }) => {
+        const handleSelectValueChange = useCallback((provider: ProviderType) => {
+          field.onChange(provider);
+          handleValueChange(provider);
+        }, [field.onChange, handleValueChange]);
+
+        return (
+          <FormItem>
+            <FormLabel>Provider</FormLabel>
+            <Select
+              value={value}
+              onValueChange={handleSelectValueChange}
+              disabled={disabled}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a provider" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="apple">Apple iCloud</SelectItem>
+                <SelectItem value="google">Google Calendar</SelectItem>
+                <SelectItem value="fastmail">Fastmail</SelectItem>
+                <SelectItem value="nextcloud">Nextcloud</SelectItem>
+                <SelectItem value="caldav">Generic CalDAV</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }
