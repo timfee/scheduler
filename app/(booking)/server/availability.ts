@@ -1,6 +1,7 @@
-import { addMinutes, format, getDay } from 'date-fns';
+import { addMinutes, format, getDay, set } from 'date-fns';
 import { loadAvailabilityTemplateAction } from '@/app/admin/availability/server/actions';
 import { type DayOfWeek } from '@/lib/schemas/availability';
+import { TIMEZONES, BUSINESS_HOURS } from '@/lib/constants';
 
 export interface BusyTime {
   startUtc: string;
@@ -27,8 +28,17 @@ export function calculateAvailableSlots(options: AvailabilityOptions): string[] 
   const { date, durationMinutes, businessHours, busyTimes } = options;
   
   // Create business hours in the user's local timezone
-  const businessStart = set(new Date(date), { hours: parseInt(businessHours.start.split(':')[0]), minutes: parseInt(businessHours.start.split(':')[1]) });
-  const businessEnd = set(new Date(date), { hours: parseInt(businessHours.end.split(':')[0]), minutes: parseInt(businessHours.end.split(':')[1]) });
+  const startParts = businessHours.start.split(':');
+  const endParts = businessHours.end.split(':');
+  
+  const businessStart = set(new Date(date), { 
+    hours: parseInt(startParts[0] ?? '0'), 
+    minutes: parseInt(startParts[1] ?? '0') 
+  });
+  const businessEnd = set(new Date(date), { 
+    hours: parseInt(endParts[0] ?? '0'), 
+    minutes: parseInt(endParts[1] ?? '0') 
+  });
   
   const availableSlots: string[] = [];
   
@@ -100,9 +110,9 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
     if (!template) {
       // Fall back to default business hours if no template is configured
       return {
-        start: '09:00',
-        end: '17:00',
-        timezone: 'America/New_York'
+        start: BUSINESS_HOURS.DEFAULT_START,
+        end: BUSINESS_HOURS.DEFAULT_END,
+        timezone: TIMEZONES.DEFAULT
       };
     }
     
@@ -111,9 +121,9 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
     // If the day is not defined, return no availability
     if (!dayAvailability || !dayAvailability.enabled || dayAvailability.slots.length === 0) {
       return {
-        start: '09:00',
-        end: '09:00', // No availability
-        timezone: 'America/New_York'
+        start: BUSINESS_HOURS.DEFAULT_START,
+        end: BUSINESS_HOURS.DEFAULT_START, // No availability
+        timezone: TIMEZONES.DEFAULT
       };
     }
     
@@ -122,25 +132,25 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
     const firstSlot = dayAvailability.slots[0];
     if (!firstSlot) {
       return {
-        start: '09:00',
-        end: '09:00', // No availability
-        timezone: template.timezone || 'America/New_York'
+        start: BUSINESS_HOURS.DEFAULT_START,
+        end: BUSINESS_HOURS.DEFAULT_START, // No availability
+        timezone: TIMEZONES.DEFAULT
       };
     }
     
     return {
       start: firstSlot.start,
       end: firstSlot.end,
-      timezone: template.timezone || 'America/New_York'
+      timezone: TIMEZONES.DEFAULT
     };
     
   } catch (error) {
     console.error('Error getting business hours for date:', error);
     // Fall back to default business hours on error
     return {
-      start: '09:00',
-      end: '17:00',
-      timezone: 'America/New_York'
+      start: BUSINESS_HOURS.DEFAULT_START,
+      end: BUSINESS_HOURS.DEFAULT_END,
+      timezone: TIMEZONES.DEFAULT
     };
   }
 }
