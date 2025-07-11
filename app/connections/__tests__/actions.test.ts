@@ -6,6 +6,8 @@ import { sql } from 'drizzle-orm';
 import * as schema from '../../../infrastructure/database/schema';
 import { createTestDb, cleanupTestDb } from '../../../infrastructure/database/__tests__/helpers/db';
 import { CALENDAR_CAPABILITY, type CalendarCapability } from '@/lib/types/constants';
+import { connectionVariants } from '@test/factories';
+import '@test/setup/jest.setup';
 
 jest.mock('next/cache', () => ({
   revalidatePath: jest.fn(),
@@ -52,7 +54,6 @@ afterAll(() => {
 });
 
 beforeEach(() => {
-  jest.restoreAllMocks();
   // Clear the tables - use where clause to satisfy ESLint
   db.delete(schema.calendars).where(sql`1=1`);
   db.delete(schema.calendarIntegrations).where(sql`1=1`);
@@ -60,74 +61,49 @@ beforeEach(() => {
 
 describe('createConnectionAction validation', () => {
   it('requires username and password for Basic auth', async () => {
+    const connectionData = connectionVariants.caldav();
+    connectionData.username = '';
+    connectionData.password = '';
+    
     await expect(
-      actions.createConnectionAction({
-        provider: 'caldav',
-        displayName: 'Test',
-        authMethod: 'Basic',
-        username: '',
-        password: '',
-        serverUrl: 'https://x',
-        capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-      })
+      actions.createConnectionAction(connectionData)
     ).rejects.toThrow('Username is required');
   });
 
   it('requires server URL for caldav provider', async () => {
+    const connectionData = connectionVariants.caldav();
+    connectionData.serverUrl = undefined;
+    
     await expect(
-      actions.createConnectionAction({
-        provider: 'caldav',
-        displayName: 'Test',
-        authMethod: 'Basic',
-        username: 'u',
-        password: 'p',
-        capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-      })
+      actions.createConnectionAction(connectionData)
     ).rejects.toThrow('Server URL is required');
   });
 
   it('requires OAuth fields', async () => {
+    const connectionData = connectionVariants.google();
+    connectionData.refreshToken = '';
+    connectionData.clientId = '';
+    connectionData.clientSecret = '';
+    connectionData.tokenUrl = '';
+    
     await expect(
-      actions.createConnectionAction({
-        provider: 'google',
-        displayName: 'G',
-        authMethod: 'Oauth',
-        username: 'u',
-        refreshToken: '',
-        clientId: '',
-        clientSecret: '',
-        tokenUrl: '',
-        capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-      })
+      actions.createConnectionAction(connectionData)
     ).rejects.toThrow('All OAuth fields are required');
   });
 
   it('creates connection when test succeeds', async () => {
-    const res = await actions.createConnectionAction({
-      provider: 'google',
-      displayName: 'ok',
-      authMethod: 'Oauth',
-      username: 'u',
-      refreshToken: 'r',
-      clientId: 'c',
-      clientSecret: 's',
-      tokenUrl: 'https://token',
-      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-    });
+    const connectionData = connectionVariants.google();
+    const res = await actions.createConnectionAction(connectionData);
+    
     expect(res).toBeDefined();
     const created = await integrations.listCalendarIntegrations();
     expect(created).toHaveLength(1);
   });
 
   it('auto-discovers config for well-known providers', async () => {
-    const res = await actions.createConnectionAction({
-      provider: 'apple',
-      displayName: 'iCloud',
-      authMethod: 'Basic',
-      username: 'user',
-      password: 'pass',
-      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-    });
+    const connectionData = connectionVariants.apple();
+    const res = await actions.createConnectionAction(connectionData);
+    
     expect(res).toBeDefined();
     const [integration] = await integrations.listCalendarIntegrations();
     expect(integration).toBeDefined();

@@ -32,6 +32,7 @@ const config: JestConfigWithTsJest = {
   moduleNameMapper: {
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),
     "server-only": "<rootDir>/test/__mocks__/server-only.ts",
+    "@test/(.*)": "<rootDir>/test/$1",
   },
 
   transform: {
