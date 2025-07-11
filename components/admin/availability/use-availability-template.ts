@@ -1,9 +1,7 @@
 import { useState, useEffect, useTransition } from "react";
-import { type WeeklyAvailability } from "@/lib/schemas/availability";
+import { type WeeklyAvailability, type DayOfWeek } from "@/lib/schemas/availability";
 import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
-
-type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 
 const DEFAULT_AVAILABILITY: WeeklyAvailability = {
   monday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },

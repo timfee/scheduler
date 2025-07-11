@@ -23,3 +23,4 @@ export const weeklyAvailabilitySchema = z.object({
 export type TimeSlot = z.infer<typeof timeSlotSchema>;
 export type DayAvailability = z.infer<typeof dayAvailabilitySchema>;
 export type WeeklyAvailability = z.infer<typeof weeklyAvailabilitySchema>;
+export type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";

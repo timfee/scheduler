@@ -3,10 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
+import { type DayOfWeek } from "@/lib/schemas/availability";
 import { DayAvailability } from "./day-availability";
 import { useAvailabilityTemplate } from "./use-availability-template";
-
-type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 
 const DAYS: { key: DayOfWeek; label: string }[] = [
   { key: "monday", label: "Monday" },
