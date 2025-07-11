@@ -1,15 +1,13 @@
-import { addDays, format, startOfDay } from 'date-fns'
 import { listBusyTimesAction } from '@/app/appointments/actions'
-import { DateSelector } from '@/app/(booking)/components/date-selector'
+import { DateSelector } from './date-selector'
+import { addDays, format, startOfDay } from 'date-fns'
 
-interface DatePageProps {
-  searchParams: Promise<{ type?: string }>
-}
-
-export default async function DatePage({ searchParams }: DatePageProps) {
-  const { type } = await searchParams
-
-  if (!type) {
+export default async function DatePage({
+  searchParams
+}: {
+  searchParams: { type?: string; date?: string; time?: string }
+}) {
+  if (!searchParams.type) {
     return <p className="text-muted-foreground">Select a type first.</p>
   }
 
@@ -22,7 +20,9 @@ export default async function DatePage({ searchParams }: DatePageProps) {
     format(to, "yyyy-MM-dd'T'HH:mm:ssXXX"),
   )
 
+
   const busyDates = new Set(busy.map(b => b.startUtc.slice(0, 10)))
 
   return <DateSelector type={type} busyDates={busyDates} />
+
 }

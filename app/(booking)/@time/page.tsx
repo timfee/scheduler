@@ -1,44 +1,21 @@
-import { getAppointmentType } from '@/app/(booking)/data'
-import { listBusyTimesAction } from '@/app/appointments/actions'
-import { addMinutes, format } from 'date-fns'
-import { TimeSelector } from '@/app/(booking)/components/time-selector'
+import { getAppointmentType } from "@/app/(booking)/data";
+import { listBusyTimesAction } from "@/app/appointments/actions";
+import { TimeSelector } from "./time-selector";
 
-interface TimePageProps {
-  searchParams: Promise<{ type?: string; date?: string }>
-}
-
-export default async function TimePage({ searchParams }: TimePageProps) {
-  const { type, date: dateParam } = await searchParams
-
-  if (!type || !dateParam) {
-    return <p className="text-muted-foreground">Select a date first.</p>
+export default async function TimePage({
+  searchParams
+}: {
+  searchParams: { type?: string; date?: string; time?: string }
+}) {
+  if (!searchParams.type || !searchParams.date) {
+    return <p className="text-muted-foreground">Select a date first.</p>;
   }
 
-  let slots: string[] = []
-  let error: string | null = null
-
+  const date = new Date(searchParams.date);
+  
   try {
-    const date = new Date(dateParam)
     const [apptType, busy] = await Promise.all([
-      getAppointmentType(type),
-      listBusyTimesAction(
-        new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
-          0,
-          0,
-          0,
-        ).toISOString(),
-        new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate(),
-          23,
-          59,
-          59,
-        ).toISOString(),
-      ),
+      getAppointmentType(searchParams.type),
     ])
 
     if (!apptType) {
