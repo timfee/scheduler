@@ -4,20 +4,19 @@
  * Script to generate environment variables for the scheduler application
  * Run with: tsx scripts/generate-env.ts
  */
-
-import { randomBytes } from 'crypto';
-import { writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { randomBytes } from "crypto";
+import { existsSync, writeFileSync } from "fs";
+import { join } from "path";
 
 function generateEncryptionKey(): string {
-  return randomBytes(32).toString('hex').toUpperCase();
+  return randomBytes(32).toString("hex").toUpperCase();
 }
 
 function generateWebhookSecret(): string {
-  return randomBytes(32).toString('base64');
+  return randomBytes(32).toString("base64");
 }
 
-function generateEnvFile(): void {
+function generateEnvFile(forceOverwrite = false): void {
   const envContent = `# Generated environment variables for scheduler
 # Copy to .env.local for local development
 
@@ -38,28 +37,28 @@ NODE_ENV=development
 # GOOGLE_OAUTH_CLIENT_SECRET=your-google-client-secret
 `;
 
-  const envPath = join(process.cwd(), '.env.example');
-  
+  const envPath = join(process.cwd(), ".env.example");
+
   if (existsSync(envPath) && !forceOverwrite) {
-    console.log('⚠️  .env.example already exists');
-    console.log('Generated values:');
+    console.log("⚠️  .env.example already exists");
+    console.log("Generated values:");
     console.log(`ENCRYPTION_KEY=${generateEncryptionKey()}`);
     console.log(`WEBHOOK_SECRET=${generateWebhookSecret()}`);
   } else {
     writeFileSync(envPath, envContent);
-    console.log('✅ Generated .env.example with secure values');
-    console.log('📝 Copy .env.example to .env.local and customize as needed');
+    console.log("✅ Generated .env.example with secure values");
+    console.log("📝 Copy .env.example to .env.local and customize as needed");
   }
 }
 
 // Display individual values for manual setup
-console.log('🔐 Environment Variable Generator');
-console.log('================================');
-console.log('');
-console.log('For GitHub Repository Secrets:');
-console.log('');
+console.log("🔐 Environment Variable Generator");
+console.log("================================");
+console.log("");
+console.log("For GitHub Repository Secrets:");
+console.log("");
 console.log(`ENCRYPTION_KEY: ${generateEncryptionKey()}`);
 console.log(`WEBHOOK_SECRET: ${generateWebhookSecret()}`);
-console.log('');
-console.log('For local development:');
+console.log("");
+console.log("For local development:");
 generateEnvFile();
