@@ -46,7 +46,7 @@ test.describe('Smoke Tests', () => {
     await page.click('body');
     
     // Wait for potential errors
-    await page.waitForTimeout(500);
+    await page.waitForEvent('pageerror', { timeout: 500 });
     
     const exportErrors = jsErrors.filter(error => 
       error.includes('updateConnectionAction') && error.includes('not found')
