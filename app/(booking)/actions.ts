@@ -159,6 +159,6 @@ export function clearRateLimiter() {
 }
 
 // Export for testing purposes
-export async function clearBookingLocks() {
+export function clearBookingLocks() {
   bookingLocks.clear();
 }
