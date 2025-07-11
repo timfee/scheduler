@@ -1,47 +1,49 @@
 "use server";
 
-import {
-  createCalendarIntegration,
-  deleteCalendarIntegration,
-  getCalendarIntegration,
-  testCalendarConnection,
-  prepareConfig,
-  updateCalendarIntegration,
-  createDAVClientFromConfig,
-  createDAVClientFromIntegration,
-  fetchCalendarOptions,
-  listCalendarIntegrations,
-  isProviderType,
-  addCalendarToIntegration,
-  getCalendarsForIntegration,
-  updateCalendarCapability,
-  removeCalendar,
-  type CreateCalendarIntegrationInput,
-  type ProviderType,
-  type UpdateCalendarIntegrationInput,
-  type CalendarOption,
-} from "@/infrastructure/database/integrations";
 import { db } from "@/infrastructure/database";
-import { calendarIntegrations } from "@/infrastructure/database/schema";
-import { eq } from "drizzle-orm";
-import { getConnections } from './data';
-import { mapErrorToUserMessage } from '@/lib/errors';
 import {
   buildConfigFromValues,
   mergeConfig,
 } from "@/infrastructure/database/config-utils";
 import {
-  connectionFormSchema,
-  type ConnectionFormValues,
-  connectionConfigSchema,
-} from "./schemas/connection";
+  addCalendarToIntegration,
+  createCalendarIntegration,
+  createDAVClientFromConfig,
+  createDAVClientFromIntegration,
+  deleteCalendarIntegration,
+  fetchCalendarOptions,
+  getCalendarIntegration,
+  getCalendarsForIntegration,
+  isProviderType,
+  listCalendarIntegrations,
+  prepareConfig,
+  removeCalendar,
+  testCalendarConnection,
+  updateCalendarCapability,
+  updateCalendarIntegration,
+  type CalendarOption,
+  type CreateCalendarIntegrationInput,
+  type ProviderType,
+  type UpdateCalendarIntegrationInput,
+} from "@/infrastructure/database/integrations";
+import { calendarIntegrations } from "@/infrastructure/database/schema";
+import { mapErrorToUserMessage } from "@/lib/errors";
+import {
+  CALENDAR_CAPABILITY,
+  type CalendarCapability,
+} from "@/lib/types/constants";
+import { eq } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { type ConnectionListItem } from "./data";
-import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/lib/types/constants";
 import { z } from "zod/v4";
 
-export type { ProviderType };
-export type { CalendarOption };
+import { getConnections, type ConnectionListItem } from "./data";
+import {
+  connectionConfigSchema,
+  connectionFormSchema,
+  type ConnectionFormValues,
+} from "./schemas/connection";
+
+export type { CalendarOption, ProviderType };
 
 export type ConnectionFormData = ConnectionFormValues;
 
@@ -95,7 +97,9 @@ export async function createConnectionAction(
       displayName: integration.displayName,
     };
   } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to create connection"));
+    throw new Error(
+      mapErrorToUserMessage(error, "Failed to create connection"),
+    );
   }
 }
 
@@ -167,7 +171,9 @@ export async function updateConnectionAction(
       displayName: updated.displayName,
     };
   } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to update connection"));
+    throw new Error(
+      mapErrorToUserMessage(error, "Failed to update connection"),
+    );
   }
 }
 
@@ -186,7 +192,9 @@ export async function deleteConnectionAction(id: string): Promise<void> {
 
     return;
   } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to delete connection"));
+    throw new Error(
+      mapErrorToUserMessage(error, "Failed to delete connection"),
+    );
   }
 }
 
@@ -321,13 +329,11 @@ export async function updateCalendarOrderAction(
     const target = list[newIndex]!;
 
     db.transaction((tx) => {
-      tx
-        .update(calendarIntegrations)
+      tx.update(calendarIntegrations)
         .set({ displayOrder: current.displayOrder })
         .where(eq(calendarIntegrations.id, target.id))
         .run();
-      tx
-        .update(calendarIntegrations)
+      tx.update(calendarIntegrations)
         .set({ displayOrder: target.displayOrder })
         .where(eq(calendarIntegrations.id, current.id))
         .run();
@@ -339,72 +345,3 @@ export async function updateCalendarOrderAction(
     throw new Error(mapErrorToUserMessage(error, "Failed to update order"));
   }
 }
-
-export async function addCalendarAction(
-  integrationId: string,
-  calendarUrl: string,
-  displayName: string,
-  capability: CalendarCapability,
-) {
-  try {
-    const validated = addCalendarSchema.parse({
-      integrationId,
-      calendarUrl,
-      displayName,
-      capability,
-    });
-
-    const calendar = await addCalendarToIntegration(
-      validated.integrationId,
-      validated.calendarUrl,
-      validated.displayName,
-      validated.capability,
-    );
-
-    revalidatePath("/connections");
-    revalidateTag("calendars");
-    return calendar;
-  } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to add calendar"));
-  }
-}
-
-export async function updateCalendarCapabilityAction(
-  calendarId: string,
-  capability: CalendarCapability,
-) {
-  try {
-    await updateCalendarCapability(calendarId, capability);
-
-    revalidatePath("/connections");
-    return;
-  } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to update calendar"));
-  }
-}
-
-export async function removeCalendarAction(calendarId: string) {
-  try {
-    const deleted = await removeCalendar(calendarId);
-
-    if (!deleted) {
-      throw new Error("Failed to remove calendar");
-    }
-
-    revalidatePath("/connections");
-    return;
-  } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to remove calendar"));
-  }
-}
-
-export async function listCalendarsForIntegrationAction(integrationId: string) {
-  try {
-    const calendars = await getCalendarsForIntegration(integrationId);
-    return calendars;
-  } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to list calendars"));
-  }
-}
-
-// Re-export calendar management actions
