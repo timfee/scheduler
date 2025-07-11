@@ -4,6 +4,12 @@ import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import type * as schema from '@/infrastructure/database/schema';
 import { connectionVariants } from '@test/factories';
 import '@test/setup/jest.setup';
+import {
+  type createConnectionAction,
+  type deleteConnectionAction,
+  type updateConnectionAction,
+  type updateCalendarOrderAction,
+} from '../actions';
 
 // Mock revalidateTag to verify it's called
 const mockRevalidateTag = jest.fn();
@@ -24,11 +30,16 @@ jest.mock('tsdav', () => ({
 }));
 
 let db: BetterSQLite3Database<typeof schema>;
+let createConnectionActionFn: typeof createConnectionAction;
+let deleteConnectionActionFn: typeof deleteConnectionAction;
+let updateConnectionActionFn: typeof updateConnectionAction;
+let updateCalendarOrderActionFn: typeof updateCalendarOrderAction;
 
 beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: "development" });
   process.env.ENCRYPTION_KEY = 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
   process.env.SQLITE_PATH = ':memory:';
+  process.env.WEBHOOK_SECRET = 'test-webhook-secret-that-is-32-characters-long';
   
   const dbModule = await import('@/infrastructure/database');
   db = dbModule.db;
@@ -43,6 +54,13 @@ beforeAll(async () => {
       updated_at INTEGER NOT NULL
     )
   `);
+
+  // Import actions after mocks are set up
+  const actionsModule = await import('../actions');
+  createConnectionActionFn = actionsModule.createConnectionAction;
+  deleteConnectionActionFn = actionsModule.deleteConnectionAction;
+  updateConnectionActionFn = actionsModule.updateConnectionAction;
+  updateCalendarOrderActionFn = actionsModule.updateCalendarOrderAction;
 });
 
 describe('Cache Invalidation', () => {
@@ -53,10 +71,8 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when creating a connection', async () => {
-    const { createConnectionAction } = await import('../actions');
-    
     const connectionData = connectionVariants.apple();
-    const result = await createConnectionAction(connectionData);
+    const result = await createConnectionActionFn(connectionData);
     
     expect(result).toBeDefined();
     expect(mockRevalidatePath).toHaveBeenCalledWith('/connections');
@@ -64,36 +80,32 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when deleting a connection', async () => {
-    const { createConnectionAction, deleteConnectionAction } = await import('../actions');
-    
     // First create a connection
     const connectionData = connectionVariants.apple();
-    const created = await createConnectionAction(connectionData);
+    const created = await createConnectionActionFn(connectionData);
     
     // Clear the mocks
     mockRevalidateTag.mockClear();
     mockRevalidatePath.mockClear();
     
     // Delete it
-    await deleteConnectionAction(created.id);
+    await deleteConnectionActionFn(created.id);
     
     expect(mockRevalidatePath).toHaveBeenCalledWith('/connections');
     expect(mockRevalidateTag).toHaveBeenCalledWith('calendars');
   });
 
   it('should call revalidateTag when updating a connection', async () => {
-    const { createConnectionAction, updateConnectionAction } = await import('../actions');
-    
     // First create a connection
     const connectionData = connectionVariants.apple();
-    const created = await createConnectionAction(connectionData);
+    const created = await createConnectionActionFn(connectionData);
     
     // Clear the mocks
     mockRevalidateTag.mockClear();
     mockRevalidatePath.mockClear();
     
     // Update it
-    await updateConnectionAction(created.id, {
+    await updateConnectionActionFn(created.id, {
       displayName: 'Updated Calendar',
     });
     
@@ -102,24 +114,22 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when updating calendar order', async () => {
-    const { createConnectionAction, updateCalendarOrderAction } = await import('../actions');
-    
     // First create two connections
     const firstConnection = connectionVariants.apple();
     firstConnection.displayName = 'First Calendar';
-    const _first = await createConnectionAction(firstConnection);
+    const _first = await createConnectionActionFn(firstConnection);
     
     const secondConnection = connectionVariants.apple();
     secondConnection.displayName = 'Second Calendar';
     secondConnection.username = 'test2@example.com';
-    const second = await createConnectionAction(secondConnection);
+    const second = await createConnectionActionFn(secondConnection);
     
     // Clear the mocks
     mockRevalidateTag.mockClear();
     mockRevalidatePath.mockClear();
     
     // Update order
-    await updateCalendarOrderAction(second.id, 'up');
+    await updateCalendarOrderActionFn(second.id, 'up');
     
     expect(mockRevalidatePath).toHaveBeenCalledWith('/connections');
     expect(mockRevalidateTag).toHaveBeenCalledWith('calendars');
