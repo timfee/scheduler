@@ -29,7 +29,7 @@ describe("Availability Schema", () => {
     it("should validate valid day availability", () => {
       const validDay = {
         enabled: true,
-        slots: [{ start: "09:00", end: BUSINESS_HOURS.DEFAULT_END }]
+        slots: [{ start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }]
       };
       expect(() => dayAvailabilitySchema.parse(validDay)).not.toThrow();
     });
