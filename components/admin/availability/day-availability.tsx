@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Clock } from "lucide-react";
-import { type DayAvailability as DayAvailabilityType } from "@/lib/schemas/availability";
+import { type DayAvailability as DayAvailabilityType, type DayOfWeek } from "@/lib/schemas/availability";
 import { TimeSlotEditor } from "./time-slot-editor";
 
 interface DayAvailabilityProps {
-  dayKey: string;
+  dayKey: DayOfWeek;
   dayLabel: string;
   availability: DayAvailabilityType;
   onToggleDay: () => void;
