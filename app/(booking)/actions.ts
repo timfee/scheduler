@@ -30,6 +30,11 @@ function cleanupOldEntries() {
   });
 }
 
+// Set up periodic cleanup every 5 minutes to prevent memory growth
+setInterval(() => {
+  cleanupOldEntries();
+}, 5 * 60 * 1000);
+
 /**
  * Server action to create a booking on the configured calendar.
  *
