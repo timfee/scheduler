@@ -14,6 +14,7 @@ export * from "./ui/label";
 export * from "./ui/select";
 export * from "./ui/separator";
 export * from "./ui/switch";
+export * from "./ui/textarea";
 
 // Admin components
 export * from "./admin";
