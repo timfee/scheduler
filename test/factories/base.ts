@@ -33,10 +33,11 @@ export class Factory<T> {
   /**
    * Build with sequence numbers
    */
-  buildSequence(count: number, sequenceField: keyof T, prefix = ''): T[] {
+  buildSequence(count: number, sequenceField: keyof T, sequenceType: 'string' | 'number' = 'string', prefix = ''): T[] {
     return Array.from({ length: count }, (_, index) => {
+      const sequenceValue = sequenceType === 'string' ? `${prefix}${index + 1}` : index + 1;
       const overrides = {
-        [sequenceField]: `${prefix}${index + 1}`,
+        [sequenceField]: sequenceValue,
       } as Partial<T>;
       return this.build(overrides);
     });
