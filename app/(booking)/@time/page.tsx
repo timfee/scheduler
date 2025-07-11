@@ -5,17 +5,20 @@ import { listBusyTimesAction } from '@/app/appointments/actions'
 import { getAppointmentType } from '@/app/(booking)/data'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { useEffect, useState } from 'react'
-import { TimeSkeleton } from '@/components/booking-skeletons'
+import { TimeSkeleton } from '@/app/(booking)/components/booking-skeletons'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function TimePage() {
   const { type, date, updateBookingStep } = useBookingState()
   const [slots, setSlots] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!type || !date) return
 
     setLoading(true)
+    setError(null)
     
     Promise.all([
       getAppointmentType(type),
@@ -57,6 +60,7 @@ export default function TimePage() {
       setSlots(availableSlots)
     }).catch((error) => {
       console.error('Failed to load time slots:', error)
+      setError('Unable to load available times. Please try again.')
       setSlots([])
     }).finally(() => setLoading(false))
   }, [type, date])
@@ -67,6 +71,14 @@ export default function TimePage() {
 
   if (loading) {
     return <TimeSkeleton />
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    )
   }
 
   if (slots.length === 0) {
