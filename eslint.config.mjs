@@ -80,6 +80,10 @@ export default tseslint.config(
       // Custom rule comment for dynamic imports
       // TODO: Add ESLint rule to catch relative dynamic imports (await import('../path'))
       // All dynamic imports should use absolute paths with @/ alias (await import('@/path'))
+      
+      // Component size and organization rules
+      "max-lines": ["warn", { max: 180, skipComments: true, skipBlankLines: true }],
+      "max-lines-per-function": ["warn", { max: 50, skipComments: true, skipBlankLines: true }],
     },
   },
   {
