@@ -15,13 +15,59 @@ const DEFAULT_AVAILABILITY: WeeklyAvailability = {
   sunday: { enabled: false, slots: [] },
 };
 
-export function useAvailabilityTemplate() {
-  const [availability, setAvailability] = useState<WeeklyAvailability>(DEFAULT_AVAILABILITY);
+// Utility function for creating availability state updaters
+function createAvailabilityUpdater(setAvailability: React.Dispatch<React.SetStateAction<WeeklyAvailability>>) {
+  return {
+    toggleDay: (day: DayOfWeek) => {
+      setAvailability(prev => ({
+        ...prev,
+        [day]: {
+          ...prev[day],
+          enabled: !prev[day].enabled,
+          slots: !prev[day].enabled ? [{ start: "09:00", end: "17:00" }] : prev[day].slots
+        }
+      }));
+    },
+    
+    addSlot: (day: DayOfWeek) => {
+      setAvailability(prev => ({
+        ...prev,
+        [day]: {
+          ...prev[day],
+          slots: [...prev[day].slots, { start: "09:00", end: "17:00" }]
+        }
+      }));
+    },
+    
+    removeSlot: (day: DayOfWeek, index: number) => {
+      setAvailability(prev => ({
+        ...prev,
+        [day]: {
+          ...prev[day],
+          slots: prev[day].slots.filter((_, i) => i !== index)
+        }
+      }));
+    },
+    
+    updateSlot: (day: DayOfWeek, index: number, field: 'start' | 'end', value: string) => {
+      setAvailability(prev => ({
+        ...prev,
+        [day]: {
+          ...prev[day],
+          slots: prev[day].slots.map((slot, i) => 
+            i === index ? { ...slot, [field]: value } : slot
+          )
+        }
+      }));
+    }
+  };
+}
+
+// Hook for loading availability template
+function useAvailabilityLoader(setAvailability: React.Dispatch<React.SetStateAction<WeeklyAvailability>>) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  // Load existing availability template on component mount
   useEffect(() => {
     const loadTemplate = async () => {
       try {
@@ -40,50 +86,14 @@ export function useAvailabilityTemplate() {
     };
 
     void loadTemplate();
-  }, []);
+  }, [setAvailability]);
 
-  const toggleDay = (day: DayOfWeek) => {
-    setAvailability(prev => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        enabled: !prev[day].enabled,
-        slots: !prev[day].enabled ? [{ start: "09:00", end: "17:00" }] : prev[day].slots
-      }
-    }));
-  };
+  return { isLoading, error, setError };
+}
 
-  const addSlot = (day: DayOfWeek) => {
-    setAvailability(prev => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        slots: [...prev[day].slots, { start: "09:00", end: "17:00" }]
-      }
-    }));
-  };
-
-  const removeSlot = (day: DayOfWeek, index: number) => {
-    setAvailability(prev => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        slots: prev[day].slots.filter((_, i) => i !== index)
-      }
-    }));
-  };
-
-  const updateSlot = (day: DayOfWeek, index: number, field: 'start' | 'end', value: string) => {
-    setAvailability(prev => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        slots: prev[day].slots.map((slot, i) => 
-          i === index ? { ...slot, [field]: value } : slot
-        )
-      }
-    }));
-  };
+// Hook for saving availability template
+function useAvailabilitySaver(availability: WeeklyAvailability, setError: React.Dispatch<React.SetStateAction<string | null>>) {
+  const [isPending, startTransition] = useTransition();
 
   const handleSave = () => {
     startTransition(async () => {
@@ -97,6 +107,17 @@ export function useAvailabilityTemplate() {
       }
     });
   };
+
+  return { isPending, handleSave };
+}
+
+// Main hook that orchestrates the smaller hooks
+export function useAvailabilityTemplate() {
+  const [availability, setAvailability] = useState<WeeklyAvailability>(DEFAULT_AVAILABILITY);
+  
+  const { isLoading, error, setError } = useAvailabilityLoader(setAvailability);
+  const { isPending, handleSave } = useAvailabilitySaver(availability, setError);
+  const { toggleDay, addSlot, removeSlot, updateSlot } = createAvailabilityUpdater(setAvailability);
 
   return {
     availability,
