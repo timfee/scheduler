@@ -1,6 +1,4 @@
 "use client";
-
-import { useCallback } from "react";
 import {
   FormField,
   FormItem,
@@ -40,10 +38,10 @@ export default function ProviderSelect({
       control={control}
       name="provider"
       render={({ field }) => {
-        const handleSelectValueChange = useCallback((provider: ProviderType) => {
+        const handleSelectValueChange = (provider: ProviderType) => {
           field.onChange(provider);
-          handleValueChange(provider);
-        }, [field.onChange, handleValueChange]);
+          onChange(provider);
+        };
 
         return (
           <FormItem>
