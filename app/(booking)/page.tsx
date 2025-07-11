@@ -8,6 +8,8 @@ import { createBookingAction } from '@/app/(booking)/actions'
 import { mapErrorToUserMessage } from '@/lib/errors'
 import { formatDateForBooking } from '@/lib/utils'
 
+const TOTAL_STEPS = 3
+
 export default function BookingPage() {
   const { type: appointmentType, date, time, progress, isComplete } = useBookingState()
   
