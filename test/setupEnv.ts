@@ -3,6 +3,7 @@ import { jest, beforeAll, afterAll, afterEach } from "@jest/globals";
 import { TextDecoder, TextEncoder } from "util";
 import { ReadableStream, TransformStream } from 'node:stream/web';
 import { MessageChannel, MessagePort } from 'worker_threads';
+import '@testing-library/jest-dom';
 
 // Set environment variables for tests
 process.env.NODE_ENV = "test";

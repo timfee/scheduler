@@ -24,7 +24,7 @@ if (
 const config: JestConfigWithTsJest = {
   preset: "ts-jest/presets/default-esm",
 
-  testEnvironment: "node",
+  testEnvironment: "jsdom",
   testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   setupFilesAfterEnv: ["<rootDir>/test/setupEnv.ts"],
   roots: ["<rootDir>"],
