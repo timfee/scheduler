@@ -131,7 +131,11 @@ describe('Double Booking Race Condition Prevention', () => {
 
     expect(successes).toHaveLength(1)
     expect(failures).toHaveLength(1)
-    expect(failures[0]?.reason?.message).toBe('Selected time is not available')
+    expect(failures[0]?.status).toBe('rejected')
+    if (failures[0]?.status === 'rejected') {
+      expect(failures[0].reason).toBeInstanceOf(Error)
+      expect((failures[0].reason as Error).message).toBe('Selected time is not available')
+    }
     
     // Only one appointment should be created
     expect(appointmentsCalled).toBe(1)
