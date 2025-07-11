@@ -57,7 +57,7 @@ export default function TimePage() {
   }
 
   if (loading) {
-    return <div className="space-y-2">Loading available times...</div>
+    return <TimeSkeleton role="status" />
   }
 
   if (slots.length === 0) {
