@@ -31,8 +31,8 @@ export default async function TimePage({
     } else {
       const dateStr = format(date, 'yyyy-MM-dd')
 
-      // Create business hours in the business timezone (9 AM to 5 PM EST), then convert to UTC
-      const businessTimezone = 'America/New_York';
+      // Create business hours in the dynamically retrieved business timezone, then convert to UTC
+      const businessTimezone = apptType.timezone || 'America/New_York'; // Fallback to EST if timezone is not provided
       const businessStart = fromZonedTime(`${dateStr}T09:00:00`, businessTimezone);
       const businessEnd = fromZonedTime(`${dateStr}T17:00:00`, businessTimezone);
 
