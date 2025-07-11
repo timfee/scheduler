@@ -1,13 +1,8 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+
 import { Plus, Trash2, Clock, Loader2 } from "lucide-react";
 import { type WeeklyAvailability, type TimeSlot } from "@/lib/schemas/availability";
 import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/actions";
@@ -171,80 +166,16 @@ export function AvailabilityTemplate() {
       ) : (
         <div className="grid gap-4">
           {DAYS.map(({ key, label }) => (
-            <Card key={key} className={`${availability[key].enabled ? 'border-green-200' : 'border-gray-200'}`}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    {label}
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={availability[key].enabled}
-                      onCheckedChange={() => toggleDay(key)}
-                    />
-                    {availability[key].enabled ? (
-                      <Badge variant="default">Available</Badge>
-                    ) : (
-                      <Badge variant="secondary">Unavailable</Badge>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-              
-              {availability[key].enabled && (
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    {availability[key].slots.map((slot) => (
-                      <div key={slot.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Label htmlFor={`${key}-${slot.id}-start`} className="text-sm font-medium">
-                            From
-                          </Label>
-                          <Input
-                            id={`${key}-${slot.id}-start`}
-                            type="time"
-                            value={slot.start}
-                            onChange={(e) => updateSlot(key, slot.id, 'start', e.target.value)}
-                            className="w-32"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Label htmlFor={`${key}-${slot.id}-end`} className="text-sm font-medium">
-                            To
-                          </Label>
-                          <Input
-                            id={`${key}-${slot.id}-end`}
-                            type="time"
-                            value={slot.end}
-                            onChange={(e) => updateSlot(key, slot.id, 'end', e.target.value)}
-                            className="w-32"
-                          />
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeSlot(key, slot.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addSlot(key)}
-                      className="w-full"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Time Slot
-                    </Button>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
+            <DayAvailability
+              key={key}
+              dayKey={key}
+              dayLabel={label}
+              availability={availability[key]}
+              onToggleDay={() => toggleDay(key)}
+              onAddSlot={() => addSlot(key)}
+              onRemoveSlot={(index) => removeSlot(key, index)}
+              onUpdateSlot={(index, field, value) => updateSlot(key, index, field, value)}
+            />
           ))}
         </div>
       )}
