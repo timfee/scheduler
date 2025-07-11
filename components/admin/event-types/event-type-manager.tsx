@@ -228,6 +228,9 @@ export function EventTypeManager() {
                     {eventType.rules.maxMeetingsPerDay && (
                       <div>Max/day: {eventType.rules.maxMeetingsPerDay}</div>
                     )}
+                    {eventType.rules.maxHoursPerDay && (
+                      <div>Max hours/day: {eventType.rules.maxHoursPerDay}h</div>
+                    )}
                   </div>
                 </div>
               </div>
