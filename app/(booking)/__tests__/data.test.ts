@@ -17,7 +17,7 @@ beforeAll(async () => {
   sqlite = testDb.sqlite;
   jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
-  data = await import("../data");
+  data = await import("@/app/(booking)/data");
 });
 
 afterAll(() => {

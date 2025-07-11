@@ -76,7 +76,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction, clearRateLimiter, clearBookingLocks } = await import('../actions'))
+  ;({ createBookingAction, clearRateLimiter, clearBookingLocks } = await import('@/app/(booking)/actions'))
 })
 
 afterEach(() => {

@@ -42,7 +42,7 @@ beforeAll(async () => {
     () => ({ db }),
   );
 
-  const integrations = await import('../integrations');
+  const integrations = await import('@/infrastructure/database/integrations');
   createCalendarIntegration = integrations.createCalendarIntegration;
   updateCalendarIntegration = integrations.updateCalendarIntegration;
   listCalendarIntegrations = integrations.listCalendarIntegrations;
