@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
-import { AppointmentTypeSkeleton, DateSkeleton, TimeSkeleton } from '@/components/booking'
+
+import { AppointmentTypeSkeleton, DateSkeleton, TimeSkeleton } from '@/app/(booking)/components/booking-skeletons'
 
 export default function BookingLayout({
   children,
