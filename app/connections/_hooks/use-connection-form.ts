@@ -51,7 +51,7 @@ export function useConnectionForm(): UseConnectionFormReturn {
   const needsServerUrl = ["nextcloud", "caldav"].includes(currentProvider);
 
   const handleProviderChange = (provider: ProviderType) => {
-    const authMethod = PROVIDER_AUTH_METHODS[provider] as "Basic" | "Oauth";
+    const authMethod = PROVIDER_AUTH_METHODS[provider];
     form.setValue("authMethod", authMethod);
 
     if (authMethod === "Basic") {
