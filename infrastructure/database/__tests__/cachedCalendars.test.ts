@@ -9,10 +9,12 @@ let sqlite: ReturnType<typeof createTestDb>['sqlite'];
 
 beforeAll(async () => {
   jest.resetModules();
-  Object.assign(process.env, { NODE_ENV: 'development' });
-  process.env.ENCRYPTION_KEY =
-    'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
-  process.env.SQLITE_PATH = ':memory:';
+  Object.assign(process.env, { 
+    NODE_ENV: 'development',
+    ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
+    SQLITE_PATH: ':memory:',
+    WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
+  });
 
   const testDb = createTestDb();
   db = testDb.db;
@@ -41,7 +43,7 @@ beforeAll(async () => {
     },
   );
 
-  const integrations = await import('../integrations');
+  const integrations = await import('@/infrastructure/database/integrations');
   getCachedCalendars = integrations.getCachedCalendars;
 });
 

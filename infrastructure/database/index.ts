@@ -4,10 +4,7 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
 import * as schema from "./schema";
-import { validateEnv } from "@/lib/utils/env";
-
-// Validate environment before creating database
-const env = validateEnv();
+import env from "@/env.config";
 
 const sqlite = new Database(env.SQLITE_PATH);
 export const db = drizzle(sqlite, { schema });
