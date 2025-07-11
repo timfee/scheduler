@@ -144,6 +144,7 @@ export default function ConnectionsClient({
 
 
   const handleEdit = async (connection: ConnectionListItem) => {
+    setTestStatus({ testing: false });
     setEditingConnection(connection);
     setIsFormOpen(true);
 
