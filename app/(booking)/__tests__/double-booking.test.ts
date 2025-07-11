@@ -3,6 +3,7 @@ import { type BookingFormData } from '@/lib/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@test/factories'
+import { DURATION } from '@/lib/constants'
 import '@test/setup/jest.setup'
 
 let createBookingAction: (data: BookingFormData) => Promise<void>
@@ -70,7 +71,7 @@ beforeAll(async () => {
       getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
         id: 'intro',
         name: 'Intro',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         isActive: true,
       })),
     })

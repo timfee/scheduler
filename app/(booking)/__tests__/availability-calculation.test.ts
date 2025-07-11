@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeAll } from '@jest/globals';
 import { calculateAvailableSlots, getBusinessHoursForDate, type BusyTime, type BusinessHours } from '../server/availability';
+import { TIMEZONES, BUSINESS_HOURS, DURATION } from '@/lib/constants';
 
 describe('Availability Calculation', () => {
   const defaultBusinessHours: BusinessHours = {
-    start: '09:00',
-    end: '17:00',
-    timezone: 'America/New_York'
+    start: BUSINESS_HOURS.DEFAULT_START,
+    end: BUSINESS_HOURS.DEFAULT_END,
+    timezone: TIMEZONES.DEFAULT
   };
 
   describe('Basic slot generation', () => {
@@ -13,7 +14,7 @@ describe('Availability Calculation', () => {
       // Given: Business hours 9 AM - 5 PM, 30-minute slots
       const options = {
         date: '2024-01-15',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes: []
       };
@@ -23,7 +24,7 @@ describe('Availability Calculation', () => {
 
       // Then: Should return 16 slots (9:00, 9:30, ..., 16:30)
       expect(slots).toHaveLength(16);
-      expect(slots[0]).toBe('09:00');
+      expect(slots[0]).toBe(BUSINESS_HOURS.DEFAULT_START);
       expect(slots[1]).toBe('09:30');
       expect(slots[slots.length - 1]).toBe('16:30');
     });
@@ -39,7 +40,7 @@ describe('Availability Calculation', () => {
 
       const options = {
         date: '2024-01-15',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
       };
@@ -68,7 +69,7 @@ describe('Availability Calculation', () => {
 
       // Then: Should return 8 slots (9:00, 10:00, ..., 16:00)
       expect(slots).toHaveLength(8);
-      expect(slots[0]).toBe('09:00');
+      expect(slots[0]).toBe(BUSINESS_HOURS.DEFAULT_START);
       expect(slots[1]).toBe('10:00');
       expect(slots[slots.length - 1]).toBe('16:00');
     });
@@ -101,7 +102,7 @@ describe('Availability Calculation', () => {
       // Then: Should not show 10 AM or 11 AM slots
       expect(slots).not.toContain('10:00');
       expect(slots).not.toContain('11:00');
-      expect(slots).toContain('09:00');
+      expect(slots).toContain(BUSINESS_HOURS.DEFAULT_START);
       expect(slots).toContain('12:00');
     });
 
@@ -120,7 +121,7 @@ describe('Availability Calculation', () => {
 
       const options = {
         date: '2024-01-15',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
       };
@@ -147,7 +148,7 @@ describe('Availability Calculation', () => {
 
       const options = {
         date: '2024-01-15',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
       };
@@ -187,7 +188,7 @@ describe('Availability Calculation', () => {
 
       // Then: Exactly one slot should fit at 10 AM
       expect(slots).toContain('10:00');
-      expect(slots).not.toContain('09:00');
+      expect(slots).not.toContain(BUSINESS_HOURS.DEFAULT_START);
       expect(slots).not.toContain('11:00');
     });
 
@@ -238,7 +239,7 @@ describe('Availability Calculation', () => {
 
       // Then: Should generate 96 slots and remain performant
       expect(slots).toHaveLength(96);
-      expect(slots[0]).toBe('09:00');
+      expect(slots[0]).toBe(BUSINESS_HOURS.DEFAULT_START);
       expect(slots[1]).toBe('09:05');
       expect(slots[slots.length - 1]).toBe('16:55');
     });
@@ -257,7 +258,7 @@ describe('Availability Calculation', () => {
 
       // Then: Only one slot at start of day
       expect(slots).toHaveLength(1);
-      expect(slots[0]).toBe('09:00');
+      expect(slots[0]).toBe(BUSINESS_HOURS.DEFAULT_START);
     });
   });
 
@@ -265,14 +266,14 @@ describe('Availability Calculation', () => {
     it('should convert business hours to user timezone', () => {
       // Given: Business hours 9 AM - 5 PM EST
       const businessHours: BusinessHours = {
-        start: '09:00',
-        end: '17:00',
-        timezone: 'America/New_York'
+        start: BUSINESS_HOURS.DEFAULT_START,
+        end: BUSINESS_HOURS.DEFAULT_END,
+        timezone: 'TIMEZONES.DEFAULT'
       };
 
       const options = {
         date: '2024-01-15',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours,
         busyTimes: []
       };
@@ -281,16 +282,16 @@ describe('Availability Calculation', () => {
       const slots = calculateAvailableSlots(options);
 
       // Then: Slots display as 9 AM - 4:30 PM EST
-      expect(slots[0]).toBe('09:00');
+      expect(slots[0]).toBe(BUSINESS_HOURS.DEFAULT_START);
       expect(slots[slots.length - 1]).toBe('16:30');
     });
 
     it('should handle booking across DST transition', () => {
       // Given: Business hours on DST transition day (Spring forward)
       const businessHours: BusinessHours = {
-        start: '09:00',
-        end: '17:00',
-        timezone: 'America/New_York'
+        start: BUSINESS_HOURS.DEFAULT_START,
+        end: BUSINESS_HOURS.DEFAULT_END,
+        timezone: 'TIMEZONES.DEFAULT'
       };
 
       const options = {
@@ -305,7 +306,7 @@ describe('Availability Calculation', () => {
 
       // Then: No duplicate or missing slots
       expect(slots).toHaveLength(8);
-      expect(slots[0]).toBe('09:00');
+      expect(slots[0]).toBe(BUSINESS_HOURS.DEFAULT_START);
       expect(slots[slots.length - 1]).toBe('16:00');
     });
 
@@ -314,7 +315,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: '22:00',
         end: '23:59',
-        timezone: 'America/New_York'
+        timezone: 'TIMEZONES.DEFAULT'
       };
 
       const options = {
@@ -345,7 +346,7 @@ describe('Availability Calculation', () => {
 
       const options = {
         date: '2024-01-15',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
       };
@@ -362,7 +363,7 @@ describe('Availability Calculation', () => {
       // Given: No busy times
       const options = {
         date: '2024-01-15',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes: []
       };
@@ -380,9 +381,9 @@ describe('Availability Calculation', () => {
       const businessHours = await getBusinessHoursForDate('2024-01-15');
       
       expect(businessHours).toEqual({
-        start: '09:00',
-        end: '17:00',
-        timezone: 'America/New_York'
+        start: BUSINESS_HOURS.DEFAULT_START,
+        end: BUSINESS_HOURS.DEFAULT_END,
+        timezone: 'TIMEZONES.DEFAULT'
       });
     });
   });
