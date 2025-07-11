@@ -1,0 +1,50 @@
+name: CI
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: TypeScript check
+        run: npx tsc -p tsconfig.json --noEmit
+
+      - name: ESLint check
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx
+
+      - name: Run tests
+        run: pnpm test --silent
+        env:
+          # Required environment variables for testing
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY || 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148' }}
+          SQLITE_PATH: ':memory:'
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET || 'test-webhook-secret-key-that-is-long-enough' }}
+          # Optional OAuth variables for testing
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          NODE_ENV: 'test'

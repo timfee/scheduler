@@ -40,37 +40,33 @@ export default function ProviderSelect({
     <FormField
       control={control}
       name="provider"
-      render={({ field }) => {
-        const handleFormFieldChange = (provider: ProviderType) => {
-          field.onChange(provider);
-          handleSelectValueChange(provider);
-        };
-
-        return (
-          <FormItem>
-            <FormLabel>Provider</FormLabel>
-            <Select
-              value={value}
-              onValueChange={handleFormFieldChange}
-              disabled={disabled}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a provider" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="apple">Apple iCloud</SelectItem>
-                <SelectItem value="google">Google Calendar</SelectItem>
-                <SelectItem value="fastmail">Fastmail</SelectItem>
-                <SelectItem value="nextcloud">Nextcloud</SelectItem>
-                <SelectItem value="caldav">Generic CalDAV</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        );
-      }}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Provider</FormLabel>
+          <Select
+            value={value}
+            onValueChange={(provider: ProviderType) => {
+              field.onChange(provider);
+              handleSelectValueChange(provider);
+            }}
+            disabled={disabled}
+          >
+            <FormControl>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a provider" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="apple">Apple iCloud</SelectItem>
+              <SelectItem value="google">Google Calendar</SelectItem>
+              <SelectItem value="fastmail">Fastmail</SelectItem>
+              <SelectItem value="nextcloud">Nextcloud</SelectItem>
+              <SelectItem value="caldav">Generic CalDAV</SelectItem>
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
     />
   );
 }

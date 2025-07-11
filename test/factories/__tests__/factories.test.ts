@@ -41,7 +41,7 @@ describe('Test Factories', () => {
 
     it('should build with sequence', () => {
       const factory = Factory.define(() => ({ name: 'test', count: 1 }));
-      const instances = factory.buildSequence(3, 'name', 'string', 'item-');
+      const instances = factory.buildStringSequence({ count: 3, sequenceField: 'name', prefix: 'item-' });
       expect(instances).toHaveLength(3);
       expect(instances[0]?.name).toBe('item-1');
       expect(instances[1]?.name).toBe('item-2');
