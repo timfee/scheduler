@@ -18,7 +18,7 @@ app/
 │   │   └── [feature-name].ts
 │   ├── hooks/
 │   │   └── use-[feature-name].ts
-│   ├── components/
+│   ├── components/              # Feature-specific components (local)
 │   │   ├── [feature-name]-client.tsx
 │   │   └── [feature-name]-form.tsx
 │   └── __tests__/
@@ -26,11 +26,16 @@ app/
 │       ├── data.test.ts
 │       └── components.test.tsx
 
-components/
-├── [feature-name]-client.tsx
-├── [feature-name]-form.tsx
-└── [feature-name]-list.tsx
+components/                      # Shared/reusable components (global)
+├── [feature-name]-client.tsx    # Main client component (shared)
+├── [feature-name]-form.tsx      # Form component (shared)
+└── [feature-name]-list.tsx      # List component (shared)
 ```
+
+**Component Directory Guidelines:**
+- Use `app/[feature-name]/components/` for components that are specific to that feature and won't be reused elsewhere
+- Use `components/` for components that might be shared across multiple features or used in different contexts
+- Main feature components (Client, Form, List) are typically placed in the global `components/` directory for easier importing
 
 ## 1. Feature README Template
 

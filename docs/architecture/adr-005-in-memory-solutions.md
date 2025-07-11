@@ -79,7 +79,7 @@ export function setCachedCalendars(integrationId: string, data: CalendarData, tt
 // In-memory session store for temporary data
 const sessionStore = new Map<string, { data: any; expiry: number }>();
 
-export function getSession(sessionId: string): any | null {
+export function getSession(sessionId: string, ttlMs: number = 30 * 60 * 1000): any | null {
   const entry = sessionStore.get(sessionId);
   
   if (!entry || Date.now() > entry.expiry) {
@@ -87,7 +87,17 @@ export function getSession(sessionId: string): any | null {
     return null;
   }
   
+  // Implement sliding expiration - refresh expiry on access
+  entry.expiry = Date.now() + ttlMs;
+  
   return entry.data;
+}
+
+export function setSession(sessionId: string, data: any, ttlMs: number = 30 * 60 * 1000): void {
+  sessionStore.set(sessionId, {
+    data,
+    expiry: Date.now() + ttlMs
+  });
 }
 ```
 
