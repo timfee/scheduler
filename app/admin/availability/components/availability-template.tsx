@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { BUSINESS_HOURS } from "@/lib/constants";
 
 import { Loader2 } from "lucide-react";
 import { type WeeklyAvailability, type TimeSlot } from "@/lib/schemas/availability";
@@ -14,7 +15,7 @@ import { DayAvailability } from "./day-availability";
 const generateSlotId = () => `slot-${crypto.randomUUID()}`;
 
 // Create default slot with ID
-const createDefaultSlot = (start = "09:00", end = "17:00") => ({
+const createDefaultSlot = (start = BUSINESS_HOURS.DEFAULT_START, end = BUSINESS_HOURS.DEFAULT_END) => ({
   id: generateSlotId(),
   start,
   end

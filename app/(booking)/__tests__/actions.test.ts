@@ -3,6 +3,7 @@ import { type BookingFormData } from '@/lib/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@test/factories'
+import { TEST_CONSTANTS } from '@/lib/constants'
 import '@test/setup/jest.setup'
 
 let createBookingAction: (data: BookingFormData) => Promise<void>
@@ -24,7 +25,7 @@ beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: 'development' })
   process.env.ENCRYPTION_KEY =
     'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148'
-  process.env.SQLITE_PATH = ':memory:'
+  process.env.SQLITE_PATH = TEST_CONSTANTS.SQLITE_PATH
 
   provider = {
     listBusyTimes: jest.fn(async () => []),

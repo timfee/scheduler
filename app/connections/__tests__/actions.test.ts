@@ -1,3 +1,4 @@
+import { TEST_CONSTANTS } from "@/lib/constants";
 // Use Jest globals for lifecycle methods; import `jest` explicitly for mocking.
 import {
   CALENDAR_CAPABILITY,
@@ -53,7 +54,7 @@ beforeAll(async () => {
     NODE_ENV: "development",
     ENCRYPTION_KEY:
       "C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148",
-    SQLITE_PATH: ":memory:",
+    SQLITE_PATH: TEST_CONSTANTS.SQLITE_PATH
     WEBHOOK_SECRET: "test-webhook-secret-with-at-least-32-characters",
   });
 
