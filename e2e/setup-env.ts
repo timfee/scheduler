@@ -1,5 +1,5 @@
 // Setup environment variables for E2E tests
-process.env.NODE_ENV = 'test';
+Object.assign(process.env, { NODE_ENV: 'test' });
 process.env.ENCRYPTION_KEY = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
 process.env.SQLITE_PATH = ':memory:';
 process.env.WEBHOOK_SECRET = 'test-webhook-secret-that-is-long-enough-to-meet-requirements';

@@ -20,8 +20,8 @@ export default async function TimePage({
     const [apptType, busy] = await Promise.all([
       getAppointmentType(searchParams.type),
       listBusyTimesAction(
-        new Date(`${searchParams.date}T00:00:00`), // Start of the day
-        new Date(`${searchParams.date}T23:59:59`)  // End of the day
+        `${searchParams.date}T00:00:00`, // Start of the day
+        `${searchParams.date}T23:59:59`  // End of the day
       ),
     ])
 
