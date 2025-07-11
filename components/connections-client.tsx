@@ -50,7 +50,7 @@ export default function ConnectionsClient({
     useState<ConnectionListItem | null>(null);
 
   // Extract test connection logic
-  const { testStatus, calendars, setCalendars, testConnection } = useTestConnection();
+  const { testStatus, calendars, setCalendars, testConnection, resetTestStatus } = useTestConnection();
 
   // sync state with server-provided data
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function ConnectionsClient({
 
 
   const handleEdit = async (connection: ConnectionListItem) => {
-    setTestStatus({ testing: false });
+    resetTestStatus();
     setEditingConnection(connection);
     setIsFormOpen(true);
 
@@ -183,6 +183,7 @@ export default function ConnectionsClient({
     form.reset();
     setEditingConnection(null);
     setCalendars([]);
+    resetTestStatus();
   };
 
   return (

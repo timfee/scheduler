@@ -19,6 +19,7 @@ interface UseTestConnectionReturn {
   calendars: CalendarOption[];
   setCalendars: (calendars: CalendarOption[]) => void;
   testConnection: (form: UseFormReturn<ConnectionFormValues>) => Promise<void>;
+  resetTestStatus: () => void;
 }
 
 /**
@@ -28,6 +29,10 @@ interface UseTestConnectionReturn {
 export function useTestConnection(): UseTestConnectionReturn {
   const [testStatus, setTestStatus] = useState<TestConnectionState>({ testing: false });
   const [calendars, setCalendars] = useState<CalendarOption[]>([]);
+
+  const resetTestStatus = useCallback(() => {
+    setTestStatus({ testing: false });
+  }, []);
 
   const testConnection = useCallback(async (form: UseFormReturn<ConnectionFormValues>) => {
     const isValid = await form.trigger();
@@ -52,5 +57,5 @@ export function useTestConnection(): UseTestConnectionReturn {
     }
   }, []);
 
-  return { testStatus, calendars, setCalendars, testConnection };
+  return { testStatus, calendars, setCalendars, testConnection, resetTestStatus };
 }

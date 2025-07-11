@@ -6,7 +6,8 @@ import { type ConnectionFormData } from "../actions";
  * Extracts the duplicated form building logic from ConnectionsClient
  */
 export function buildConnectionFormData(
-  values: ConnectionFormValues
+  values: ConnectionFormValues,
+  isTestMode = false
 ): ConnectionFormData {
   const baseData = {
     provider: values.provider,
@@ -31,7 +32,7 @@ export function buildConnectionFormData(
       refreshToken: values.refreshToken ?? "",
       clientId: values.clientId ?? "",
       clientSecret: values.clientSecret ?? "",
-      tokenUrl: values.tokenUrl || "https://accounts.google.com/o/oauth2/token",
+      tokenUrl: (values.tokenUrl && values.tokenUrl.trim()) ? values.tokenUrl : (isTestMode ? "https://accounts.google.com/o/oauth2/token" : ""),
     };
   }
 }
