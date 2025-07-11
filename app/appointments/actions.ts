@@ -5,7 +5,7 @@ import { getBookingCalendar, createDAVClientFromIntegration } from "@/infrastruc
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
 import { mapErrorToUserMessage } from "@/lib/errors";
 
-const cachedListBusyTimes = async (from: string, to: string) => {
+const listBusyTimes = async (from: string, to: string) => {
   try {
     const integration = await getBookingCalendar();
     if (!integration) return [];
@@ -24,7 +24,7 @@ const cachedListBusyTimes = async (from: string, to: string) => {
 
 export const listBusyTimesAction = (from: string, to: string) => 
   unstable_cache(
-    async () => cachedListBusyTimes(from, to),
+    () => listBusyTimes(from, to),
     [`busy-times-${from}-${to}`],
     { 
       revalidate: 300, // Cache for 5 minutes
