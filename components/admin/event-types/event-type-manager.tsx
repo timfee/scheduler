@@ -380,6 +380,7 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() => removeDuration(index)}
+                    aria-label="Remove duration"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
