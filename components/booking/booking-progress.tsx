@@ -22,7 +22,7 @@ export function BookingProgress({ progress, total = 3 }: BookingProgressProps) {
         ))}
       </div>
       <span className="text-sm text-gray-600">
-        Step {clampedProgress} of {total}
+        Step {clampedProgress} of {clampedTotal}
       </span>
     </div>
   )
