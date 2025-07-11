@@ -1,7 +1,7 @@
 /** @jest-environment jsdom */
 import React from 'react'
 import { describe, it, expect, jest } from '@jest/globals'
-import ReactDOM from 'react-dom/test-utils'
+import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
@@ -45,17 +45,21 @@ describe('booking flow parallel routes', () => {
     const params = new URLSearchParams()
     mockUseSearchParams.mockReturnValue([params, jest.fn()])
     const div = document.createElement('div')
-    ReactDOM.act(() => {
-      createRoot(div).render(
+    const root = createRoot(div)
+    
+    act(() => {
+      root.render(
         <NuqsTestingAdapter>
           <TestComponent />
         </NuqsTestingAdapter>
       )
     })
+    
     const button = div.querySelector('button')!
-    ReactDOM.act(() => {
+    act(() => {
       button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
+    
     expect(div.querySelector('[data-testid="type"]')?.textContent).toBe('intro')
   })
 
@@ -63,8 +67,10 @@ describe('booking flow parallel routes', () => {
     const params = new URLSearchParams()
     mockUseSearchParams.mockReturnValue([params, jest.fn()])
     const div = document.createElement('div')
-    ReactDOM.act(() => {
-      createRoot(div).render(
+    const root = createRoot(div)
+    
+    act(() => {
+      root.render(
         <NuqsTestingAdapter>
           <TestComponent />
         </NuqsTestingAdapter>
@@ -77,7 +83,7 @@ describe('booking flow parallel routes', () => {
     
     // Set type - progress should be 1
     const setTypeButton = div.querySelector('button')!
-    ReactDOM.act(() => {
+    act(() => {
       setTypeButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
     expect(div.querySelector('[data-testid="progress"]')?.textContent).toBe('1')
@@ -88,8 +94,10 @@ describe('booking flow parallel routes', () => {
     const params = new URLSearchParams()
     mockUseSearchParams.mockReturnValue([params, jest.fn()])
     const div = document.createElement('div')
-    ReactDOM.act(() => {
-      createRoot(div).render(
+    const root = createRoot(div)
+    
+    act(() => {
+      root.render(
         <NuqsTestingAdapter>
           <TestComponent />
         </NuqsTestingAdapter>
@@ -99,7 +107,7 @@ describe('booking flow parallel routes', () => {
     // Set all fields at once
     const setAllButton = div.querySelectorAll('button')[3]
     if (setAllButton) {
-      ReactDOM.act(() => {
+      act(() => {
         setAllButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
       })
     }
@@ -131,9 +139,12 @@ describe('booking flow parallel routes', () => {
       )
     }
     const div = document.createElement('div')
-    ReactDOM.act(() => {
-      createRoot(div).render(<App />)
+    const root = createRoot(div)
+    
+    act(() => {
+      root.render(<App />)
     })
+    
     expect(div.textContent).toContain('ok')
     expect(div.textContent).toContain('error')
   })

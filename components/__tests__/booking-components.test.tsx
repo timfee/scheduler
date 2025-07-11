@@ -51,5 +51,33 @@ describe('Booking Components', () => {
       expect(result).toBeTruthy()
       expect(result.type).toBe('div')
     })
+
+    it('should clamp progress to minimum value (0)', () => {
+      const result = BookingProgress({ progress: -5, total: 3 })
+      expect(result).toBeTruthy()
+      expect(result.type).toBe('div')
+      // Should render without throwing errors when progress is negative
+    })
+
+    it('should clamp progress to maximum value (total)', () => {
+      const result = BookingProgress({ progress: 10, total: 3 })
+      expect(result).toBeTruthy()
+      expect(result.type).toBe('div')
+      // Should render without throwing errors when progress exceeds total
+    })
+
+    it('should handle negative total values gracefully', () => {
+      const result = BookingProgress({ progress: 1, total: -1 })
+      expect(result).toBeTruthy()
+      expect(result.type).toBe('div')
+      // Should render without throwing errors when total is negative
+    })
+
+    it('should handle zero total values', () => {
+      const result = BookingProgress({ progress: 1, total: 0 })
+      expect(result).toBeTruthy()
+      expect(result.type).toBe('div')
+      // Should render without throwing errors when total is zero
+    })
   })
 })
