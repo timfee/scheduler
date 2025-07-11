@@ -1,3 +1,4 @@
+import { TEST_CONSTANTS } from "@/lib/constants";
 import type * as schema from "@/lib/schemas/database";
 import { jest } from "@jest/globals";
 import { connectionVariants } from "@test/factories";
@@ -31,7 +32,7 @@ beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: "development" });
   process.env.ENCRYPTION_KEY =
     "C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148";
-  process.env.SQLITE_PATH = ":memory:";
+    process.env.SQLITE_PATH = TEST_CONSTANTS.SQLITE_PATH;
 
   const dbModule = await import("@/infrastructure/database");
   db = dbModule.db;

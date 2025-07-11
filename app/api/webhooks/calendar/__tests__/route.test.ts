@@ -1,3 +1,4 @@
+import { TEST_CONSTANTS } from "@/lib/constants";
 import { describe, expect, it, beforeAll } from "@jest/globals";
 import { createHmac } from "crypto";
 import { z } from "zod";
@@ -24,7 +25,7 @@ beforeAll(() => {
   Object.assign(process.env, {
     NODE_ENV: 'development',
     ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
-    SQLITE_PATH: ':memory:',
+    SQLITE_PATH: TEST_CONSTANTS.SQLITE_PATH
     WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
   });
 });

@@ -1,9 +1,11 @@
+import { DEV_SERVER, TEST_CONSTANTS } from '../lib/constants';
+
 // Setup environment variables for E2E tests
 Object.assign(process.env, { NODE_ENV: 'test' });
-process.env.ENCRYPTION_KEY = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
-process.env.SQLITE_PATH = ':memory:';
-process.env.WEBHOOK_SECRET = 'test-webhook-secret-that-is-long-enough-to-meet-requirements';
+process.env.ENCRYPTION_KEY = TEST_CONSTANTS.ENCRYPTION_KEY;
+process.env.SQLITE_PATH = TEST_CONSTANTS.SQLITE_PATH;
+process.env.WEBHOOK_SECRET = TEST_CONSTANTS.WEBHOOK_SECRET;
 
 // Additional test environment variables
-process.env.NEXTAUTH_URL = 'http://localhost:3000';
-process.env.NEXTAUTH_SECRET = 'test-secret-for-nextauth';
+process.env.NEXTAUTH_URL = DEV_SERVER.URL;
+process.env.NEXTAUTH_SECRET = TEST_CONSTANTS.NEXTAUTH_SECRET;

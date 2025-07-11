@@ -2,6 +2,7 @@ import { getAppointmentType } from "@/app/(booking)/server/data";
 import { listBusyTimesAction } from "@/app/appointments/actions";
 import { TimeSelector } from "./time-selector";
 import { addMinutes, format } from 'date-fns';
+import { BUSINESS_HOURS } from "@/lib/constants";
 
 export default async function TimePage({
   searchParams
@@ -31,8 +32,8 @@ export default async function TimePage({
       const dateStr = format(date, 'yyyy-MM-dd')
 
       // Create business hours in the user's local timezone (9 AM to 5 PM in their timezone)
-      const businessStart = new Date(`${dateStr}T09:00:00`)
-      const businessEnd = new Date(`${dateStr}T17:00:00`)
+      const businessStart = new Date(`${dateStr}T${BUSINESS_HOURS.DEFAULT_START}:00`)
+      const businessEnd = new Date(`${dateStr}T${BUSINESS_HOURS.DEFAULT_END}:00`)
 
       const availableSlots: string[] = []
       for (

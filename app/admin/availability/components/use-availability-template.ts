@@ -2,13 +2,14 @@ import { useState, useEffect, useTransition } from "react";
 import { type WeeklyAvailability, type DayOfWeek } from "@/lib/schemas/availability";
 import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/server/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
+import { BUSINESS_HOURS } from "@/lib/constants";
 
 const DEFAULT_AVAILABILITY: WeeklyAvailability = {
-  monday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  tuesday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  wednesday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  thursday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-  friday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
+  monday: { enabled: true, slots: [{ start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }] },
+  tuesday: { enabled: true, slots: [{ start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }] },
+  wednesday: { enabled: true, slots: [{ start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }] },
+  thursday: { enabled: true, slots: [{ start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }] },
+  friday: { enabled: true, slots: [{ start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }] },
   saturday: { enabled: false, slots: [] },
   sunday: { enabled: false, slots: [] },
 };
@@ -22,7 +23,7 @@ function createAvailabilityUpdater(setAvailability: React.Dispatch<React.SetStat
         [day]: {
           ...prev[day],
           enabled: !prev[day].enabled,
-          slots: !prev[day].enabled ? [{ start: "09:00", end: "17:00" }] : prev[day].slots
+          slots: !prev[day].enabled ? [{ start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }] : prev[day].slots
         }
       }));
     },
@@ -32,7 +33,7 @@ function createAvailabilityUpdater(setAvailability: React.Dispatch<React.SetStat
         ...prev,
         [day]: {
           ...prev[day],
-          slots: [...prev[day].slots, { start: "09:00", end: "17:00" }]
+          slots: [...prev[day].slots, { start: BUSINESS_HOURS.DEFAULT_START, end: BUSINESS_HOURS.DEFAULT_END }]
         }
       }));
     },

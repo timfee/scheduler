@@ -3,6 +3,7 @@ import { type BookingFormData } from '@/lib/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@test/factories'
+import { DURATION, TEST_CONSTANTS } from '@/lib/constants'
 import '@test/setup/jest.setup'
 
 let createBookingAction: (data: BookingFormData) => Promise<void>
@@ -23,9 +24,9 @@ const mockCalendarEvent: CalendarEvent = calendarEventFactory.build({
 beforeAll(async () => {
   Object.assign(process.env, { 
     NODE_ENV: 'development',
-    ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
-    SQLITE_PATH: ':memory:',
-    WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
+    ENCRYPTION_KEY: TEST_CONSTANTS.ENCRYPTION_KEY,
+    SQLITE_PATH: TEST_CONSTANTS.SQLITE_PATH,
+    WEBHOOK_SECRET: TEST_CONSTANTS.WEBHOOK_SECRET,
   })
 
   provider = {
@@ -70,7 +71,7 @@ beforeAll(async () => {
       getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
         id: 'intro',
         name: 'Intro',
-        durationMinutes: 30,
+        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         isActive: true,
       })),
     })

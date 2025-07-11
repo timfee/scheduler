@@ -4,6 +4,7 @@ import {
 } from "@/infrastructure/database/__tests__/helpers/db";
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { sql } from "drizzle-orm";
+import { DURATION } from "@/lib/constants";
 
 import type * as bookingData from "../data";
 
@@ -28,10 +29,10 @@ afterAll(() => {
 describe("booking data", () => {
   it("fetches appointment types from database", async () => {
     db.run(
-      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('1', 'Intro', 30, 1, 0, 0)`,
+      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('1', 'Intro', DURATION.DEFAULT_APPOINTMENT_MINUTES, 1, 0, 0)`,
     );
     db.run(
-      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('2', 'Old', 30, 0, 0, 0)`,
+      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('2', 'Old', DURATION.DEFAULT_APPOINTMENT_MINUTES, 0, 0, 0)`,
     );
 
     const list = await data.listAppointmentTypes();

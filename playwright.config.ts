@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { DEV_SERVER, TEST_CONSTANTS } from './lib/constants';
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -11,7 +12,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: DEV_SERVER.URL,
     trace: 'on-first-retry',
   },
 
@@ -35,8 +36,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'ENCRYPTION_KEY="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" WEBHOOK_SECRET="test-webhook-secret-that-is-long-enough-to-meet-requirements" SQLITE_PATH=":memory:" npm run dev',
-    port: 3000,
+    command: `ENCRYPTION_KEY="${TEST_CONSTANTS.ENCRYPTION_KEY}" WEBHOOK_SECRET="${TEST_CONSTANTS.WEBHOOK_SECRET}" SQLITE_PATH="${TEST_CONSTANTS.SQLITE_PATH}" npm run dev`,
+    port: DEV_SERVER.PORT,
     reuseExistingServer: true,
   },
 });
