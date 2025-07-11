@@ -48,7 +48,7 @@ export default function ProviderSelect({
             <FormLabel>Provider</FormLabel>
             <Select
               value={value}
-              onValueChange={(provider) => handleSelectValueChange(provider, field)}
+              onValueChange={(provider) => handleSelectValueChange(provider as ProviderType, field)}
               disabled={disabled}
             >
               <FormControl>

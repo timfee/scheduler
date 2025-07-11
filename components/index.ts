@@ -10,7 +10,10 @@ export * from "./ui/card";
 export * from "./ui/checkbox";
 export * from "./ui/form";
 export * from "./ui/input";
+export * from "./ui/label";
 export * from "./ui/select";
+export * from "./ui/separator";
+export * from "./ui/switch";
 
 // Admin components
 export * from "./admin";
