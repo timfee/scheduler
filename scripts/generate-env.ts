@@ -42,20 +42,12 @@ NODE_ENV=development
   if (existsSync(envPath) && !forceOverwrite) {
     console.log("⚠️  .env.example already exists");
     console.log("Generated values:");
-
-    const envPath = join(process.cwd(), ".env.example");
-
-    if (existsSync(envPath) && !forceOverwrite) {
-      console.log("⚠️  .env.example already exists");
-      console.log("Generated values:");
-      console.log(`ENCRYPTION_KEY=${generateEncryptionKey()}`);
-      console.log(`WEBHOOK_SECRET=${generateWebhookSecret()}`);
-    } else {
-      writeFileSync(envPath, envContent);
-
-      console.log("✅ Generated .env.example with secure values");
-      console.log("📝 Copy .env.example to .env.local and customize as needed");
-    }
+    console.log(`ENCRYPTION_KEY=${generateEncryptionKey()}`);
+    console.log(`WEBHOOK_SECRET=${generateWebhookSecret()}`);
+  } else {
+    writeFileSync(envPath, envContent);
+    console.log("✅ Generated .env.example with secure values");
+    console.log("📝 Copy .env.example to .env.local and customize as needed");
   }
 }
 
