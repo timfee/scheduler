@@ -21,14 +21,12 @@ import { type Control } from "react-hook-form";
 
 interface ProviderSelectProps {
   control: Control<ConnectionFormValues>;
-  value: ProviderType;
   onChange: (provider: ProviderType) => void;
   disabled?: boolean;
 }
 
 export default function ProviderSelect({
   control,
-  value,
   onChange,
   disabled,
 }: ProviderSelectProps) {
