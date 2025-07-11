@@ -5,7 +5,7 @@ import { ReadableStream, TransformStream } from 'node:stream/web';
 import { MessageChannel, MessagePort } from 'worker_threads';
 
 // Set environment variables for tests
-process.env.NODE_ENV = "development";
+process.env.NODE_ENV = "test";
 process.env.ENCRYPTION_KEY = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 process.env.SQLITE_PATH = ":memory:";
 process.env.WEBHOOK_SECRET = "test-webhook-secret-that-is-long-enough-to-meet-requirements";
