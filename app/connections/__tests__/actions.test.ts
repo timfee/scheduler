@@ -61,9 +61,7 @@ beforeEach(() => {
 
 describe('createConnectionAction validation', () => {
   it('requires username and password for Basic auth', async () => {
-    const connectionData = connectionVariants.caldav();
-    connectionData.username = '';
-    connectionData.password = '';
+    const connectionData = connectionVariants.caldav({ username: '', password: '' });
     
     await expect(
       actions.createConnectionAction(connectionData)
