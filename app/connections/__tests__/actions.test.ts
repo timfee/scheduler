@@ -61,7 +61,9 @@ beforeEach(() => {
 
 describe('createConnectionAction validation', () => {
   it('requires username and password for Basic auth', async () => {
-    const connectionData = connectionVariants.caldav({ username: '', password: '' });
+    const connectionData = connectionVariants.caldav();
+    connectionData.username = '';
+    connectionData.password = '';
     
     await expect(
       actions.createConnectionAction(connectionData)
@@ -78,12 +80,10 @@ describe('createConnectionAction validation', () => {
   });
 
   it('requires OAuth fields', async () => {
-    const connectionData = connectionVariants.google({
-      refreshToken: '',
-      clientId: '',
-      clientSecret: '',
-      tokenUrl: ''
-    });
+    const connectionData = connectionVariants.google();
+    connectionData.refreshToken = '';
+    connectionData.clientId = '';
+    connectionData.clientSecret = '';
     
     await expect(
       actions.createConnectionAction(connectionData)

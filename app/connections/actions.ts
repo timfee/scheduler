@@ -30,7 +30,7 @@ import {
   connectionFormSchema,
   type ConnectionFormValues,
   connectionConfigSchema,
-} from "./schemas/connection";
+} from "@/lib/schemas/connection";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { type ConnectionListItem } from "./data";
 
@@ -329,4 +329,4 @@ export {
   updateCalendarCapabilityAction,
   removeCalendarAction,
   listCalendarsForIntegrationAction,
-} from './calendar-actions';
+} from '@/actions/calendar-actions';

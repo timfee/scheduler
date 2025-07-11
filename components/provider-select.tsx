@@ -33,24 +33,24 @@ export default function ProviderSelect({
   onChange,
   disabled,
 }: ProviderSelectProps) {
-  // Removed handleValueChange as it was redundant.
+  const handleSelectValueChange = useCallback((provider: ProviderType) => {
+    onChange(provider);
+  }, [onChange]);
 
   return (
     <FormField
       control={control}
       name="provider"
       render={({ field }) => {
-        const handleSelectValueChange = useCallback((provider: ProviderType) => {
-          field.onChange(provider);
-          handleValueChange(provider);
-        }, [field.onChange, handleValueChange]);
-
         return (
           <FormItem>
             <FormLabel>Provider</FormLabel>
             <Select
               value={value}
-              onValueChange={handleSelectValueChange}
+              onValueChange={(provider: ProviderType) => {
+                field.onChange(provider);
+                handleSelectValueChange(provider);
+              }}
               disabled={disabled}
             >
               <FormControl>

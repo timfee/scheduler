@@ -1,4 +1,4 @@
-import { type ConnectionFormValues } from "../schemas/connection";
+import { type ConnectionFormValues } from "@/lib/schemas/connection";
 import { type ConnectionFormData } from "../actions";
 
 /**
