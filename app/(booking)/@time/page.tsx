@@ -1,8 +1,8 @@
 import { getAppointmentType } from "@/app/(booking)/server/data";
 import { listBusyTimesAction } from "@/app/appointments/actions";
 import { TimeSelector } from "./time-selector";
-import { addMinutes, format } from 'date-fns';
-import { BUSINESS_HOURS } from "@/lib/constants";
+import { calculateAvailableSlots, type BusinessHours } from "../server/availability-core";
+import { TIMEZONES } from "@/lib/constants";
 
 export default async function TimePage({
   searchParams
@@ -13,12 +13,11 @@ export default async function TimePage({
     return <p className="text-muted-foreground">Select a date first.</p>;
   }
 
-  const date = new Date(searchParams.date);
   let slots: string[] = [];
   let error: string | null = null;
   
   try {
-    const [apptType, busy] = await Promise.all([
+    const [apptType, busyTimes] = await Promise.all([
       getAppointmentType(searchParams.type),
       listBusyTimesAction(
         `${searchParams.date}T00:00:00`, // Start of the day
@@ -29,40 +28,20 @@ export default async function TimePage({
     if (!apptType) {
       slots = []
     } else {
-      const dateStr = format(date, 'yyyy-MM-dd')
+      // Define business hours with timezone support
+      const businessHours: BusinessHours = {
+        start: '09:00',
+        end: '17:00',
+        timezone: TIMEZONES.DEFAULT
+      };
 
-      // Create business hours in the user's local timezone (9 AM to 5 PM in their timezone)
-      const businessStart = new Date(`${dateStr}T${BUSINESS_HOURS.DEFAULT_START}:00`)
-      const businessEnd = new Date(`${dateStr}T${BUSINESS_HOURS.DEFAULT_END}:00`)
-
-      const availableSlots: string[] = []
-      for (
-        let t = businessStart;
-        t < businessEnd;
-        t = addMinutes(t, apptType.durationMinutes)
-      ) {
-        const start = t
-        const end = addMinutes(start, apptType.durationMinutes)
-
-        // Convert start/end to UTC for comparison with busy times
-        const startUTC = new Date(
-          start.getTime() - start.getTimezoneOffset() * 60000,
-        )
-        const endUTC = new Date(
-          end.getTime() - end.getTimezoneOffset() * 60000,
-        )
-
-        const overlap = busy.some((b) => {
-          const bStart = new Date(b.startUtc)
-          const bEnd = new Date(b.endUtc)
-          return bStart < endUTC && bEnd > startUTC
-        })
-        if (!overlap) {
-          // Display time in user's local timezone
-          availableSlots.push(format(start, 'HH:mm'))
-        }
-      }
-      slots = availableSlots
+      // Use the centralized availability calculation function
+      slots = calculateAvailableSlots({
+        date: searchParams.date,
+        durationMinutes: apptType.durationMinutes,
+        businessHours,
+        busyTimes
+      });
     }
   } catch (err) {
     console.error('Failed to load time slots:', err)
