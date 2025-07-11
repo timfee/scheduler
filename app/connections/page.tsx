@@ -9,7 +9,7 @@ import {
 import { AlertCircle } from "lucide-react";
 
 import { getConnections } from "./data";
-import ConnectionsClient from "@/components/connections-client";
+import { ConnectionsClient } from "@/components/admin/connections";
 import { Suspense } from "react";
 
 async function ConnectionsLoader() {

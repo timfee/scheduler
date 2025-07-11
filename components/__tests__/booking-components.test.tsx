@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals'
-import { AppointmentTypeSkeleton, DateSkeleton, TimeSkeleton } from '@/components/booking-skeletons'
-import { BookingProgress } from '@/components/booking-progress'
+import { AppointmentTypeSkeleton, DateSkeleton, TimeSkeleton } from '@/components/booking'
+import { BookingProgress } from '@/components/booking'
 
 describe('Booking Components', () => {
   describe('Skeleton Components', () => {

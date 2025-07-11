@@ -12,9 +12,8 @@ export * from "./ui/form";
 export * from "./ui/input";
 export * from "./ui/select";
 
-// App-specific components
-export { default as CapabilitiesField } from "./capabilities-field";
-export { default as ConnectionForm } from "./connection-form";
-export { default as ConnectionsClient } from "./connections-client";
-export { default as ConnectionsList } from "./connections-list";
-export { default as ProviderSelect } from "./provider-select";
+// Admin components
+export * from "./admin";
+
+// Booking components
+export * from "./booking";

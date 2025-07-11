@@ -5,7 +5,7 @@ import { listBusyTimesAction } from '@/app/appointments/actions'
 import { getAppointmentType } from '@/app/(booking)/data'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { useCallback, useEffect, useState } from 'react'
-import { TimeSkeleton } from '@/components/booking-skeletons'
+import { TimeSkeleton } from '@/components/booking'
 
 export default function TimePage() {
   const { type, date, updateBookingStep } = useBookingState()
