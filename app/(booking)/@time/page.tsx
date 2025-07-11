@@ -1,44 +1,25 @@
-"use client";
+import { getAppointmentType } from '@/app/(booking)/data'
+import { listBusyTimesAction } from '@/app/appointments/actions'
+import { addMinutes, format } from 'date-fns'
+import { TimeSelector } from '@/app/(booking)/components/time-selector'
 
-import { TimeSkeleton } from "@/app/(booking)/components/booking-skeletons";
-import { getAppointmentType } from "@/app/(booking)/data";
-import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
-import { listBusyTimesAction } from "@/app/appointments/actions";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { addMinutes, format } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+interface TimePageProps {
+  searchParams: Promise<{ type?: string; date?: string }>
+}
 
-export default function TimePage() {
-  const { type, date, updateBookingStep } = useBookingState();
-  const [slots, setSlots] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default async function TimePage({ searchParams }: TimePageProps) {
+  const { type, date: dateParam } = await searchParams
 
-  const handleSelectTime = useCallback(
-    (time: string) => {
-      updateBookingStep({ time });
-    },
-    [updateBookingStep],
-  );
+  if (!type || !dateParam) {
+    return <p className="text-muted-foreground">Select a date first.</p>
+  }
 
-  const handleButtonClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      const button = event.currentTarget;
-      const time = button.dataset.time;
-      if (time) {
-        handleSelectTime(time);
-      }
-    },
-    [handleSelectTime],
-  );
+  let slots: string[] = []
+  let error: string | null = null
 
-  useEffect(() => {
-    if (!type || !date) return;
-
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
+  try {
+    const date = new Date(dateParam)
+    const [apptType, busy] = await Promise.all([
       getAppointmentType(type),
       listBusyTimesAction(
         new Date(
@@ -59,91 +40,50 @@ export default function TimePage() {
         ).toISOString(),
       ),
     ])
-      .then(([apptType, busy]) => {
-        if (!apptType) {
-          setSlots([]);
-          return;
+
+    if (!apptType) {
+      slots = []
+    } else {
+      const dateStr = format(date, 'yyyy-MM-dd')
+
+      // Create business hours in the user's local timezone (9 AM to 5 PM in their timezone)
+      const businessStart = new Date(`${dateStr}T09:00:00`)
+      const businessEnd = new Date(`${dateStr}T17:00:00`)
+
+      const availableSlots: string[] = []
+      for (
+        let t = businessStart;
+        t < businessEnd;
+        t = addMinutes(t, apptType.durationMinutes)
+      ) {
+        const start = t
+        const end = addMinutes(start, apptType.durationMinutes)
+
+        // Convert start/end to UTC for comparison with busy times
+        const startUTC = new Date(
+          start.getTime() - start.getTimezoneOffset() * 60000,
+        )
+        const endUTC = new Date(
+          end.getTime() - end.getTimezoneOffset() * 60000,
+        )
+
+        const overlap = busy.some((b) => {
+          const bStart = new Date(b.startUtc)
+          const bEnd = new Date(b.endUtc)
+          return bStart < endUTC && bEnd > startUTC
+        })
+        if (!overlap) {
+          // Display time in user's local timezone
+          availableSlots.push(format(start, 'HH:mm'))
         }
-
-        const dateStr = format(date, "yyyy-MM-dd");
-
-        // Create business hours in the user's local timezone (9 AM to 5 PM in their timezone)
-        const businessStart = new Date(`${dateStr}T09:00:00`);
-        const businessEnd = new Date(`${dateStr}T17:00:00`);
-
-        const availableSlots: string[] = [];
-        for (
-          let t = businessStart;
-          t < businessEnd;
-          t = addMinutes(t, apptType.durationMinutes)
-        ) {
-          const start = t;
-          const end = addMinutes(start, apptType.durationMinutes);
-
-          // Convert start/end to UTC for comparison with busy times
-          const startUTC = new Date(
-            start.getTime() - start.getTimezoneOffset() * 60000,
-          );
-          const endUTC = new Date(
-            end.getTime() - end.getTimezoneOffset() * 60000,
-          );
-
-          const overlap = busy.some((b) => {
-            const bStart = new Date(b.startUtc);
-            const bEnd = new Date(b.endUtc);
-            return bStart < endUTC && bEnd > startUTC;
-          });
-          if (!overlap) {
-            // Display time in user's local timezone
-            availableSlots.push(format(start, "HH:mm"));
-          }
-        }
-        setSlots(availableSlots);
-      })
-      .catch((error) => {
-        console.error("Failed to load time slots:", error);
-        setError("Unable to load available times. Please try again.");
-        setSlots([]);
-      })
-      .finally(() => setLoading(false));
-  }, [type, date]);
-
-  if (!type || !date) {
-    return <p className="text-muted-foreground">Select a date first.</p>;
+      }
+      slots = availableSlots
+    }
+  } catch (err) {
+    console.error('Failed to load time slots:', err)
+    error = 'Unable to load available times. Please try again.'
+    slots = []
   }
 
-  if (loading) {
-    return <TimeSkeleton />;
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    );
-  }
-
-  if (slots.length === 0) {
-    return <p className="text-muted-foreground">No times available</p>;
-  }
-
-  return (
-    <div>
-      <h2 className="mb-3 font-medium">Select Time</h2>
-      <ul className="space-y-2">
-        {slots.map((t) => (
-          <li key={t}>
-            <button
-              onClick={handleButtonClick}
-              data-time={t}
-              className="w-full rounded border p-2 text-left hover:bg-gray-100"
-            >
-              {t}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  return <TimeSelector type={type} date={dateParam} slots={slots} error={error} />
 }
