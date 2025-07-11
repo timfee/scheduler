@@ -1,12 +1,14 @@
 "use client";
 
+import { useState, useEffect, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-import { Plus, Trash2, Clock, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { type WeeklyAvailability, type TimeSlot } from "@/lib/schemas/availability";
-import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/_server/actions";
+import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/server/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
+import { DayAvailability } from "./day-availability";
 
 // Generate unique ID for slots
 const generateSlotId = () => `slot-${crypto.randomUUID()}`;
@@ -173,8 +175,14 @@ export function AvailabilityTemplate() {
               availability={availability[key]}
               onToggleDay={() => toggleDay(key)}
               onAddSlot={() => addSlot(key)}
-              onRemoveSlot={(index) => removeSlot(key, index)}
-              onUpdateSlot={(index, field, value) => updateSlot(key, index, field, value)}
+              onRemoveSlot={(index) => {
+                const slot = availability[key].slots[index];
+                if (slot?.id) removeSlot(key, slot.id);
+              }}
+              onUpdateSlot={(index, field, value) => {
+                const slot = availability[key].slots[index];
+                if (slot) updateSlot(key, index, field, value);
+              }}
             />
           ))}
         </div>

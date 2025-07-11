@@ -2,7 +2,7 @@ import { describe, it, expect, jest } from '@jest/globals'
 import { AvailabilityTemplate } from '../availability-template';
 
 // Mock the actions
-jest.mock('@/app/admin/availability/_server/actions', () => ({
+jest.mock('@/app/admin/availability/server/actions', () => ({
   loadAvailabilityTemplateAction: jest.fn().mockResolvedValue(null),
   saveAvailabilityTemplateAction: jest.fn().mockResolvedValue(undefined),
 }));

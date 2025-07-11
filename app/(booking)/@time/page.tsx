@@ -1,6 +1,7 @@
-import { getAppointmentType } from "@/app/(booking)/_server/data";
+import { getAppointmentType } from "@/app/(booking)/server/data";
 import { listBusyTimesAction } from "@/app/appointments/actions";
 import { TimeSelector } from "./time-selector";
+import { addMinutes, format } from 'date-fns';
 
 export default async function TimePage({
   searchParams
@@ -12,11 +13,16 @@ export default async function TimePage({
   }
 
   const date = new Date(searchParams.date);
+  let slots: string[] = [];
+  let error: string | null = null;
   
   try {
     const [apptType, busy] = await Promise.all([
       getAppointmentType(searchParams.type),
-      listBusyTimesAction(searchParams.date),
+      listBusyTimesAction(
+        new Date(`${searchParams.date}T00:00:00`), // Start of the day
+        new Date(`${searchParams.date}T23:59:59`)  // End of the day
+      ),
     ])
 
     if (!apptType) {
@@ -63,5 +69,5 @@ export default async function TimePage({
     slots = []
   }
 
-  return <TimeSelector type={type} date={dateParam} slots={slots} error={error} />
+  return <TimeSelector slots={slots} error={error} />
 }

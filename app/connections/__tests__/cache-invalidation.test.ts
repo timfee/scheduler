@@ -56,7 +56,7 @@ describe("Cache Invalidation", () => {
   });
 
   it("should call revalidateTag when creating a connection", async () => {
-    const { createConnectionAction } = await import("../_server/actions");
+    const { createConnectionAction } = await import("../server/actions");
 
     const connectionData = connectionVariants.apple();
     const result = await createConnectionAction(connectionData);
@@ -68,7 +68,7 @@ describe("Cache Invalidation", () => {
 
   it("should call revalidateTag when deleting a connection", async () => {
     const { createConnectionAction, deleteConnectionAction } = await import(
-      "../_server/actions"
+      "../server/actions"
     );
 
     // First create a connection
@@ -88,7 +88,7 @@ describe("Cache Invalidation", () => {
 
   it("should call revalidateTag when updating a connection", async () => {
     const { createConnectionAction, updateConnectionAction } = await import(
-      "../_server/actions"
+      "../server/actions"
     );
 
     // First create a connection
@@ -110,7 +110,7 @@ describe("Cache Invalidation", () => {
 
   it("should call revalidateTag when updating calendar order", async () => {
     const { createConnectionAction, updateCalendarOrderAction } = await import(
-      "../_server/actions"
+      "../server/actions"
     );
 
     // First create two connections

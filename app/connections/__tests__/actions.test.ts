@@ -65,8 +65,8 @@ beforeAll(async () => {
   jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
   integrations = await import("@/infrastructure/database/integrations");
-  actions = await import("@/app/connections/_server/actions");
-  calendarActions = await import("@/app/connections/_server/calendar-actions");
+  actions = await import("@/app/connections/server/actions");
+  calendarActions = await import("@/app/connections/server/calendar-actions");
 });
 
 afterAll(() => {
