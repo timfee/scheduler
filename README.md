@@ -10,12 +10,27 @@ pnpm install
 ```
 
 ### Environment variables
-Create a `.env.local` file with at least:
+Create a `.env.local` file with required environment variables:
+
 ```bash
-ENCRYPTION_KEY=<64-character hex string>
-NODE_ENV=development
+# Generate environment variables with secure defaults
+pnpm env:generate
+
+# Copy the generated .env.example to .env.local
+cp .env.example .env.local
 ```
-The `ENCRYPTION_KEY` secures stored credentials. Google Calendar support requires `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET`.
+
+**Required variables:**
+- `ENCRYPTION_KEY`: 64-character hex string for encrypting sensitive data
+- `WEBHOOK_SECRET`: 32+ character secret for webhook verification
+
+**Optional variables:**
+- `SQLITE_PATH`: Database path (default: `scheduler.db`)
+- `NODE_ENV`: Environment mode (default: `development`)
+- `GOOGLE_OAUTH_CLIENT_ID`: Google OAuth client ID for calendar integration
+- `GOOGLE_OAUTH_CLIENT_SECRET`: Google OAuth client secret for calendar integration
+
+📖 **See [Environment Variables Documentation](./docs/environment-variables.md) for detailed setup instructions.**
 
 ### Initialize the database
 Run once to create `scheduler.db`:
@@ -39,6 +54,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 | `pnpm db:init` | Initialize the SQLite database |
 | `pnpm db:generate` | Generate database types |
 | `pnpm db:push` | Apply SQLite migrations |
+| `pnpm env:generate` | Generate secure environment variables |
 | `pnpm lint` | Run ESLint |
 | `pnpm test` | Execute tests |
 | `pnpm format` | Format code with Prettier |
@@ -62,6 +78,7 @@ For detailed information about architectural decisions, patterns, and developmen
 - **[Development Guidelines](./docs/architecture/development-guidelines.md)**: Guidelines for maintaining simplicity and consistency
 - **[Feature Development](./docs/architecture/feature-development-guidelines.md)**: Patterns for developing new features
 - **[Feature Template](./docs/architecture/templates/feature-template.md)**: Template for creating new features
+- **[Environment Variables](./docs/environment-variables.md)**: Environment setup and configuration guide
 
 ### Key Architectural Patterns
 
