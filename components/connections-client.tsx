@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import ConnectionForm from "./connection-form";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback } from "react";
 
 import {
   createConnectionAction,
@@ -69,6 +69,22 @@ export default function ConnectionsClient({
   const handleTestConnection = async () => {
     await testConnection(form);
   };
+
+  const resetForm = useCallback(() => {
+    form.reset();
+    setEditingConnection(null);
+    setCalendars([]);
+    resetTestStatus();
+  }, [form, setEditingConnection, setCalendars, resetTestStatus]);
+
+  const handleOpenForm = useCallback(() => {
+    setIsFormOpen(true);
+  }, []);
+
+  const handleCancelForm = useCallback(() => {
+    setIsFormOpen(false);
+    resetForm();
+  }, [resetForm]);
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -179,13 +195,6 @@ export default function ConnectionsClient({
     }
   };
 
-  const resetForm = () => {
-    form.reset();
-    setEditingConnection(null);
-    setCalendars([]);
-    resetTestStatus();
-  };
-
   return (
     <div className="space-y-6">
       <ConnectionForm
@@ -200,15 +209,12 @@ export default function ConnectionsClient({
         onProviderChange={handleProviderChange}
         onTestConnection={handleTestConnection}
         onSubmit={onSubmit}
-        onCancel={() => {
-          setIsFormOpen(false);
-          resetForm();
-        }}
+        onCancel={handleCancelForm}
       />
 
       {/* Add Connection Button */}
       {!isFormOpen && (
-        <Button onClick={() => setIsFormOpen(true)}>Add Connection</Button>
+        <Button onClick={handleOpenForm}>Add Connection</Button>
       )}
 
       {/* Connections List */}

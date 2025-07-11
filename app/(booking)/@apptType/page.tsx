@@ -2,13 +2,25 @@
 
 import { listAppointmentTypes } from '@/app/(booking)/data'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AppointmentTypeSkeleton } from '@/components/booking-skeletons'
 
 export default function AppointmentTypePage() {
   const { updateBookingStep } = useBookingState()
   const [types, setTypes] = useState<Awaited<ReturnType<typeof listAppointmentTypes>>>([])
   const [loading, setLoading] = useState(true)
+
+  const handleSelectType = useCallback((typeId: string) => {
+    updateBookingStep({ type: typeId })
+  }, [updateBookingStep])
+
+  const handleButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
+    const typeId = button.dataset.typeId;
+    if (typeId) {
+      handleSelectType(typeId);
+    }
+  }, [handleSelectType]);
 
   useEffect(() => {
     listAppointmentTypes()
@@ -31,7 +43,8 @@ export default function AppointmentTypePage() {
         {types.map(t => (
           <li key={t.id}>
             <button
-              onClick={() => updateBookingStep({ type: t.id })}
+              onClick={handleButtonClick}
+              data-type-id={t.id}
               className="w-full text-left p-2 hover:bg-gray-100 rounded border"
             >
               {t.name}
