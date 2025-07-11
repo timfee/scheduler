@@ -1,9 +1,5 @@
+import { TimeSkeleton } from '@/components/booking-skeletons'
+
 export default function Loading() {
-  return (
-    <div className="space-y-2" aria-label="Loading time slots">
-      <div className="h-6 rounded bg-gray-200 animate-pulse" />
-      <div className="h-6 rounded bg-gray-200 animate-pulse" />
-      <div className="h-6 rounded bg-gray-200 animate-pulse" />
-    </div>
-  );
+  return <TimeSkeleton />
 }

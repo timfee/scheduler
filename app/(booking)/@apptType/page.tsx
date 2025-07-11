@@ -3,6 +3,7 @@
 import { listAppointmentTypes } from '@/app/(booking)/data'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { useEffect, useState } from 'react'
+import { AppointmentTypeSkeleton } from '@/components/booking-skeletons'
 
 export default function AppointmentTypePage() {
   const { updateBookingStep } = useBookingState()
@@ -20,7 +21,7 @@ export default function AppointmentTypePage() {
   }, [])
 
   if (loading) {
-    return <div className="space-y-2">Loading appointment types...</div>
+    return <AppointmentTypeSkeleton />
   }
 
   return (
