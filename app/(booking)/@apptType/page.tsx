@@ -3,7 +3,7 @@
 import { listAppointmentTypes } from '@/app/(booking)/data'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { useEffect, useState } from 'react'
-import { AppointmentTypeSkeleton } from '@/components/booking-skeletons'
+import { AppointmentTypeSkeleton } from '@/app/(booking)/components/booking-skeletons'
 
 export default function AppointmentTypePage() {
   const { updateBookingStep } = useBookingState()

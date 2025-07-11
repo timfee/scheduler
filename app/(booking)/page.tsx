@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { BookingProgress } from '@/components/booking-progress'
+import { BookingProgress } from '@/app/(booking)/components/booking-progress'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { createBookingAction } from '@/app/(booking)/actions'
 import { mapErrorToUserMessage } from '@/lib/errors'
@@ -52,7 +52,7 @@ export default function BookingPage() {
 
   return (
     <div className="col-span-full mt-6">
-      <BookingProgress progress={TOTAL_STEPS} />
+      <BookingProgress progress={3} />
       <p className="font-medium">You selected:</p>
       <ul className="list-disc pl-4 mb-4">
         <li>Type: {appointmentType}</li>
