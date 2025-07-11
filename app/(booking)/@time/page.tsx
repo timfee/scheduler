@@ -31,9 +31,6 @@ export default function TimePage() {
 
       const dateStr = format(date, 'yyyy-MM-dd')
       
-      // Get user's timezone (fallback to UTC)
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
-      
       // Create business hours in the user's local timezone (9 AM to 5 PM in their timezone)
       const businessStart = new Date(`${dateStr}T09:00:00`)
       const businessEnd = new Date(`${dateStr}T17:00:00`)
