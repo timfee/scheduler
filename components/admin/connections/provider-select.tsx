@@ -1,4 +1,7 @@
 "use client";
+
+import { type ProviderType } from "@/app/connections/actions";
+import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
 import {
   FormControl,
   FormField,
@@ -16,9 +19,6 @@ import {
 import { useCallback } from "react";
 import { type Control } from "react-hook-form";
 
-import { type ProviderType } from "@/app/connections/actions";
-import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
-
 interface ProviderSelectProps {
   control: Control<ConnectionFormValues>;
   value: ProviderType;
@@ -32,10 +32,16 @@ export default function ProviderSelect({
   onChange,
   disabled,
 }: ProviderSelectProps) {
-  const handleSelectValueChange = useCallback((provider: ProviderType, field: { onChange: (value: ProviderType) => void }) => {
-    field.onChange(provider);
-    onChange(provider);
-  }, [onChange]);
+  const handleSelectValueChange = useCallback(
+    (
+      provider: ProviderType,
+      field: { onChange: (value: ProviderType) => void },
+    ) => {
+      field.onChange(provider);
+      onChange(provider);
+    },
+    [onChange],
+  );
 
   return (
     <FormField
@@ -47,7 +53,9 @@ export default function ProviderSelect({
             <FormLabel>Provider</FormLabel>
             <Select
               value={field.value}
-              onValueChange={(provider) => handleSelectValueChange(provider as ProviderType, field)}
+              onValueChange={(provider) =>
+                handleSelectValueChange(provider as ProviderType, field)
+              }
               disabled={disabled}
             >
               <FormControl>
