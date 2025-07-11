@@ -106,8 +106,8 @@ describe('createConnectionAction validation', () => {
     expect(res).toBeDefined();
     const [integration] = await integrations.listCalendarIntegrations();
     expect(integration).toBeDefined();
-    expect(integration!.config.serverUrl).toBeDefined();
-    expect(integration!.config.calendarUrl).toBeUndefined();
+    expect(integration?.config.serverUrl).toBeDefined();
+    expect(integration?.config.calendarUrl).toBeUndefined();
   });
 });
 

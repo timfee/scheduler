@@ -6,10 +6,13 @@ import { type ConnectionConfigValues } from "@/app/connections/schemas/connectio
  */
 export function buildConfigFromValues(values: ConnectionConfigValues): CalendarIntegrationConfig {
   if (values.authMethod === "Basic") {
+    if (!values.password) {
+      throw new Error("Password is required for Basic authentication");
+    }
     const cfg: BasicAuthConfig = {
       authMethod: "Basic",
       username: values.username,
-      password: values.password!,
+      password: values.password,
       serverUrl: values.serverUrl ?? "",
       calendarUrl: values.calendarUrl,
       capabilities: values.capabilities,
@@ -17,13 +20,17 @@ export function buildConfigFromValues(values: ConnectionConfigValues): CalendarI
     return cfg;
   }
 
+  if (!values.refreshToken || !values.clientId || !values.clientSecret || !values.tokenUrl) {
+    throw new Error("All OAuth fields are required for OAuth authentication");
+  }
+
   const cfg: OAuthConfig = {
     authMethod: "Oauth",
     username: values.username,
-    refreshToken: values.refreshToken!,
-    clientId: values.clientId!,
-    clientSecret: values.clientSecret!,
-    tokenUrl: values.tokenUrl!,
+    refreshToken: values.refreshToken,
+    clientId: values.clientId,
+    clientSecret: values.clientSecret,
+    tokenUrl: values.tokenUrl,
     serverUrl: values.serverUrl ?? "",
     calendarUrl: values.calendarUrl,
     capabilities: values.capabilities,

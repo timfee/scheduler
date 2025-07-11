@@ -14,6 +14,18 @@ export default function TimePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const handleSelectTime = useCallback((time: string) => {
+    updateBookingStep({ time })
+  }, [updateBookingStep])
+
+  const handleButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
+    const time = button.dataset.time;
+    if (time) {
+      handleSelectTime(time);
+    }
+  }, [handleSelectTime]);
+
   useEffect(() => {
     if (!type || !date) return
 
@@ -92,7 +104,8 @@ export default function TimePage() {
         {slots.map((t) => (
           <li key={t}>
             <button
-              onClick={() => updateBookingStep({ time: t })}
+              onClick={handleButtonClick}
+              data-time={t}
               className="w-full text-left p-2 hover:bg-gray-100 rounded border"
             >
               {t}

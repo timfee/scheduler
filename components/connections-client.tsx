@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import ConnectionForm from "./connection-form";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback } from "react";
 
 import {
   createConnectionAction,
@@ -22,7 +22,7 @@ import {
   type ConnectionFormValues,
   PROVIDER_AUTH_METHODS,
 } from "@/app/connections/hooks/use-connection-form";
-import { buildConnectionFormData } from "@/app/connections/utils/form-data-builder";
+import { buildConnectionFormData, DEFAULT_GOOGLE_TOKEN_URL } from "@/app/connections/utils/form-data-builder";
 import { useTestConnection } from "@/app/connections/hooks/use-test-connection";
 
 interface ConnectionsClientProps {
@@ -69,6 +69,22 @@ export default function ConnectionsClient({
   const handleTestConnection = async () => {
     await testConnection(form);
   };
+
+  const resetForm = useCallback(() => {
+    form.reset();
+    setEditingConnection(null);
+    setCalendars([]);
+    resetTestStatus();
+  }, [form, setEditingConnection, setCalendars, resetTestStatus]);
+
+  const handleOpenForm = useCallback(() => {
+    setIsFormOpen(true);
+  }, []);
+
+  const handleCancelForm = useCallback(() => {
+    setIsFormOpen(false);
+    resetForm();
+  }, [resetForm]);
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -169,7 +185,7 @@ export default function ConnectionsClient({
         refreshToken: "",
         clientId: "",
         clientSecret: "",
-        tokenUrl: "https://accounts.google.com/o/oauth2/token",
+        tokenUrl: DEFAULT_GOOGLE_TOKEN_URL,
       });
     } catch (error) {
       setCalendars([]);
@@ -177,13 +193,6 @@ export default function ConnectionsClient({
         message: mapErrorToUserMessage(error, "Failed to load connection"),
       });
     }
-  };
-
-  const resetForm = () => {
-    form.reset();
-    setEditingConnection(null);
-    setCalendars([]);
-    resetTestStatus();
   };
 
   return (
@@ -200,15 +209,12 @@ export default function ConnectionsClient({
         onProviderChange={handleProviderChange}
         onTestConnection={handleTestConnection}
         onSubmit={onSubmit}
-        onCancel={() => {
-          setIsFormOpen(false);
-          resetForm();
-        }}
+        onCancel={handleCancelForm}
       />
 
       {/* Add Connection Button */}
       {!isFormOpen && (
-        <Button onClick={() => setIsFormOpen(true)}>Add Connection</Button>
+        <Button onClick={handleOpenForm}>Add Connection</Button>
       )}
 
       {/* Connections List */}

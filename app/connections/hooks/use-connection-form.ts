@@ -7,6 +7,7 @@ import {
   connectionFormSchema,
   type ConnectionFormValues,
 } from "../schemas/connection";
+import { DEFAULT_GOOGLE_TOKEN_URL } from "../utils/form-data-builder";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   apple: "Basic",
@@ -40,7 +41,7 @@ export function useConnectionForm(): UseConnectionFormReturn {
       refreshToken: "",
       clientId: "",
       clientSecret: "",
-      tokenUrl: "https://accounts.google.com/o/oauth2/token",
+      tokenUrl: DEFAULT_GOOGLE_TOKEN_URL,
       capabilities: [],
     },
   });
@@ -60,7 +61,7 @@ export function useConnectionForm(): UseConnectionFormReturn {
       form.setValue("tokenUrl", "");
     } else {
       form.setValue("password", "");
-      form.setValue("tokenUrl", "https://accounts.google.com/o/oauth2/token");
+      form.setValue("tokenUrl", DEFAULT_GOOGLE_TOKEN_URL);
     }
 
     if (!["nextcloud", "caldav"].includes(provider)) {
