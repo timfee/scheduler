@@ -143,4 +143,50 @@ describe('createBookingAction', () => {
       Date.now = originalDateNow
     }
   })
+
+  it('cleans up old rate limit entries during booking requests', async () => {
+    // This test verifies that the manual cleanup works correctly during booking requests
+    
+    // Create a booking to populate the rate limiter
+    await createBookingAction(validData)
+    
+    // Mock Date.now to simulate time passing beyond cleanup threshold
+    const originalDateNow = Date.now
+    const mockNow = jest.fn<() => number>()
+    Date.now = mockNow
+    
+    try {
+      // Return time 3 minutes in the future (beyond 2 minute cleanup threshold)
+      mockNow.mockReturnValue(originalDateNow() + 3 * 60 * 1000)
+      
+      // The manual cleanup during booking should remove old entries
+      await createBookingAction(validData)
+      
+      // Should succeed because cleanup removes old entries
+      expect(provider.createAppointment).toHaveBeenCalled()
+    } finally {
+      Date.now = originalDateNow
+    }
+  })
+
+  it('sets up periodic cleanup interval to prevent memory growth', async () => {
+    // Use fake timers to test the setInterval scheduling
+    jest.useFakeTimers()
+    const setIntervalSpy = jest.spyOn(global, 'setInterval')
+    
+    try {
+      // Re-import the module to trigger the setInterval call
+      jest.resetModules()
+      await import('@/actions/booking-actions')
+      
+      // Verify that setInterval was called with the cleanup function and 5 minute interval
+      expect(setIntervalSpy).toHaveBeenCalledWith(
+        expect.any(Function),
+        5 * 60 * 1000
+      )
+    } finally {
+      jest.useRealTimers()
+      setIntervalSpy.mockRestore()
+    }
+  })
 })

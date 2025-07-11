@@ -92,6 +92,11 @@ export async function createBookingAction(formData: BookingFormData) {
   }
 }
 
+// Set up periodic cleanup every 5 minutes to prevent memory growth
+setInterval(() => {
+  cleanupOldEntries();
+}, 5 * 60 * 1000);
+
 // Export for testing purposes
 export function clearRateLimiter() {
   lastBookingAt.clear();
