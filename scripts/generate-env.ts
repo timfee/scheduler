@@ -40,7 +40,7 @@ NODE_ENV=development
 
   const envPath = join(process.cwd(), '.env.example');
   
-  if (existsSync(envPath)) {
+  if (existsSync(envPath) && !forceOverwrite) {
     console.log('⚠️  .env.example already exists');
     console.log('Generated values:');
     console.log(`ENCRYPTION_KEY=${generateEncryptionKey()}`);
