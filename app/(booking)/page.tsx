@@ -8,6 +8,8 @@ import { createBookingAction } from '@/app/(booking)/actions'
 import { mapErrorToUserMessage } from '@/lib/errors'
 import { formatDateForBooking } from '@/lib/utils'
 
+const TOTAL_STEPS = 3
+
 export default function BookingPage() {
   const { type: appointmentType, date, time, progress, isComplete } = useBookingState()
   
@@ -52,7 +54,7 @@ export default function BookingPage() {
 
   return (
     <div className="col-span-full mt-6">
-      <BookingProgress progress={3} />
+      <BookingProgress progress={TOTAL_STEPS} />
       <p className="font-medium">You selected:</p>
       <ul className="list-disc pl-4 mb-4">
         <li>Type: {appointmentType}</li>

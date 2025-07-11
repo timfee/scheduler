@@ -26,8 +26,10 @@ describe('Business Hours Timezone Handling', () => {
     // Convert to UTC
     const utcTime = new Date(localTime.getTime() - (localTime.getTimezoneOffset() * 60000))
     
-    // The UTC time should be different from local time (unless in UTC timezone)
-    expect(utcTime.getTime()).toBeDefined()
+    // Verify correct UTC conversion by checking hour difference matches timezone offset
+    const expectedHourDifference = localTime.getTimezoneOffset() / 60
+    const actualHourDifference = utcTime.getHours() - localTime.getHours()
+    expect(actualHourDifference).toBe(expectedHourDifference)
   })
 
   it('should format time slots correctly', () => {
