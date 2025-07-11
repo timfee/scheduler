@@ -40,7 +40,7 @@ export default function BookingPage() {
       
       await createBookingAction({ 
         type: appointmentType, 
-        date: date instanceof Date ? formatDateForBooking(date) : '', 
+        date: typeof date === 'string' ? date : date instanceof Date ? formatDateForBooking(date) : '', 
         time: time, 
         name: rawName, 
         email: rawEmail 
