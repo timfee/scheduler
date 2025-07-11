@@ -1,2 +1,2 @@
-export * from "./booking-progress";
-export * from "./booking-skeletons";
+export * from "@/app/(booking)/components/booking-progress";
+export * from "@/app/(booking)/components/booking-skeletons";
