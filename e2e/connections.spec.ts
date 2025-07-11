@@ -72,8 +72,8 @@ test.describe('Connections E2E', () => {
     // Try to interact with the connections interface
     await page.click('body'); // Just trigger any client-side code
     
-    // Wait a bit for any async operations
-    await page.waitForTimeout(1000);
+    // Wait for a specific UI element indicating the completion of async operations
+    await page.waitForSelector('text=Submission Complete', { timeout: 5000 });
     
     // Check for specific export errors
     const exportErrors = consoleErrors.filter(error => 
