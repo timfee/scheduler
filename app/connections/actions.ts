@@ -6,20 +6,16 @@ import {
   mergeConfig,
 } from "@/infrastructure/database/config-utils";
 import {
-  addCalendarToIntegration,
   createCalendarIntegration,
   createDAVClientFromConfig,
   createDAVClientFromIntegration,
   deleteCalendarIntegration,
   fetchCalendarOptions,
   getCalendarIntegration,
-  getCalendarsForIntegration,
   isProviderType,
   listCalendarIntegrations,
   prepareConfig,
-  removeCalendar,
   testCalendarConnection,
-  updateCalendarCapability,
   updateCalendarIntegration,
   type CalendarOption,
   type CreateCalendarIntegrationInput,
@@ -28,13 +24,8 @@ import {
 } from "@/infrastructure/database/integrations";
 import { calendarIntegrations } from "@/infrastructure/database/schema";
 import { mapErrorToUserMessage } from "@/lib/errors";
-import {
-  CALENDAR_CAPABILITY,
-  type CalendarCapability,
-} from "@/lib/types/constants";
 import { eq } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { z } from "zod/v4";
 
 import { getConnections, type ConnectionListItem } from "./data";
 import {
@@ -47,16 +38,6 @@ export type { CalendarOption, ProviderType };
 
 export type ConnectionFormData = ConnectionFormValues;
 
-const addCalendarSchema = z.object({
-  integrationId: z.string().uuid(),
-  calendarUrl: z.string().url(),
-  displayName: z.string().min(1),
-  capability: z.enum([
-    CALENDAR_CAPABILITY.BOOKING,
-    CALENDAR_CAPABILITY.BLOCKING_AVAILABLE,
-    CALENDAR_CAPABILITY.BLOCKING_BUSY,
-  ]),
-});
 
 /**
  * Create a new calendar connection

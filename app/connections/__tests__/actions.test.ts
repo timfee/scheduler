@@ -66,6 +66,7 @@ beforeAll(async () => {
 
   integrations = await import("@/infrastructure/database/integrations");
   actions = await import("@/app/connections/actions");
+  calendarActions = await import("@/app/connections/calendar-actions");
 });
 
 afterAll(() => {
