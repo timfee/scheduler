@@ -10,7 +10,13 @@ export default function AppointmentTypePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    void listAppointmentTypes().then(setTypes).finally(() => setLoading(false))
+    listAppointmentTypes()
+      .then(setTypes)
+      .catch(error => {
+        console.error('Failed to fetch appointment types:', error);
+        setTypes([]); // Fallback to an empty list
+      })
+      .finally(() => setLoading(false));
   }, [])
 
   if (loading) {
