@@ -144,10 +144,8 @@ describe('createBookingAction', () => {
     }
   })
 
-  it('sets up periodic cleanup to prevent memory growth', async () => {
-    // This test verifies that the setInterval for periodic cleanup is set up
-    // We can't easily test the actual interval execution in Jest, but we can verify
-    // that the cleanup function works correctly when called directly
+  it('cleans up old rate limit entries during booking requests', async () => {
+    // This test verifies that the manual cleanup works correctly during booking requests
     
     // Create a booking to populate the rate limiter
     await createBookingAction(validData)
@@ -161,14 +159,34 @@ describe('createBookingAction', () => {
       // Return time 3 minutes in the future (beyond 2 minute cleanup threshold)
       mockNow.mockReturnValue(originalDateNow() + 3 * 60 * 1000)
       
-      // The periodic cleanup should work the same as the manual cleanup
-      // This verifies that the cleanup logic is correct for the setInterval
+      // The manual cleanup during booking should remove old entries
       await createBookingAction(validData)
       
       // Should succeed because cleanup removes old entries
       expect(provider.createAppointment).toHaveBeenCalled()
     } finally {
       Date.now = originalDateNow
+    }
+  })
+
+  it('sets up periodic cleanup interval to prevent memory growth', async () => {
+    // Use fake timers to test the setInterval scheduling
+    jest.useFakeTimers()
+    const setIntervalSpy = jest.spyOn(global, 'setInterval')
+    
+    try {
+      // Re-import the module to trigger the setInterval call
+      jest.resetModules()
+      await import('../actions')
+      
+      // Verify that setInterval was called with the cleanup function and 5 minute interval
+      expect(setIntervalSpy).toHaveBeenCalledWith(
+        expect.any(Function),
+        5 * 60 * 1000
+      )
+    } finally {
+      jest.useRealTimers()
+      setIntervalSpy.mockRestore()
     }
   })
 })
