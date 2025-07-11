@@ -40,7 +40,7 @@ export function AdminNavigation() {
       <div className="flex space-x-8">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive = pathname.startsWith(item.href);
           
           return (
             <Button
