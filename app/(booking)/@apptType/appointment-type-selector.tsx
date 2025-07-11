@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { type AppointmentType } from '@/app/(booking)/data';
+import { type AppointmentType } from '@/app/(booking)/_server/data';
 
 interface AppointmentTypeSelectorProps {
   types: AppointmentType[];

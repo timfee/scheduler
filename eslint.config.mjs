@@ -72,6 +72,17 @@ export default tseslint.config(
               from: "*",
               message: "Only 'ui' and 'layout' directories are allowed under components/. Place shared components in the root components/ directory or create feature-specific components in features/*/components/",
             },
+            // Feature organization rules - prevent server code from importing client code
+            {
+              target: "./app/**/_server/**",
+              from: "./app/**/_components/**",
+              message: "Server code cannot import from client components. Move shared logic to /lib/ or create server-only utilities.",
+            },
+            {
+              target: "./app/**/_server/**",
+              from: "./app/**/_hooks/**",
+              message: "Server code cannot import from client hooks. Move shared logic to /lib/ or create server-only utilities.",
+            },
           ],
         },
       ],

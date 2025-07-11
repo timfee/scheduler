@@ -92,3 +92,13 @@ For detailed information about architectural decisions, patterns, and developmen
 
 Errors related to calendar connections or encryption extend `CalendarConnectionError` or `EncryptionError`. These classes include a `code` field to allow mapping to descriptive messages. When an action fails, the error is caught and converted to a message for the UI using `mapErrorToUserMessage`.
 
+## Architecture
+
+The application follows a consistent feature-based organization pattern. Each feature has clear separation between server and client code:
+
+- **Server code** (`_server/`): Actions, data fetching, server-only utilities
+- **Client code** (`_components/`, `_hooks/`): Interactive components and client-side state
+- **Schemas** (`/lib/schemas/`): Centralized data validation and types
+
+📖 **See [Feature Organization Documentation](./docs/architecture/feature-organization.md) for detailed architecture guidelines.**
+

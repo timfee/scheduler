@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/infrastructure/database";
-import { preferences } from "@/infrastructure/database/schema";
+import { preferences } from "@/lib/schemas/database";
 import { eq } from "drizzle-orm";
 
 /**

@@ -1,5 +1,5 @@
-import { listAppointmentTypes } from '@/app/(booking)/data'
-import { AppointmentTypeSelector } from '@/app/(booking)/components/appointment-type-selector'
+import { listAppointmentTypes } from '@/app/(booking)/_server/data'
+import { AppointmentTypeSelector } from '@/app/(booking)/_components/appointment-type-selector'
 
 export default async function AppointmentTypePage() {
   const types = await listAppointmentTypes()

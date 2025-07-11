@@ -10,7 +10,7 @@ import {
   type NewCalendarIntegration,
   type Calendar,
   type NewCalendar,
-} from "@/infrastructure/database/schema";
+} from "@/lib/schemas/database";
 import { type CalendarCapability } from "@/lib/types/constants";
 import { CalendarConnectionError } from "@/lib/errors";
 import { eq, sql, asc } from "drizzle-orm";

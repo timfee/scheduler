@@ -24,7 +24,7 @@ import {
   cleanupTestDb,
   createTestDb,
 } from "../../../infrastructure/database/__tests__/helpers/db";
-import * as schema from "../../../infrastructure/database/schema";
+import * as schema from "@/lib/schemas/database";
 
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
@@ -65,8 +65,8 @@ beforeAll(async () => {
   jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
   integrations = await import("@/infrastructure/database/integrations");
-  actions = await import("@/app/connections/actions");
-  calendarActions = await import("@/app/connections/calendar-actions");
+  actions = await import("@/app/connections/_server/actions");
+  calendarActions = await import("@/app/connections/_server/calendar-actions");
 });
 
 afterAll(() => {

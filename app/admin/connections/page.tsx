@@ -1,8 +1,8 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-import { getConnections } from "@/app/connections/data";
-import { ConnectionsClient } from "@/components/admin/connections";
+import { getConnections } from "@/app/connections/_server/data";
+import { ConnectionsClient } from "@/app/connections/_components";
 import { Suspense } from "react";
 
 async function ConnectionsLoader() {

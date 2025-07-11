@@ -17,7 +17,7 @@ export * from "./ui/switch";
 export * from "./ui/textarea";
 
 // Admin components
-export * from "./admin";
+// export * from "./admin"; // Removed - admin components moved to app/admin directories
 
 // Booking components
 export * from "./booking";

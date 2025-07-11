@@ -1,5 +1,5 @@
 import { beforeAll, afterEach, describe, expect, it, jest } from '@jest/globals'
-import { type BookingFormData } from '../schemas/booking'
+import { type BookingFormData } from '@/lib/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@test/factories'
@@ -65,7 +65,7 @@ beforeAll(async () => {
   )
 
   jest.unstable_mockModule(
-    '@/app/(booking)/data',
+    '@/app/(booking)/_server/data',
     () => ({
       getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
         id: 'intro',
@@ -76,7 +76,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction, clearRateLimiter, clearBookingLocks } = await import('@/app/(booking)/actions'))
+  ;({ createBookingAction, clearRateLimiter, clearBookingLocks } = await import('@/app/(booking)/_server/actions'))
 })
 
 afterEach(() => {

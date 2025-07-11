@@ -1,4 +1,4 @@
-import { getAppointmentType } from "@/app/(booking)/data";
+import { getAppointmentType } from "@/app/(booking)/_server/data";
 import { listBusyTimesAction } from "@/app/appointments/actions";
 import { TimeSelector } from "./time-selector";
 

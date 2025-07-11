@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { createTables } from "../infrastructure/database/migrations";
-import * as schema from "../infrastructure/database/schema";
+import * as schema from "@/lib/schemas/database";
 
 function initDb() {
   // Initialize database
