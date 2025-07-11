@@ -1,4 +1,4 @@
-import { getAppointmentType } from "@/app/(booking)/_server/data";
+import { getAppointmentType } from "@/app/(booking)/server/data";
 import { listBusyTimesAction } from "@/app/appointments/actions";
 import { TimeSelector } from "./time-selector";
 import { addMinutes, format } from 'date-fns';

@@ -1,7 +1,7 @@
 'use client'
 
 import { addDays, format, startOfDay } from 'date-fns'
-import { useBookingState } from '@/app/(booking)/_hooks/use-booking-state'
+import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
 import { useCallback } from 'react'
 
 interface DateSelectorProps {

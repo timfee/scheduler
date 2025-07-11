@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 
 import { Loader2 } from "lucide-react";
 import { type WeeklyAvailability, type TimeSlot } from "@/lib/schemas/availability";
-import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/_server/actions";
+import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/server/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { DayAvailability } from "./day-availability";
 

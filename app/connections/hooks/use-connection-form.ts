@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import { type ProviderType } from "../_server/actions";
+import { type ProviderType } from "../server/actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
@@ -52,7 +52,9 @@ export function useConnectionForm(): UseConnectionFormReturn {
 
   const handleProviderChange = (provider: ProviderType) => {
     const authMethod = PROVIDER_AUTH_METHODS[provider];
-    form.setValue("authMethod", authMethod);
+    if (authMethod) {
+      form.setValue("authMethod", authMethod);
+    }
 
     if (authMethod === "Basic") {
       form.setValue("refreshToken", "");

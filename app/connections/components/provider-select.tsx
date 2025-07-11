@@ -1,7 +1,7 @@
 "use client";
 
-import { type ProviderType } from "@/app/connections/_server/actions";
-import { type ConnectionFormValues } from "@/app/connections/_hooks/use-connection-form";
+import { type ProviderType } from "@/app/connections/server/actions";
+import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
 import {
   FormControl,
   FormField,

@@ -65,7 +65,7 @@ beforeAll(async () => {
   )
 
   jest.unstable_mockModule(
-    '@/app/(booking)/_server/data',
+    '@/app/(booking)/server/data',
     () => ({
       getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
         id: 'intro',
@@ -76,7 +76,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction, clearRateLimiter, clearBookingLocks } = await import('@/app/(booking)/_server/actions'))
+  ;({ createBookingAction, clearRateLimiter, clearBookingLocks } = await import('@/app/(booking)/server/actions'))
 })
 
 afterEach(() => {
