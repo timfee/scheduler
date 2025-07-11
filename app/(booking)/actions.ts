@@ -34,7 +34,22 @@ function cleanupOldEntries() {
   });
 }
 
-// Generate a unique key for a time slot to prevent concurrent bookings
+/**
+ * Generate a unique ISO-based key for a time slot to prevent concurrent bookings.
+ * 
+ * Creates a composite key from the start and end times that uniquely identifies
+ * a time slot for use in the booking locks Map. This ensures that concurrent
+ * booking attempts for the same time slot are properly serialized.
+ * 
+ * @param startTime - The start time of the booking slot
+ * @param endTime - The end time of the booking slot
+ * @returns A unique string key in the format "startISO-endISO"
+ * 
+ * @remarks
+ * Both Date objects are converted to ISO strings using toISOString(), which
+ * always returns UTC time regardless of the local timezone. This ensures
+ * consistent key generation across different server environments.
+ */
 function getTimeSlotKey(startTime: Date, endTime: Date): string {
   return `${startTime.toISOString()}-${endTime.toISOString()}`;
 }
