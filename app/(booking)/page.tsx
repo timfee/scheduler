@@ -52,7 +52,7 @@ export default function BookingPage() {
 
   return (
     <div className="col-span-full mt-6">
-      <BookingProgress progress={3} />
+      <BookingProgress progress={TOTAL_STEPS} />
       <p className="font-medium">You selected:</p>
       <ul className="list-disc pl-4 mb-4">
         <li>Type: {appointmentType}</li>
