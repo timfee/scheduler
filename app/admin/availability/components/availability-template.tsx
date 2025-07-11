@@ -181,7 +181,7 @@ export function AvailabilityTemplate() {
               }}
               onUpdateSlot={(index, field, value) => {
                 const slot = availability[key].slots[index];
-                if (slot) updateSlot(key, index, field, value);
+                if (slot?.id) updateSlot(key, slot.id, field, value);
               }}
             />
           ))}
