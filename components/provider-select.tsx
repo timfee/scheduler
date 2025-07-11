@@ -1,6 +1,4 @@
 "use client";
-
-import { useCallback } from "react";
 import {
   FormField,
   FormItem,
@@ -16,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { type Control } from "react-hook-form";
+import { useCallback } from "react";
 
 import { type ProviderType } from "@/app/connections/actions";
 import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";

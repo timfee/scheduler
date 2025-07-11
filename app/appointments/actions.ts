@@ -22,8 +22,8 @@ const cachedListBusyTimes = async (from: string, to: string) => {
   }
 };
 
-export const listBusyTimesAction = (from: string, to: string) => 
-  unstable_cache(
+export async function listBusyTimesAction(from: string, to: string) {
+  return unstable_cache(
     async () => cachedListBusyTimes(from, to),
     [`busy-times-${from}-${to}`],
     { 
@@ -31,3 +31,4 @@ export const listBusyTimesAction = (from: string, to: string) =>
       tags: ['busy-times']
     }
   )();
+}
