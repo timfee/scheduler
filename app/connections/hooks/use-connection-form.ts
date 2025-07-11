@@ -6,7 +6,7 @@ import { type ProviderType } from "../actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
-} from "../schemas/connection";
+} from "@/lib/schemas/connection";
 import { DEFAULT_GOOGLE_TOKEN_URL } from "../utils/form-data-builder";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
@@ -17,7 +17,7 @@ const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   caldav: "Basic",
 };
 
-export { connectionFormSchema, type ConnectionFormValues } from "../schemas/connection";
+export { connectionFormSchema, type ConnectionFormValues } from "@/lib/schemas/connection";
 
 export interface UseConnectionFormReturn {
   form: UseFormReturn<ConnectionFormValues, unknown, ConnectionFormValues>;

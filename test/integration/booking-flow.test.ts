@@ -1,4 +1,4 @@
-import { type BookingFormData } from "@/app/(booking)/schemas/booking";
+import { type BookingFormData } from "@/lib/schemas/booking";
 import { type CalDavProvider } from "@/infrastructure/providers/caldav";
 import { type CalendarEvent } from "@/lib/schemas/calendar-event";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";

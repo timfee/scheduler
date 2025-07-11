@@ -1,5 +1,5 @@
 import { beforeAll, afterEach, describe, expect, it, jest } from '@jest/globals'
-import { type BookingFormData } from '../schemas/booking'
+import { type BookingFormData } from '@/lib/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@test/factories'

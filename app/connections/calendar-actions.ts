@@ -9,7 +9,7 @@ import {
   removeCalendar,
   updateCalendarCapability,
 } from "@/infrastructure/database/integrations";
-import { type Calendar } from "@/infrastructure/database/schema";
+import { type Calendar } from "@/lib/schemas/database";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { CALENDAR_CAPABILITY, type CalendarCapability } from "@/lib/types/constants";
 

@@ -24,7 +24,7 @@ import {
   cleanupTestDb,
   createTestDb,
 } from "../../../infrastructure/database/__tests__/helpers/db";
-import * as schema from "../../../infrastructure/database/schema";
+import * as schema from "@/lib/schemas/database";
 
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),

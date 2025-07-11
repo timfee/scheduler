@@ -1,4 +1,4 @@
-import type * as schema from "@/infrastructure/database/schema";
+import type * as schema from "@/lib/schemas/database";
 import { jest } from "@jest/globals";
 import { connectionVariants } from "@test/factories";
 

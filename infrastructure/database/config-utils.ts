@@ -1,5 +1,5 @@
 import { type CalendarIntegrationConfig, type BasicAuthConfig, type OAuthConfig } from "./integrations";
-import { type ConnectionConfigValues } from "@/app/connections/schemas/connection";
+import { type ConnectionConfigValues } from "@/lib/schemas/connection";
 
 /**
  * Extract common fields shared by both auth methods.

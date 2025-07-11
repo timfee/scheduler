@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { type ConnectionFormValues } from "../schemas/connection";
+import { type ConnectionFormValues } from "@/lib/schemas/connection";
 import { type CalendarOption } from "../actions";
 import { testConnectionAction, listCalendarsAction } from "../actions";
 import { buildConnectionFormData } from "../utils/form-data-builder";

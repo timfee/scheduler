@@ -1,5 +1,5 @@
 import { Factory } from './base';
-import { type AppointmentType } from '@/infrastructure/database/schema';
+import { type AppointmentType } from '@/lib/schemas/database';
 import { randomUUID } from 'crypto';
 
 /**

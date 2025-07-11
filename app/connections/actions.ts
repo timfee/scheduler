@@ -22,7 +22,7 @@ import {
   type ProviderType,
   type UpdateCalendarIntegrationInput,
 } from "@/infrastructure/database/integrations";
-import { calendarIntegrations } from "@/infrastructure/database/schema";
+import { calendarIntegrations } from "@/lib/schemas/database";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { eq } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -32,7 +32,7 @@ import {
   connectionConfigSchema,
   connectionFormSchema,
   type ConnectionFormValues,
-} from "./schemas/connection";
+} from "@/lib/schemas/connection";
 
 export type { CalendarOption, ProviderType };
 

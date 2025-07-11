@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache'
 import { db } from "@/infrastructure/database";
-import { appointmentTypes } from "@/infrastructure/database/schema";
+import { appointmentTypes } from "@/lib/schemas/database";
 import { eq } from "drizzle-orm";
 
 export type AppointmentType = typeof appointmentTypes.$inferSelect;
