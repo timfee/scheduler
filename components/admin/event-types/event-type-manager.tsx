@@ -520,7 +520,7 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
                       ...prev.rules, 
                       advanceBooking: { 
                         ...prev.rules.advanceBooking, 
-                        max: parseInt(e.target.value) ?? 0 
+                        max: parseInt(e.target.value) || 0
                       }
                     }
                   }))}
