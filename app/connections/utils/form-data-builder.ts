@@ -6,8 +6,7 @@ import { type ConnectionFormData } from "../actions";
  * Extracts the duplicated form building logic from ConnectionsClient
  */
 export function buildConnectionFormData(
-  values: ConnectionFormValues,
-  _isForTesting = false
+  values: ConnectionFormValues
 ): ConnectionFormData {
   const baseData = {
     provider: values.provider,
