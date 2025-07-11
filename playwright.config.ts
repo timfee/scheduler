@@ -35,7 +35,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
+    command: 'ENCRYPTION_KEY="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" WEBHOOK_SECRET="test-webhook-secret-that-is-long-enough-to-meet-requirements" SQLITE_PATH=":memory:" npm run dev',
     port: 3000,
     reuseExistingServer: true,
   },
