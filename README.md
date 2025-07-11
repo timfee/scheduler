@@ -45,14 +45,31 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Architecture
 
-- **app/**: Next.js server and client components, plus API routes.
-- **features/**: Domain feature modules with components, actions, and hooks.
+- **app/**: Next.js server and client components, organized by feature domains.
+- **components/**: Shared UI components and feature-specific client components.
 - **infrastructure/**: Database access, encryption utilities, and provider integrations.
 - **lib/**: Miscellaneous shared helpers and validation.
-- **schemas/** and **types/**: Zod schemas and shared TypeScript types.
-- **test/** and **__tests__/**: Unit and integration tests.
+- **docs/architecture/**: Architecture Decision Records (ADRs) and development guidelines.
 
-Server actions now throw `Error` objects on failure. Client components should catch these and display a user-friendly message using helpers from `features/shared/errors.ts`.
+Server actions now throw `Error` objects on failure. Client components should catch these and display a user-friendly message using helpers from `lib/errors.ts`.
+
+### Architecture Documentation
+
+For detailed information about architectural decisions, patterns, and development guidelines, see:
+
+- **[Architecture Overview](./docs/architecture/README.md)**: Complete guide to the application architecture
+- **[Architecture Decision Records](./docs/architecture/)**: Documented decisions about state management, server actions, dependencies, and more
+- **[Development Guidelines](./docs/architecture/development-guidelines.md)**: Guidelines for maintaining simplicity and consistency
+- **[Feature Development](./docs/architecture/feature-development-guidelines.md)**: Patterns for developing new features
+- **[Feature Template](./docs/architecture/templates/feature-template.md)**: Template for creating new features
+
+### Key Architectural Patterns
+
+- **Manual State Management**: Using React hooks instead of state management libraries
+- **Server Actions**: Direct server-side operations without API routes
+- **Feature-based Organization**: Code organized by business domain
+- **Minimal Dependencies**: Careful evaluation of new dependencies
+- **In-memory Solutions**: Simple caching and rate limiting without external services
 
 ## Error handling
 
