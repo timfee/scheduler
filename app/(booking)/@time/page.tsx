@@ -1,7 +1,7 @@
 import { getAppointmentType } from "@/app/(booking)/server/data";
 import { listBusyTimesAction } from "@/app/appointments/actions";
 import { TimeSelector } from "./time-selector";
-import { addMinutes, format } from 'date-fns';
+import { addMinutes, format, startOfDay, endOfDay } from 'date-fns';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 export default async function TimePage({
@@ -21,8 +21,8 @@ export default async function TimePage({
     const [apptType, busy] = await Promise.all([
       getAppointmentType(searchParams.type),
       listBusyTimesAction(
-        `${searchParams.date}T00:00:00Z`, // Start of the day
-        `${searchParams.date}T23:59:59Z`  // End of the day
+        format(startOfDay(date), "yyyy-MM-dd'T'HH:mm:ssXXX"), // Start of the day
+        format(endOfDay(date), "yyyy-MM-dd'T'HH:mm:ssXXX")  // End of the day
       ),
     ])
 
@@ -31,8 +31,8 @@ export default async function TimePage({
     } else {
       const dateStr = format(date, 'yyyy-MM-dd')
 
-      // Create business hours in the dynamically fetched business timezone, then convert to UTC
-      const businessTimezone = apptType.timezone || 'America/New_York'; // Fallback to default if timezone is not provided
+      // Create business hours in the business timezone (9 AM to 5 PM EST), then convert to UTC
+      const businessTimezone = 'America/New_York';
       const businessStart = fromZonedTime(`${dateStr}T09:00:00`, businessTimezone);
       const businessEnd = fromZonedTime(`${dateStr}T17:00:00`, businessTimezone);
 
