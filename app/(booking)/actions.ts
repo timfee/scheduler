@@ -14,6 +14,10 @@ import { bookingFormSchema, type BookingFormData } from "./schemas/booking";
 // Simple in-memory rate limiter keyed by email address
 const lastBookingAt = new Map<string, number>();
 
+// In-memory lock to prevent double booking race condition
+// Maps time slot keys to promises representing ongoing booking attempts
+const bookingLocks = new Map<string, Promise<void>>();
+
 // Cleanup old rate limit entries to prevent memory growth
 // Remove entries older than 2 minutes (rate limit is 1 minute)
 const CLEANUP_THRESHOLD = 2 * 60 * 1000; // 2 minutes in milliseconds
@@ -28,6 +32,11 @@ function cleanupOldEntries() {
       lastBookingAt.delete(email);
     }
   });
+}
+
+// Generate a unique key for a time slot to prevent concurrent bookings
+function getTimeSlotKey(startTime: Date, endTime: Date): string {
+  return `${startTime.toISOString()}-${endTime.toISOString()}`;
 }
 
 /**
@@ -71,22 +80,54 @@ export async function createBookingAction(formData: BookingFormData) {
       integration.config.calendarUrl ?? "",
     );
 
-    const conflicts = await provider.listBusyTimes({
-      from: start.toISOString(),
-      to: end.toISOString(),
-    });
-    if (conflicts.length > 0) {
-      throw new Error("Selected time is not available");
+    // Create a unique key for this time slot to prevent concurrent bookings
+    const timeSlotKey = getTimeSlotKey(start, end);
+    
+    // Check if there's already a booking attempt in progress for this time slot
+    const existingLock = bookingLocks.get(timeSlotKey);
+    if (existingLock) {
+      // Wait for the existing booking attempt to complete
+      await existingLock;
+      // After waiting, check if the slot is still available
+      const conflicts = await provider.listBusyTimes({
+        from: start.toISOString(),
+        to: end.toISOString(),
+      });
+      if (conflicts.length > 0) {
+        throw new Error("Selected time is not available");
+      }
     }
 
-    await provider.createAppointment({
-      title: `${apptType.name} - ${name}`,
-      description: `Scheduled via booking form for ${email}`,
-      startUtc: start.toISOString(),
-      endUtc: end.toISOString(),
-      ownerTimeZone: DEFAULT_TIMEZONE,
-      location: "",
-    });
+    // Create a new lock for this booking attempt
+    const bookingPromise = (async () => {
+      try {
+        // Check availability one more time under the lock
+        const conflicts = await provider.listBusyTimes({
+          from: start.toISOString(),
+          to: end.toISOString(),
+        });
+        if (conflicts.length > 0) {
+          throw new Error("Selected time is not available");
+        }
+
+        // Create the appointment atomically after confirming availability
+        await provider.createAppointment({
+          title: `${apptType.name} - ${name}`,
+          description: `Scheduled via booking form for ${email}`,
+          startUtc: start.toISOString(),
+          endUtc: end.toISOString(),
+          ownerTimeZone: DEFAULT_TIMEZONE,
+          location: "",
+        });
+      } finally {
+        // Clean up the lock when done
+        bookingLocks.delete(timeSlotKey);
+      }
+    })();
+
+    // Store the lock and await the booking
+    bookingLocks.set(timeSlotKey, bookingPromise);
+    await bookingPromise;
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to create booking"));
   }
@@ -95,4 +136,9 @@ export async function createBookingAction(formData: BookingFormData) {
 // Export for testing purposes
 export function clearRateLimiter() {
   lastBookingAt.clear();
+}
+
+// Export for testing purposes
+export function clearBookingLocks() {
+  bookingLocks.clear();
 }
