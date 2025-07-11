@@ -70,12 +70,12 @@ export default function ConnectionsClient({
     await testConnection(form);
   };
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     form.reset();
     setEditingConnection(null);
     setCalendars([]);
     resetTestStatus();
-  };
+  }, [form, setEditingConnection, setCalendars, resetTestStatus]);
 
   const handleOpenForm = useCallback(() => {
     setIsFormOpen(true);
