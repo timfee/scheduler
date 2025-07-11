@@ -9,11 +9,11 @@ export interface BusyTime {
 export interface BusinessHours {
   start: string; // HH:mm format
   end: string;   // HH:mm format
-  timezone?: string;
+  timeZone?: string;
 }
 
 export interface AvailabilityOptions {
-  date: string; // YYYY-MM-DD format
+  selectedDate: string; // YYYY-MM-DD format
   durationMinutes: number;
   businessHours: BusinessHours;
   busyTimes: BusyTime[];
@@ -23,14 +23,14 @@ export interface AvailabilityOptions {
  * Calculate available booking slots for a given date and duration
  */
 export function calculateAvailableSlots(options: AvailabilityOptions): string[] {
-  const { date, durationMinutes, businessHours, busyTimes } = options;
+  const { selectedDate, durationMinutes, businessHours, busyTimes } = options;
   
   // Get the timezone from business hours, default to UTC
-  const businessTimezone = businessHours.timezone ?? 'UTC';
+  const businessTimeZone = businessHours.timeZone ?? 'UTC';
   
   // Create business hours in the specified timezone, then convert to UTC for calculation
-  const businessStartUtc = fromZonedTime(`${date}T${businessHours.start}:00`, businessTimezone);
-  const businessEndUtc = fromZonedTime(`${date}T${businessHours.end}:00`, businessTimezone);
+  const businessStartUtc = fromZonedTime(`${selectedDate}T${businessHours.start}:00`, businessTimeZone);
+  const businessEndUtc = fromZonedTime(`${selectedDate}T${businessHours.end}:00`, businessTimeZone);
   
   const availableSlots: string[] = [];
   
@@ -62,7 +62,7 @@ export function calculateAvailableSlots(options: AvailabilityOptions): string[] 
     
     if (!hasOverlap) {
       // Display time in business timezone for user readability
-      const slotDisplayTime = toZonedTime(slotStartUtc, businessTimezone);
+      const slotDisplayTime = toZonedTime(slotStartUtc, businessTimeZone);
       availableSlots.push(format(slotDisplayTime, 'HH:mm'));
     }
   }

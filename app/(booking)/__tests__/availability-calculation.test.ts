@@ -6,14 +6,14 @@ describe('Availability Calculation', () => {
   const defaultBusinessHours: BusinessHours = {
     start: BUSINESS_HOURS.DEFAULT_START,
     end: BUSINESS_HOURS.DEFAULT_END,
-    timezone: TIMEZONES.DEFAULT
+    timeZone: TIMEZONES.DEFAULT
   };
 
   describe('Basic slot generation', () => {
     it('should generate all slots for empty calendar', () => {
       // Given: Business hours 9 AM - 5 PM, 30-minute slots
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes: []
@@ -39,7 +39,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
@@ -58,7 +58,7 @@ describe('Availability Calculation', () => {
     it('should handle 60-minute slots', () => {
       // Given: 60-minute appointment duration
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 60,
         businessHours: defaultBusinessHours,
         busyTimes: []
@@ -90,7 +90,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 60,
         businessHours: defaultBusinessHours,
         busyTimes
@@ -120,7 +120,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
@@ -147,7 +147,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
@@ -177,7 +177,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 60,
         businessHours: defaultBusinessHours,
         busyTimes
@@ -210,7 +210,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 60,
         businessHours: defaultBusinessHours,
         busyTimes
@@ -228,7 +228,7 @@ describe('Availability Calculation', () => {
     it('should handle minimum duration slots (5 minutes)', () => {
       // Given: 8-hour business day
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 5,
         businessHours: defaultBusinessHours,
         busyTimes: []
@@ -247,7 +247,7 @@ describe('Availability Calculation', () => {
     it('should handle maximum duration slots (full day)', () => {
       // Given: 8-hour business day
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 480, // 8 hours
         businessHours: defaultBusinessHours,
         busyTimes: []
@@ -268,11 +268,11 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_END,
-        timezone: TIMEZONES.DEFAULT
+        timeZone: TIMEZONES.DEFAULT
       };
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours,
         busyTimes: []
@@ -291,7 +291,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: '09:00',
         end: '17:00',
-        timezone: 'America/New_York'
+        timeZone: 'America/New_York'
       };
 
       const busyTimes: BusyTime[] = [
@@ -302,7 +302,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 30,
         businessHours,
         busyTimes
@@ -325,7 +325,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: '09:00',
         end: '17:00',
-        timezone: 'America/Los_Angeles'
+        timeZone: 'America/Los_Angeles'
       };
 
       const busyTimes: BusyTime[] = [
@@ -336,7 +336,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 30,
         businessHours,
         busyTimes
@@ -359,7 +359,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: '09:00',
         end: '17:00',
-        timezone: 'UTC'
+        timeZone: 'UTC'
       };
 
       const busyTimes: BusyTime[] = [
@@ -370,7 +370,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 30,
         businessHours,
         busyTimes
@@ -397,7 +397,7 @@ describe('Availability Calculation', () => {
       };
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 60,
         businessHours,
         busyTimes: []
@@ -417,7 +417,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: '09:00',
         end: '17:00',
-        timezone: 'America/New_York'
+        timeZone: 'America/New_York'
       };
 
       const busyTimes: BusyTime[] = [
@@ -429,7 +429,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 30,
         businessHours,
         busyTimes
@@ -450,11 +450,11 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_END,
-        timezone: TIMEZONES.DEFAULT
+        timeZone: TIMEZONES.DEFAULT
       };
 
       const options = {
-        date: '2024-03-10', // DST transition day in 2024
+        selectedDate: '2024-03-10', // DST transition day in 2024
         durationMinutes: 60,
         businessHours,
         busyTimes: []
@@ -474,11 +474,11 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: '22:00',
         end: '23:59',
-        timezone: TIMEZONES.DEFAULT
+        timeZone: TIMEZONES.DEFAULT
       };
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: 60,
         businessHours,
         busyTimes: []
@@ -504,7 +504,7 @@ describe('Availability Calculation', () => {
       ];
 
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes
@@ -521,7 +521,7 @@ describe('Availability Calculation', () => {
     it('should handle empty busy times array', () => {
       // Given: No busy times
       const options = {
-        date: '2024-01-15',
+        selectedDate: '2024-01-15',
         durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
         businessHours: defaultBusinessHours,
         busyTimes: []

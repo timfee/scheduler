@@ -47,7 +47,7 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
       return {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_END,
-        timezone: TIMEZONES.DEFAULT
+        timeZone: TIMEZONES.DEFAULT
       };
     }
     
@@ -58,7 +58,7 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
       return {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_START, // No availability
-        timezone: TIMEZONES.DEFAULT
+        timeZone: TIMEZONES.DEFAULT
       };
     }
     
@@ -69,14 +69,14 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
       return {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_START, // No availability
-        timezone: TIMEZONES.DEFAULT
+        timeZone: TIMEZONES.DEFAULT
       };
     }
     
     return {
       start: firstSlot.start,
       end: firstSlot.end,
-      timezone: TIMEZONES.DEFAULT
+      timeZone: TIMEZONES.DEFAULT
     };
     
   } catch (error) {
@@ -85,7 +85,7 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
     return {
       start: BUSINESS_HOURS.DEFAULT_START,
       end: BUSINESS_HOURS.DEFAULT_END,
-      timezone: TIMEZONES.DEFAULT
+      timeZone: TIMEZONES.DEFAULT
     };
   }
 }

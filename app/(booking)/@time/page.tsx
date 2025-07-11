@@ -32,12 +32,12 @@ export default async function TimePage({
       const businessHours: BusinessHours = {
         start: '09:00',
         end: '17:00',
-        timezone: TIMEZONES.DEFAULT
+        timeZone: TIMEZONES.DEFAULT
       };
 
       // Use the centralized availability calculation function
       slots = calculateAvailableSlots({
-        date: searchParams.date,
+        selectedDate: searchParams.date,
         durationMinutes: apptType.durationMinutes,
         businessHours,
         busyTimes
