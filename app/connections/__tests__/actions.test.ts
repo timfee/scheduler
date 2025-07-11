@@ -6,7 +6,7 @@ import { sql } from 'drizzle-orm';
 import * as schema from '../../../infrastructure/database/schema';
 import { createTestDb, cleanupTestDb } from '../../../infrastructure/database/__tests__/helpers/db';
 import { CALENDAR_CAPABILITY, type CalendarCapability } from '@/lib/types/constants';
-import { connectionVariants } from '@test/factories';
+import { connectionVariants, connectionFactory } from '@test/factories';
 import '@test/setup/jest.setup';
 
 jest.mock('next/cache', () => ({
@@ -61,7 +61,13 @@ beforeEach(() => {
 
 describe('createConnectionAction validation', () => {
   it('requires username and password for Basic auth', async () => {
-    const connectionData = connectionVariants.caldav({ username: '', password: '' });
+    const connectionData = connectionFactory.build({
+      provider: 'caldav',
+      authMethod: 'Basic',
+      username: '', 
+      password: '',
+      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
+    });
     
     await expect(
       actions.createConnectionAction(connectionData)
@@ -78,11 +84,14 @@ describe('createConnectionAction validation', () => {
   });
 
   it('requires OAuth fields', async () => {
-    const connectionData = connectionVariants.google({
+    const connectionData = connectionFactory.build({
+      provider: 'google',
+      authMethod: 'Oauth',
       refreshToken: '',
       clientId: '',
       clientSecret: '',
-      tokenUrl: ''
+      tokenUrl: '',
+      capabilities: [CALENDAR_CAPABILITY.BOOKING],
     });
     
     await expect(

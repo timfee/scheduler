@@ -4,7 +4,7 @@ import { addMinutes, format } from 'date-fns'
 import { listBusyTimesAction } from '@/app/appointments/actions'
 import { getAppointmentType } from '@/app/(booking)/data'
 import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { TimeSkeleton } from '@/app/(booking)/components/booking-skeletons'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
