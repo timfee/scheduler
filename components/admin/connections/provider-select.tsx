@@ -40,9 +40,9 @@ export default function ProviderSelect({
             <FormLabel>Provider</FormLabel>
             <Select
               value={field.value}
-              onValueChange={(provider) => {
-                field.onChange(provider as ProviderType);
-                onChange(provider as ProviderType);
+              onValueChange={(provider: ProviderType) => {
+                field.onChange(provider);
+                onChange(provider);
               }}
               disabled={disabled}
             >
