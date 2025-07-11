@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { sql } from 'drizzle-orm';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import type * as schema from '../infrastructure/database/schema';
+import type * as schema from '@/infrastructure/database/schema';
 import { connectionVariants } from '@test/factories';
 import '@test/setup/jest.setup';
 
@@ -30,7 +30,7 @@ beforeAll(async () => {
   process.env.ENCRYPTION_KEY = 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148';
   process.env.SQLITE_PATH = ':memory:';
   
-  const dbModule = await import('../infrastructure/database');
+  const dbModule = await import('@/infrastructure/database');
   db = dbModule.db;
   db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
@@ -53,7 +53,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when creating a connection', async () => {
-    const { createConnectionAction } = await import('../app/connections/actions');
+    const { createConnectionAction } = await import('../actions');
     
     const connectionData = connectionVariants.apple();
     const result = await createConnectionAction(connectionData);
@@ -64,7 +64,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when deleting a connection', async () => {
-    const { createConnectionAction, deleteConnectionAction } = await import('../app/connections/actions');
+    const { createConnectionAction, deleteConnectionAction } = await import('../actions');
     
     // First create a connection
     const connectionData = connectionVariants.apple();
@@ -82,7 +82,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when updating a connection', async () => {
-    const { createConnectionAction, updateConnectionAction } = await import('../app/connections/actions');
+    const { createConnectionAction, updateConnectionAction } = await import('../actions');
     
     // First create a connection
     const connectionData = connectionVariants.apple();
@@ -102,7 +102,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when updating calendar order', async () => {
-    const { createConnectionAction, updateCalendarOrderAction } = await import('../app/connections/actions');
+    const { createConnectionAction, updateCalendarOrderAction } = await import('../actions');
     
     // First create two connections
     const firstConnection = connectionVariants.apple();
