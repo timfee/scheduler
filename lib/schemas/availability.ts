@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 
 export const timeSlotSchema = z.object({
+  id: z.string().optional(), // Optional for backward compatibility
   start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
   end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
 });
