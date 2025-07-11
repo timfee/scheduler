@@ -16,7 +16,7 @@ export default function TimePage() {
 
     setLoading(true)
     
-    void Promise.all([
+    Promise.all([
       getAppointmentType(type),
       listBusyTimesAction(
         new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).toISOString(),
