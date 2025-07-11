@@ -10,7 +10,9 @@ export function useBookingState() {
   const [state, setState] = useQueryStates(bookingParsers)
 
   const updateBookingStep = (updates: Partial<typeof state>) => {
-    void setState(updates) // nuqs automatically batches these updates
+    setState(updates).catch((error) => {
+      console.error('Failed to update booking state:', error)
+    })
   }
 
   const progress = [state.type, state.date, state.time].filter(Boolean).length

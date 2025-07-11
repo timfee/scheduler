@@ -46,6 +46,9 @@ export default function TimePage() {
         }
       }
       setSlots(availableSlots)
+    }).catch((error) => {
+      console.error('Failed to load time slots:', error)
+      setSlots([])
     }).finally(() => setLoading(false))
   }, [type, date])
 

@@ -32,6 +32,12 @@ export default function BookingPage() {
       if (typeof rawName !== 'string' || typeof rawEmail !== 'string') {
         throw new Error('Invalid form submission')
       }
+      
+      // Validate all required booking fields are present
+      if (!appointmentType || !date || !time) {
+        throw new Error('Missing required booking information')
+      }
+      
       await createBookingAction({ 
         type: appointmentType, 
         date: date instanceof Date ? formatDateForBooking(date) : '', 
