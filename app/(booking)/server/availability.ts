@@ -124,14 +124,14 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
       return {
         start: '09:00',
         end: '09:00', // No availability
-        timezone: 'America/New_York'
+        timezone: template.timezone || 'America/New_York'
       };
     }
     
     return {
       start: firstSlot.start,
       end: firstSlot.end,
-      timezone: 'America/New_York'
+      timezone: template.timezone || 'America/New_York'
     };
     
   } catch (error) {
