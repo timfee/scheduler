@@ -4,13 +4,15 @@ interface BookingProgressProps {
 }
 
 export function BookingProgress({ progress, total = 3 }: BookingProgressProps) {
-  // Clamp progress to valid range [0, total]
-  const clampedProgress = Math.max(0, Math.min(progress, total))
+  // Clamp total to a non-negative value
+  const clampedTotal = Math.max(0, total);
+  // Clamp progress to valid range [0, clampedTotal]
+  const clampedProgress = Math.max(0, Math.min(progress, clampedTotal));
   
   return (
     <div className="flex items-center space-x-2 mb-4">
       <div className="flex space-x-1">
-        {Array.from({ length: total }, (_, i) => i + 1).map((step) => (
+        {Array.from({ length: clampedTotal }, (_, i) => i + 1).map((step) => (
           <div
             key={step}
             className={`w-2 h-2 rounded-full transition-colors duration-200 ${
