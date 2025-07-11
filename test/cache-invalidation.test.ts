@@ -2,6 +2,8 @@ import { jest } from '@jest/globals';
 import { sql } from 'drizzle-orm';
 import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import type * as schema from '../infrastructure/database/schema';
+import { connectionVariants } from '@test/factories';
+import '@test/setup/jest.setup';
 
 // Mock revalidateTag to verify it's called
 const mockRevalidateTag = jest.fn();
@@ -45,23 +47,16 @@ beforeAll(async () => {
 
 describe('Cache Invalidation', () => {
   beforeEach(() => {
+    db.run(sql`DELETE FROM calendar_integrations`);
     mockRevalidateTag.mockClear();
     mockRevalidatePath.mockClear();
-    db.run(sql`DELETE FROM calendar_integrations`);
   });
 
   it('should call revalidateTag when creating a connection', async () => {
     const { createConnectionAction } = await import('../app/connections/actions');
-    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
-    const result = await createConnectionAction({
-      provider: 'apple',
-      displayName: 'Test Calendar',
-      authMethod: 'Basic',
-      username: 'test@example.com',
-      password: 'password123',
-      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-    });
+    const connectionData = connectionVariants.apple();
+    const result = await createConnectionAction(connectionData);
     
     expect(result).toBeDefined();
     expect(mockRevalidatePath).toHaveBeenCalledWith('/connections');
@@ -70,17 +65,10 @@ describe('Cache Invalidation', () => {
 
   it('should call revalidateTag when deleting a connection', async () => {
     const { createConnectionAction, deleteConnectionAction } = await import('../app/connections/actions');
-    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
     // First create a connection
-    const created = await createConnectionAction({
-      provider: 'apple',
-      displayName: 'Test Calendar',
-      authMethod: 'Basic',
-      username: 'test@example.com',
-      password: 'password123',
-      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-    });
+    const connectionData = connectionVariants.apple();
+    const created = await createConnectionAction(connectionData);
     
     // Clear the mocks
     mockRevalidateTag.mockClear();
@@ -95,17 +83,10 @@ describe('Cache Invalidation', () => {
 
   it('should call revalidateTag when updating a connection', async () => {
     const { createConnectionAction, updateConnectionAction } = await import('../app/connections/actions');
-    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
     // First create a connection
-    const created = await createConnectionAction({
-      provider: 'apple',
-      displayName: 'Test Calendar',
-      authMethod: 'Basic',
-      username: 'test@example.com',
-      password: 'password123',
-      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-    });
+    const connectionData = connectionVariants.apple();
+    const created = await createConnectionAction(connectionData);
     
     // Clear the mocks
     mockRevalidateTag.mockClear();
@@ -122,26 +103,16 @@ describe('Cache Invalidation', () => {
 
   it('should call revalidateTag when updating calendar order', async () => {
     const { createConnectionAction, updateCalendarOrderAction } = await import('../app/connections/actions');
-    const { CALENDAR_CAPABILITY } = await import('../lib/types/constants');
     
     // First create two connections
-    const _first = await createConnectionAction({
-      provider: 'apple',
-      displayName: 'First Calendar',
-      authMethod: 'Basic',
-      username: 'test1@example.com',
-      password: 'password123',
-      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-    });
+    const firstConnection = connectionVariants.apple();
+    firstConnection.displayName = 'First Calendar';
+    const _first = await createConnectionAction(firstConnection);
     
-    const second = await createConnectionAction({
-      provider: 'apple',
-      displayName: 'Second Calendar',
-      authMethod: 'Basic',
-      username: 'test2@example.com',
-      password: 'password123',
-      capabilities: [CALENDAR_CAPABILITY.BLOCKING_BUSY],
-    });
+    const secondConnection = connectionVariants.apple();
+    secondConnection.displayName = 'Second Calendar';
+    secondConnection.username = 'test2@example.com';
+    const second = await createConnectionAction(secondConnection);
     
     // Clear the mocks
     mockRevalidateTag.mockClear();
