@@ -323,10 +323,4 @@ export async function updateCalendarOrderAction(
   }
 }
 
-// Re-export calendar management actions
-export {
-  addCalendarAction,
-  updateCalendarCapabilityAction,
-  removeCalendarAction,
-  listCalendarsForIntegrationAction,
-} from './calendar-actions';
+// Note: Calendar management actions are exported from calendar-actions.ts

@@ -25,6 +25,8 @@ jest.mock('tsdav', () => ({
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let actions: typeof import('../actions');
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+let calendarActions: typeof import('../calendar-actions');
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let integrations: typeof import('../../../infrastructure/database/integrations');
 let db: BetterSQLite3Database<typeof schema>;
 let sqlite: DatabaseType;
@@ -46,6 +48,7 @@ beforeAll(async () => {
 
   integrations = await import('../../../infrastructure/database/integrations');
   actions = await import('../actions');
+  calendarActions = await import('../calendar-actions');
 });
 
 afterAll(() => {
@@ -258,7 +261,7 @@ describe('calendar management actions', () => {
 
   describe('addCalendarAction', () => {
     it('adds a calendar to an integration', async () => {
-      const calendar = await actions.addCalendarAction(
+      const calendar = await calendarActions.addCalendarAction(
         integrationId,
         'https://calendar.local/cal1',
         'Test Calendar',
@@ -272,7 +275,7 @@ describe('calendar management actions', () => {
 
     it('validates calendar URL format', async () => {
       await expect(
-        actions.addCalendarAction(
+        calendarActions.addCalendarAction(
           integrationId,
           'invalid-url',
           'Test Calendar',
@@ -283,7 +286,7 @@ describe('calendar management actions', () => {
 
     it('validates integration ID format', async () => {
       await expect(
-        actions.addCalendarAction(
+        calendarActions.addCalendarAction(
           'invalid-uuid',
           'https://calendar.local/cal1',
           'Test Calendar',
@@ -294,7 +297,7 @@ describe('calendar management actions', () => {
 
     it('validates display name is not empty', async () => {
       await expect(
-        actions.addCalendarAction(
+        calendarActions.addCalendarAction(
           integrationId,
           'https://calendar.local/cal1',
           '',
@@ -305,7 +308,7 @@ describe('calendar management actions', () => {
 
     it('validates calendar capability', async () => {
       await expect(
-        actions.addCalendarAction(
+        calendarActions.addCalendarAction(
           integrationId,
           'https://calendar.local/cal1',
           'Test Calendar',
@@ -319,7 +322,7 @@ describe('calendar management actions', () => {
     let calendarId: string;
 
     beforeEach(async () => {
-      const calendar = await actions.addCalendarAction(
+      const calendar = await calendarActions.addCalendarAction(
         integrationId,
         'https://calendar.local/cal1',
         'Test Calendar',
@@ -329,12 +332,12 @@ describe('calendar management actions', () => {
     });
 
     it('updates calendar capability', async () => {
-      await actions.updateCalendarCapabilityAction(
+      await calendarActions.updateCalendarCapabilityAction(
         calendarId,
         CALENDAR_CAPABILITY.BLOCKING_BUSY
       );
       
-      const calendars = await actions.listCalendarsForIntegrationAction(integrationId);
+      const calendars = await calendarActions.listCalendarsForIntegrationAction(integrationId);
       expect(calendars).toHaveLength(1);
       expect(calendars[0]).toBeDefined();
       expect(calendars[0]!.capability).toBe(CALENDAR_CAPABILITY.BLOCKING_BUSY);
@@ -344,7 +347,7 @@ describe('calendar management actions', () => {
       // This test depends on implementation details - the actual function may or may not throw
       // Let's make it more robust by catching any error that might occur
       try {
-        await actions.updateCalendarCapabilityAction(
+        await calendarActions.updateCalendarCapabilityAction(
           'non-existent-id',
           CALENDAR_CAPABILITY.BLOCKING_BUSY
         );
@@ -360,7 +363,7 @@ describe('calendar management actions', () => {
     let calendarId: string;
 
     beforeEach(async () => {
-      const calendar = await actions.addCalendarAction(
+      const calendar = await calendarActions.addCalendarAction(
         integrationId,
         'https://calendar.local/cal1',
         'Test Calendar',
@@ -370,48 +373,48 @@ describe('calendar management actions', () => {
     });
 
     it('removes a calendar', async () => {
-      await actions.removeCalendarAction(calendarId);
+      await calendarActions.removeCalendarAction(calendarId);
       
-      const calendars = await actions.listCalendarsForIntegrationAction(integrationId);
+      const calendars = await calendarActions.listCalendarsForIntegrationAction(integrationId);
       expect(calendars).toHaveLength(0);
     });
 
     it('handles non-existent calendar', async () => {
       await expect(
-        actions.removeCalendarAction('non-existent-id')
+        calendarActions.removeCalendarAction('non-existent-id')
       ).rejects.toThrow('Failed to remove calendar');
     });
   });
 
   describe('listCalendarsForIntegrationAction', () => {
     it('lists calendars for an integration', async () => {
-      await actions.addCalendarAction(
+      await calendarActions.addCalendarAction(
         integrationId,
         'https://calendar.local/cal1',
         'Calendar 1',
         CALENDAR_CAPABILITY.BOOKING
       );
       
-      await actions.addCalendarAction(
+      await calendarActions.addCalendarAction(
         integrationId,
         'https://calendar.local/cal2',
         'Calendar 2',
         CALENDAR_CAPABILITY.BLOCKING_BUSY
       );
 
-      const calendars = await actions.listCalendarsForIntegrationAction(integrationId);
+      const calendars = await calendarActions.listCalendarsForIntegrationAction(integrationId);
       expect(calendars).toHaveLength(2);
       expect(calendars.map(c => c.displayName)).toEqual(['Calendar 1', 'Calendar 2']);
     });
 
     it('returns empty array for integration with no calendars', async () => {
-      const calendars = await actions.listCalendarsForIntegrationAction(integrationId);
+      const calendars = await calendarActions.listCalendarsForIntegrationAction(integrationId);
       expect(calendars).toHaveLength(0);
     });
 
     it('handles non-existent integration', async () => {
       // This function returns an empty array for non-existent integrations
-      const calendars = await actions.listCalendarsForIntegrationAction('non-existent-id');
+      const calendars = await calendarActions.listCalendarsForIntegrationAction('non-existent-id');
       expect(calendars).toEqual([]);
     });
   });
