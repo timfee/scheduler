@@ -1,5 +1,5 @@
 import { Factory } from './base';
-import { type ConnectionFormValues } from '@/app/connections/schemas/connection';
+import { type ConnectionFormValues } from '@/lib/schemas/connection';
 import { type CalendarIntegration } from '@/infrastructure/database/schema';
 import { CALENDAR_CAPABILITY } from '@/lib/types/constants';
 import { randomUUID } from 'crypto';

@@ -8,8 +8,8 @@ import {
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
 import { DEFAULT_TIMEZONE } from "@/lib/types/constants";
 
-import { getAppointmentType } from "./data";
-import { bookingFormSchema, type BookingFormData } from "./schemas/booking";
+import { getAppointmentType } from "../app/(booking)/data";
+import { bookingFormSchema, type BookingFormData } from "../lib/schemas/booking";
 
 // Simple in-memory rate limiter keyed by email address
 const lastBookingAt = new Map<string, number>();

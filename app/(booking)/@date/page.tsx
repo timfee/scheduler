@@ -1,10 +1,10 @@
 'use client'
 
 import { addDays, format, startOfDay } from 'date-fns'
-import { listBusyTimesAction } from '@/app/appointments/actions'
-import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
+import { listBusyTimesAction } from '@/actions/appointments-actions'
+import { useBookingState } from '@/lib/hooks/use-booking-state'
 import { useEffect, useState } from 'react'
-import { DateSkeleton } from '@/app/(booking)/components/booking-skeletons'
+import { DateSkeleton } from '@/components/booking-skeletons'
 
 export default function DatePage() {
   const { type, updateBookingStep } = useBookingState()

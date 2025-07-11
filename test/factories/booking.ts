@@ -1,5 +1,5 @@
 import { Factory } from './base';
-import { type BookingFormData } from '@/app/(booking)/schemas/booking';
+import { type BookingFormData } from '@/lib/schemas/booking';
 
 /**
  * Factory for creating booking form data

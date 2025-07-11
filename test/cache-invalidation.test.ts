@@ -53,7 +53,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when creating a connection', async () => {
-    const { createConnectionAction } = await import('../app/connections/actions');
+    const { createConnectionAction } = await import('../actions/connections-actions');
     
     const connectionData = connectionVariants.apple();
     const result = await createConnectionAction(connectionData);
@@ -64,7 +64,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when deleting a connection', async () => {
-    const { createConnectionAction, deleteConnectionAction } = await import('../app/connections/actions');
+    const { createConnectionAction, deleteConnectionAction } = await import('../actions/connections-actions');
     
     // First create a connection
     const connectionData = connectionVariants.apple();
@@ -82,7 +82,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when updating a connection', async () => {
-    const { createConnectionAction, updateConnectionAction } = await import('../app/connections/actions');
+    const { createConnectionAction, updateConnectionAction } = await import('../actions/connections-actions');
     
     // First create a connection
     const connectionData = connectionVariants.apple();
@@ -102,7 +102,7 @@ describe('Cache Invalidation', () => {
   });
 
   it('should call revalidateTag when updating calendar order', async () => {
-    const { createConnectionAction, updateCalendarOrderAction } = await import('../app/connections/actions');
+    const { createConnectionAction, updateCalendarOrderAction } = await import('../actions/connections-actions');
     
     // First create two connections
     const firstConnection = connectionVariants.apple();

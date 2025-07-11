@@ -1,4 +1,4 @@
-import { AppointmentTypeSkeleton } from '@/app/(booking)/components/booking-skeletons'
+import { AppointmentTypeSkeleton } from '@/components/booking-skeletons'
 
 export default function Loading() {
   return <AppointmentTypeSkeleton />

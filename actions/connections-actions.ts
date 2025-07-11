@@ -20,7 +20,7 @@ import {
 import { db } from "@/infrastructure/database";
 import { calendarIntegrations } from "@/infrastructure/database/schema";
 import { eq } from "drizzle-orm";
-import { getConnections } from './data';
+import { getConnections } from '../app/connections/data';
 import { mapErrorToUserMessage } from '@/lib/errors';
 import {
   buildConfigFromValues,
@@ -30,9 +30,9 @@ import {
   connectionFormSchema,
   type ConnectionFormValues,
   connectionConfigSchema,
-} from "./schemas/connection";
+} from "../lib/schemas/connection";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { type ConnectionListItem } from "./data";
+import { type ConnectionListItem } from "../app/connections/data";
 
 export type { ProviderType };
 export type { CalendarOption };

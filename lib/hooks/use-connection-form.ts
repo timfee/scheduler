@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import { type ProviderType } from "../actions";
+import { type ProviderType } from "@/actions/connections-actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,

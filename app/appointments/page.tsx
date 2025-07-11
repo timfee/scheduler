@@ -1,5 +1,5 @@
 import { Calendar } from "@/components/ui/calendar";
-import { listBusyTimesAction } from "./actions";
+import { listBusyTimesAction } from "@/actions/appointments-actions";
 import { addDays, startOfDay, format } from "date-fns";
 
 export default async function AppointmentsPage() {

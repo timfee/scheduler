@@ -1,11 +1,11 @@
 'use client'
 
 import { addMinutes, format } from 'date-fns'
-import { listBusyTimesAction } from '@/app/appointments/actions'
+import { listBusyTimesAction } from '@/actions/appointments-actions'
 import { getAppointmentType } from '@/app/(booking)/data'
-import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
+import { useBookingState } from '@/lib/hooks/use-booking-state'
 import { useEffect, useState } from 'react'
-import { TimeSkeleton } from '@/app/(booking)/components/booking-skeletons'
+import { TimeSkeleton } from '@/components/booking-skeletons'
 import { Alert } from '@/components/ui/alert'
 
 export default function TimePage() {

@@ -1,5 +1,5 @@
 import { beforeAll, afterEach, describe, expect, it, jest } from '@jest/globals'
-import { type BookingFormData } from '../schemas/booking'
+import { type BookingFormData } from '@/lib/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@test/factories'
@@ -74,7 +74,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction, clearRateLimiter } = await import('../actions'))
+  ;({ createBookingAction, clearRateLimiter } = await import('@/actions/booking-actions'))
 })
 
 afterEach(() => {
@@ -102,7 +102,7 @@ describe('createBookingAction', () => {
         createDAVClientFromIntegration: jest.fn(async () => ({})),
       })
     )
-    const { createBookingAction: action } = await import('../actions')
+    const { createBookingAction: action } = await import('@/actions/booking-actions')
     await expect(action(validData)).rejects.toThrow('No booking calendar configured')
   })
 

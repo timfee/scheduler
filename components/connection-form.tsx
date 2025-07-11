@@ -24,8 +24,8 @@ import { type UseFormReturn } from "react-hook-form";
 
 import ProviderSelect from "./provider-select";
 import CapabilitiesField from "./capabilities-field";
-import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
-import { type CalendarOption, type ProviderType } from "@/app/connections/actions";
+import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
+import { type CalendarOption, type ProviderType } from "@/actions/connections-actions";
 import { type ConnectionListItem } from "@/app/connections/data";
 
 export interface ConnectionFormProps {

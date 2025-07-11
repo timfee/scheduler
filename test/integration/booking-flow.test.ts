@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, jest } from '@jest/globals'
-import { type BookingFormData } from '@/app/(booking)/schemas/booking'
+import { type BookingFormData } from '@/lib/schemas/booking'
 import { type CalDavProvider } from '@/infrastructure/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 
@@ -73,7 +73,7 @@ beforeAll(async () => {
     })
   )
 
-  ;({ createBookingAction } = await import('@/app/(booking)/actions'))
+  ;({ createBookingAction } = await import('@/actions/booking-actions'))
 })
 
 describe('booking flow integration', () => {

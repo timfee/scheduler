@@ -23,7 +23,7 @@ jest.mock('tsdav', () => ({
 }));
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-let actions: typeof import('../actions');
+let actions: typeof import('@/actions/connections-actions');
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let integrations: typeof import('../../../infrastructure/database/integrations');
 let db: BetterSQLite3Database<typeof schema>;
@@ -45,7 +45,7 @@ beforeAll(async () => {
   jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
   integrations = await import('../../../infrastructure/database/integrations');
-  actions = await import('../actions');
+  actions = await import('@/actions/connections-actions');
 });
 
 afterAll(() => {
