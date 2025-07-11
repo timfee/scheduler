@@ -31,11 +31,26 @@ export class Factory<T> {
   }
 
   /**
-   * Build with sequence numbers
+   * Build a sequence of string values
    */
-  buildSequence(count: number, sequenceField: keyof T, sequenceType: 'string' | 'number' = 'string', prefix = ''): T[] {
+  buildStringSequence(options: { count: number; sequenceField: keyof T; prefix?: string }): T[] {
+    const { count, sequenceField, prefix = '' } = options;
     return Array.from({ length: count }, (_, index) => {
-      const sequenceValue = sequenceType === 'string' ? `${prefix}${index + 1}` : index + 1;
+      const sequenceValue = `${prefix}${index + 1}`;
+      const overrides = {
+        [sequenceField]: sequenceValue,
+      } as Partial<T>;
+      return this.build(overrides);
+    });
+  }
+
+  /**
+   * Build a sequence of number values
+   */
+  buildNumberSequence(options: { count: number; sequenceField: keyof T }): T[] {
+    const { count, sequenceField } = options;
+    return Array.from({ length: count }, (_, index) => {
+      const sequenceValue = index + 1;
       const overrides = {
         [sequenceField]: sequenceValue,
       } as Partial<T>;
