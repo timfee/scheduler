@@ -77,7 +77,6 @@ export default function ConnectionForm({
             {/* Provider Selection */}
             <ProviderSelect
               control={form.control}
-              value={currentProvider}
               onChange={onProviderChange}
               disabled={!!editingConnection}
             />

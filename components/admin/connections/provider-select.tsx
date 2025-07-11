@@ -16,33 +16,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCallback } from "react";
+
 import { type Control } from "react-hook-form";
 
 interface ProviderSelectProps {
   control: Control<ConnectionFormValues>;
-  value: ProviderType;
   onChange: (provider: ProviderType) => void;
   disabled?: boolean;
 }
 
 export default function ProviderSelect({
   control,
-  value,
   onChange,
   disabled,
 }: ProviderSelectProps) {
-  const handleSelectValueChange = useCallback(
-    (
-      provider: ProviderType,
-      field: { onChange: (value: ProviderType) => void },
-    ) => {
-      field.onChange(provider);
-      onChange(provider);
-    },
-    [onChange],
-  );
-
   return (
     <FormField
       control={control}
@@ -53,9 +40,10 @@ export default function ProviderSelect({
             <FormLabel>Provider</FormLabel>
             <Select
               value={field.value}
-              onValueChange={(provider) =>
-                handleSelectValueChange(provider as ProviderType, field)
-              }
+              onValueChange={(provider) => {
+                field.onChange(provider as ProviderType);
+                onChange(provider as ProviderType);
+              }}
               disabled={disabled}
             >
               <FormControl>
