@@ -22,7 +22,7 @@ import {
   type ConnectionFormValues,
   PROVIDER_AUTH_METHODS,
 } from "@/app/connections/hooks/use-connection-form";
-import { buildConnectionFormData } from "@/app/connections/utils/form-data-builder";
+import { buildConnectionFormData, DEFAULT_GOOGLE_TOKEN_URL } from "@/app/connections/utils/form-data-builder";
 import { useTestConnection } from "@/app/connections/hooks/use-test-connection";
 
 interface ConnectionsClientProps {
@@ -169,7 +169,7 @@ export default function ConnectionsClient({
         refreshToken: "",
         clientId: "",
         clientSecret: "",
-        tokenUrl: "https://accounts.google.com/o/oauth2/token",
+        tokenUrl: DEFAULT_GOOGLE_TOKEN_URL,
       });
     } catch (error) {
       setCalendars([]);
