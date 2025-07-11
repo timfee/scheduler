@@ -44,8 +44,8 @@ beforeAll(async () => {
   // Mock the database module to use our test database
   jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
 
-  integrations = await import('../../../infrastructure/database/integrations');
-  actions = await import('../actions');
+  integrations = await import('@/infrastructure/database/integrations');
+  actions = await import('@/app/connections/actions');
 });
 
 afterAll(() => {

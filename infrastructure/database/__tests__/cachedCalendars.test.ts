@@ -41,7 +41,7 @@ beforeAll(async () => {
     },
   );
 
-  const integrations = await import('../integrations');
+  const integrations = await import('@/infrastructure/database/integrations');
   getCachedCalendars = integrations.getCachedCalendars;
 });
 
