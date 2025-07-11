@@ -133,12 +133,6 @@ const caldav = calendarIntegrationVariants.caldav();
 const orderedIntegration = calendarIntegrationVariants.withDisplayOrder(5);
 ```
 
-// Variants
-const intro = appointmentTypeVariants.intro();
-const consultation = appointmentTypeVariants.consultation();
-const custom = appointmentTypeVariants.withDuration(45);
-```
-
 ### Creating Custom Factories
 
 ```typescript
