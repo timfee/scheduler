@@ -1,5 +1,11 @@
 export const DEFAULT_TIMEZONE = "UTC" as const;
 
+export const DEFAULT_BUSINESS_HOURS = {
+  start: '09:00',
+  end: '17:00',
+  timezone: 'America/New_York'
+} as const;
+
 export const ICAL_PROD_ID = {
   company: "example.com",
   product: "scheduler",

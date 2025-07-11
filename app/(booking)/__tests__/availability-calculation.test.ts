@@ -1,12 +1,9 @@
 import { describe, it, expect, beforeAll } from '@jest/globals';
 import { calculateAvailableSlots, getBusinessHoursForDate, type BusyTime, type BusinessHours } from '../server/availability';
+import { DEFAULT_BUSINESS_HOURS } from '@/lib/types/constants';
 
 describe('Availability Calculation', () => {
-  const defaultBusinessHours: BusinessHours = {
-    start: '09:00',
-    end: '17:00',
-    timezone: 'America/New_York'
-  };
+  const defaultBusinessHours: BusinessHours = DEFAULT_BUSINESS_HOURS;
 
   describe('Basic slot generation', () => {
     it('should generate all slots for empty calendar', () => {
@@ -379,11 +376,7 @@ describe('Availability Calculation', () => {
     it('should return default business hours when no template exists', async () => {
       const businessHours = await getBusinessHoursForDate('2024-01-15');
       
-      expect(businessHours).toEqual({
-        start: '09:00',
-        end: '17:00',
-        timezone: 'America/New_York'
-      });
+      expect(businessHours).toEqual(DEFAULT_BUSINESS_HOURS);
     });
   });
 });
