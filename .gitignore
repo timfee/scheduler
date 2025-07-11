@@ -42,3 +42,5 @@ next-env.d.ts
 
 # database file
 scheduler.db
+test.db
+*.db
