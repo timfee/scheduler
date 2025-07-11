@@ -108,8 +108,8 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
     
     const dayAvailability = template[dayName];
     
-    // If the day is not enabled, return no availability
-    if (!dayAvailability.enabled || dayAvailability.slots.length === 0) {
+    // If the day is not defined, return no availability
+    if (!dayAvailability || !dayAvailability.enabled || dayAvailability.slots.length === 0) {
       return {
         start: '09:00',
         end: '09:00', // No availability
