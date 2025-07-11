@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from '@jest/globals';
-import { calculateAvailableSlots, getBusinessHoursForDate, type BusyTime, type BusinessHours } from '../_server/availability';
+import { calculateAvailableSlots, getBusinessHoursForDate, type BusyTime, type BusinessHours } from '../server/availability';
 
 describe('Availability Calculation', () => {
   const defaultBusinessHours: BusinessHours = {
@@ -376,8 +376,8 @@ describe('Availability Calculation', () => {
   });
 
   describe('getBusinessHoursForDate', () => {
-    it('should return default business hours', () => {
-      const businessHours = getBusinessHoursForDate('2024-01-15');
+    it('should return default business hours when no template exists', async () => {
+      const businessHours = await getBusinessHoursForDate('2024-01-15');
       
       expect(businessHours).toEqual({
         start: '09:00',
