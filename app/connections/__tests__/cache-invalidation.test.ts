@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type * as schema from "@/infrastructure/database/schema";
 import { jest } from "@jest/globals";
 import { connectionVariants } from "@test/factories";
@@ -6,6 +7,14 @@ import "@test/setup/jest.setup";
 
 import { sql } from "drizzle-orm";
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+=======
+import { jest } from '@jest/globals';
+import { sql } from 'drizzle-orm';
+import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import type * as schema from '@/infrastructure/database/schema';
+import { connectionVariants } from '@test/factories';
+import '@test/setup/jest.setup';
+>>>>>>> 93a8030 (Reorganize test structure for consistency and implement best practices)
 
 // Mock revalidateTag to verify it's called
 const mockRevalidateTag = jest.fn();
@@ -35,8 +44,13 @@ beforeAll(async () => {
     SQLITE_PATH: ":memory:",
     WEBHOOK_SECRET: "test-webhook-secret-key-that-is-long-enough",
   });
+<<<<<<< HEAD
 
   const dbModule = await import("@/infrastructure/database");
+=======
+  
+  const dbModule = await import('@/infrastructure/database');
+>>>>>>> 93a8030 (Reorganize test structure for consistency and implement best practices)
   db = dbModule.db;
   db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
@@ -58,11 +72,17 @@ describe("Cache Invalidation", () => {
     mockRevalidatePath.mockClear();
   });
 
+<<<<<<< HEAD
   it("should call revalidateTag when creating a connection", async () => {
     const { createConnectionAction } = await import(
       "@/app/connections/actions"
     );
 
+=======
+  it('should call revalidateTag when creating a connection', async () => {
+    const { createConnectionAction } = await import('../actions');
+    
+>>>>>>> 93a8030 (Reorganize test structure for consistency and implement best practices)
     const connectionData = connectionVariants.apple();
     const result = await createConnectionAction(connectionData);
 
@@ -71,11 +91,17 @@ describe("Cache Invalidation", () => {
     expect(mockRevalidateTag).toHaveBeenCalledWith("calendars");
   });
 
+<<<<<<< HEAD
   it("should call revalidateTag when deleting a connection", async () => {
     const { createConnectionAction, deleteConnectionAction } = await import(
       "@/app/connections/actions"
     );
 
+=======
+  it('should call revalidateTag when deleting a connection', async () => {
+    const { createConnectionAction, deleteConnectionAction } = await import('../actions');
+    
+>>>>>>> 93a8030 (Reorganize test structure for consistency and implement best practices)
     // First create a connection
     const connectionData = connectionVariants.apple();
     const created = await createConnectionAction(connectionData);
@@ -91,11 +117,17 @@ describe("Cache Invalidation", () => {
     expect(mockRevalidateTag).toHaveBeenCalledWith("calendars");
   });
 
+<<<<<<< HEAD
   it("should call revalidateTag when updating a connection", async () => {
     const { createConnectionAction, updateConnectionAction } = await import(
       "@/app/connections/actions"
     );
 
+=======
+  it('should call revalidateTag when updating a connection', async () => {
+    const { createConnectionAction, updateConnectionAction } = await import('../actions');
+    
+>>>>>>> 93a8030 (Reorganize test structure for consistency and implement best practices)
     // First create a connection
     const connectionData = connectionVariants.apple();
     const created = await createConnectionAction(connectionData);
@@ -113,11 +145,17 @@ describe("Cache Invalidation", () => {
     expect(mockRevalidateTag).toHaveBeenCalledWith("calendars");
   });
 
+<<<<<<< HEAD
   it("should call revalidateTag when updating calendar order", async () => {
     const { createConnectionAction, updateCalendarOrderAction } = await import(
       "@/app/connections/actions"
     );
 
+=======
+  it('should call revalidateTag when updating calendar order', async () => {
+    const { createConnectionAction, updateCalendarOrderAction } = await import('../actions');
+    
+>>>>>>> 93a8030 (Reorganize test structure for consistency and implement best practices)
     // First create two connections
     const firstConnection = connectionVariants.apple();
     firstConnection.displayName = "First Calendar";
