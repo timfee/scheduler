@@ -8,3 +8,4 @@ export const preferences = sqliteTable("preferences", {
 });
 
 export type Preference = typeof preferences.$inferSelect;
+export type NewPreference = typeof preferences.$inferInsert;
