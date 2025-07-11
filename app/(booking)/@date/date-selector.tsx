@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { addDays, format, startOfDay } from 'date-fns';
 
 interface DateSelectorProps {
-  busyDates: string[];
+  busyDates: string[] | Set<string>;
   selectedDate?: string;
 }
 
@@ -18,7 +18,7 @@ export function DateSelector({ busyDates, selectedDate }: DateSelectorProps) {
     router.push(`?${params.toString()}`);
   };
   
-  const busyDatesSet = new Set(busyDates);
+  const busyDatesSet = busyDates instanceof Set ? busyDates : new Set(busyDates);
   const today = startOfDay(new Date());
   const days = Array.from({ length: 5 }).map((_, i) => addDays(today, i));
   

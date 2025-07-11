@@ -23,6 +23,6 @@ export default async function DatePage({
 
   const busyDates = new Set(busy.map(b => b.startUtc.slice(0, 10)))
 
-  return <DateSelector type={type} busyDates={busyDates} />
+  return <DateSelector type={searchParams.type} busyDates={busyDates} />
 
 }
