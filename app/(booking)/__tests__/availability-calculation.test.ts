@@ -291,7 +291,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_END,
-        timezone: 'TIMEZONES.DEFAULT'
+        timezone: TIMEZONES.DEFAULT
       };
 
       const options = {
