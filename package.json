@@ -13,6 +13,7 @@
     "db:push": "drizzle-kit push:sqlite",
     "db:push:pg": "drizzle-kit push:pg",
     "dev": "next dev --turbopack",
+    "env:generate": "tsx scripts/generate-env.ts",
     "format": "sort-package-json && prettier '**/*.{cjs,mjs,ts,tsx,md,json}' --ignore-path ../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
     "format:check": "prettier '**/*.{cjs,mjs,ts,tsx,md,json}' --ignore-path ../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --check",
     "lint": "eslint",
