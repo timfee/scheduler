@@ -63,7 +63,7 @@ NODE_ENV=development
 =======
   const envPath = join(process.cwd(), '.env.example');
   
-  if (existsSync(envPath)) {
+  if (existsSync(envPath) && !forceOverwrite) {
     console.log('⚠️  .env.example already exists');
     console.log('Generated values:');
 >>>>>>> dfc03e0 (Add GitHub environment setup, CI workflow, and documentation)
