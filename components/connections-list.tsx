@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUp, ArrowDown } from "lucide-react";
@@ -26,6 +27,48 @@ export default function ConnectionsList({
   onDelete,
   onMove,
 }: ConnectionsListProps) {
+  const handleMoveUp = useCallback((id: string) => {
+    onMove(id, "up");
+  }, [onMove]);
+
+  const handleMoveDown = useCallback((id: string) => {
+    onMove(id, "down");
+  }, [onMove]);
+
+  const handleEdit = useCallback((connection: ConnectionListItem) => {
+    onEdit(connection);
+  }, [onEdit]);
+
+  const handleDelete = useCallback((id: string) => {
+    onDelete(id);
+  }, [onDelete]);
+
+  const handleButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
+    const action = button.dataset.action;
+    const connectionId = button.dataset.connectionId;
+    
+    if (!action || !connectionId) return;
+    
+    switch (action) {
+      case 'move-up':
+        handleMoveUp(connectionId);
+        break;
+      case 'move-down':
+        handleMoveDown(connectionId);
+        break;
+      case 'edit':
+        const connection = connections.find(c => c.id === connectionId);
+        if (connection) {
+          handleEdit(connection);
+        }
+        break;
+      case 'delete':
+        handleDelete(connectionId);
+        break;
+    }
+  }, [connections, handleMoveUp, handleMoveDown, handleEdit, handleDelete]);
+
   if (connections.length === 0) {
     return <p className="text-muted-foreground">No calendar connections yet.</p>;
   }
@@ -46,7 +89,9 @@ export default function ConnectionsList({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => onMove(connection.id, "up")}
+                  onClick={handleButtonClick}
+                  data-action="move-up"
+                  data-connection-id={connection.id}
                   aria-label="Move up"
                 >
                   <ArrowUp className="h-4 w-4" />
@@ -54,18 +99,28 @@ export default function ConnectionsList({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => onMove(connection.id, "down")}
+                  onClick={handleButtonClick}
+                  data-action="move-down"
+                  data-connection-id={connection.id}
                   aria-label="Move down"
                 >
                   <ArrowDown className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => onEdit(connection)}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleButtonClick}
+                  data-action="edit"
+                  data-connection-id={connection.id}
+                >
                   Edit
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => onDelete(connection.id)}
+                  onClick={handleButtonClick}
+                  data-action="delete"
+                  data-connection-id={connection.id}
                 >
                   Delete
                 </Button>

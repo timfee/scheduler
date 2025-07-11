@@ -4,7 +4,7 @@ import { addMinutes, format } from 'date-fns'
 import { listBusyTimesAction } from '@/actions/appointments-actions'
 import { getAppointmentType } from '@/app/(booking)/data'
 import { useBookingState } from '@/lib/hooks/use-booking-state'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { TimeSkeleton } from '@/components/booking-skeletons'
 import { Alert } from '@/components/ui/alert'
 
@@ -13,6 +13,18 @@ export default function TimePage() {
   const [slots, setSlots] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const handleSelectTime = useCallback((time: string) => {
+    updateBookingStep({ time })
+  }, [updateBookingStep])
+
+  const handleButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
+    const time = button.dataset.time;
+    if (time) {
+      handleSelectTime(time);
+    }
+  }, [handleSelectTime]);
 
   useEffect(() => {
     if (!type || !date) return
@@ -88,7 +100,8 @@ export default function TimePage() {
         {slots.map((t) => (
           <li key={t}>
             <button
-              onClick={() => updateBookingStep({ time: t })}
+              onClick={handleButtonClick}
+              data-time={t}
               className="w-full text-left p-2 hover:bg-gray-100 rounded border"
             >
               {t}

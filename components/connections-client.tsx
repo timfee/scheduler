@@ -2,19 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import ConnectionForm from "./connection-form";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback } from "react";
 
 import {
   createConnectionAction,
   deleteConnectionAction,
-  testConnectionAction,
   updateConnectionAction,
-  listCalendarsAction,
   getConnectionDetailsAction,
   listCalendarsForConnectionAction,
   listConnectionsAction,
   updateCalendarOrderAction,
-  type CalendarOption,
   type ConnectionFormData,
 } from "@/actions/connections-actions";
 import { type ConnectionListItem } from "@/app/connections/data";
@@ -25,6 +22,8 @@ import {
   type ConnectionFormValues,
   PROVIDER_AUTH_METHODS,
 } from "@/lib/hooks/use-connection-form";
+import { buildConnectionFormData, DEFAULT_GOOGLE_TOKEN_URL } from "@/lib/utils/form-data-builder";
+import { useTestConnection } from "@/lib/hooks/use-test-connection";
 
 interface ConnectionsClientProps {
   initialConnections: ConnectionListItem[];
@@ -49,12 +48,9 @@ export default function ConnectionsClient({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingConnection, setEditingConnection] =
     useState<ConnectionListItem | null>(null);
-  const [testStatus, setTestStatus] = useState<{
-    testing: boolean;
-    success?: boolean;
-    message?: string;
-  }>({ testing: false });
-  const [calendars, setCalendars] = useState<CalendarOption[]>([]);
+
+  // Extract test connection logic
+  const { testStatus, calendars, setCalendars, testConnection, resetTestStatus } = useTestConnection();
 
   // sync state with server-provided data
   useEffect(() => {
@@ -71,82 +67,29 @@ export default function ConnectionsClient({
   } = useConnectionForm();
 
   const handleTestConnection = async () => {
-    const isValid = await form.trigger();
-    if (!isValid) return;
-
-    const values = form.getValues();
-    setTestStatus({ testing: true });
-
-    // Build the connection data based on auth method
-    const testData: Partial<ConnectionFormData> =
-      values.authMethod === "Basic"
-        ? {
-            provider: values.provider,
-            displayName: values.displayName,
-            authMethod: "Basic",
-            username: values.username,
-            password: values.password ?? "",
-            serverUrl: values.serverUrl,
-            calendarUrl: values.calendarUrl,
-            capabilities: values.capabilities,
-          }
-        : {
-            provider: values.provider,
-            displayName: values.displayName,
-            authMethod: "Oauth",
-            username: values.username,
-            refreshToken: values.refreshToken ?? "",
-            clientId: values.clientId ?? "",
-            clientSecret: values.clientSecret ?? "",
-            tokenUrl: values.tokenUrl ?? "",
-            serverUrl: values.serverUrl,
-            calendarUrl: values.calendarUrl,
-            capabilities: values.capabilities,
-          };
-
-    try {
-      await testConnectionAction(values.provider, testData);
-      const calendars = await listCalendarsAction(values.provider, testData);
-      setCalendars(calendars);
-      setTestStatus({ testing: false, success: true, message: "Connection successful!" });
-    } catch (error) {
-      setTestStatus({
-        testing: false,
-        success: false,
-        message: mapErrorToUserMessage(error, "Connection failed"),
-      });
-    }
+    await testConnection(form);
   };
+
+  const resetForm = useCallback(() => {
+    form.reset();
+    setEditingConnection(null);
+    setCalendars([]);
+    resetTestStatus();
+  }, [form, setEditingConnection, setCalendars, resetTestStatus]);
+
+  const handleOpenForm = useCallback(() => {
+    setIsFormOpen(true);
+  }, []);
+
+  const handleCancelForm = useCallback(() => {
+    setIsFormOpen(false);
+    resetForm();
+  }, [resetForm]);
 
   const onSubmit = async (values: FormValues) => {
     try {
-      // Build the connection data based on auth method
-      const connectionData: ConnectionFormData =
-        values.authMethod === "Basic"
-          ? {
-              provider: values.provider,
-              displayName: values.displayName,
-              authMethod: "Basic",
-              username: values.username,
-              password: values.password ?? "",
-              serverUrl: values.serverUrl,
-              calendarUrl: values.calendarUrl,
-              capabilities: values.capabilities,
-            }
-          : {
-              provider: values.provider,
-              displayName: values.displayName,
-              authMethod: "Oauth",
-              username: values.username,
-              refreshToken: values.refreshToken ?? "",
-              clientId: values.clientId ?? "",
-              clientSecret: values.clientSecret ?? "",
-              tokenUrl:
-                values.tokenUrl ?? "https://accounts.google.com/o/oauth2/token",
-              serverUrl: values.serverUrl,
-              calendarUrl: values.calendarUrl,
-              capabilities: values.capabilities,
-            };
+      // Build the connection data using the utility function
+      const connectionData: ConnectionFormData = buildConnectionFormData(values);
 
       if (editingConnection) {
         const optimistic = {
@@ -217,9 +160,9 @@ export default function ConnectionsClient({
 
 
   const handleEdit = async (connection: ConnectionListItem) => {
+    resetTestStatus();
     setEditingConnection(connection);
     setIsFormOpen(true);
-    setTestStatus({ testing: false });
 
     try {
       const [details, calendars] = await Promise.all([
@@ -242,7 +185,7 @@ export default function ConnectionsClient({
         refreshToken: "",
         clientId: "",
         clientSecret: "",
-        tokenUrl: "https://accounts.google.com/o/oauth2/token",
+        tokenUrl: DEFAULT_GOOGLE_TOKEN_URL,
       });
     } catch (error) {
       setCalendars([]);
@@ -250,13 +193,6 @@ export default function ConnectionsClient({
         message: mapErrorToUserMessage(error, "Failed to load connection"),
       });
     }
-  };
-
-  const resetForm = () => {
-    form.reset();
-    setEditingConnection(null);
-    setTestStatus({ testing: false });
-    setCalendars([]);
   };
 
   return (
@@ -273,15 +209,12 @@ export default function ConnectionsClient({
         onProviderChange={handleProviderChange}
         onTestConnection={handleTestConnection}
         onSubmit={onSubmit}
-        onCancel={() => {
-          setIsFormOpen(false);
-          resetForm();
-        }}
+        onCancel={handleCancelForm}
       />
 
       {/* Add Connection Button */}
       {!isFormOpen && (
-        <Button onClick={() => setIsFormOpen(true)}>Add Connection</Button>
+        <Button onClick={handleOpenForm}>Add Connection</Button>
       )}
 
       {/* Connections List */}
