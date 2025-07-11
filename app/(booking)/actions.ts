@@ -154,7 +154,7 @@ export async function createBookingAction(formData: BookingFormData) {
 }
 
 // Export for testing purposes
-export async function clearRateLimiter() {
+export function clearRateLimiter() {
   lastBookingAt.clear();
 }
 
