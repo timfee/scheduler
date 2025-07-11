@@ -27,8 +27,8 @@ export function calculateAvailableSlots(options: AvailabilityOptions): string[] 
   const { date, durationMinutes, businessHours, busyTimes } = options;
   
   // Create business hours in the user's local timezone
-  const businessStart = new Date(`${date}T${businessHours.start}:00`);
-  const businessEnd = new Date(`${date}T${businessHours.end}:00`);
+  const businessStart = set(new Date(date), { hours: parseInt(businessHours.start.split(':')[0]), minutes: parseInt(businessHours.start.split(':')[1]) });
+  const businessEnd = set(new Date(date), { hours: parseInt(businessHours.end.split(':')[0]), minutes: parseInt(businessHours.end.split(':')[1]) });
   
   const availableSlots: string[] = [];
   
