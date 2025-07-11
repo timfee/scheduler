@@ -11,7 +11,7 @@ export default function Navigation() {
     { href: "/", label: "Dashboard" },
     { href: "/admin", label: "Administration" },
     { href: "/appointments", label: "Appointments" },
-    { href: "/availability", label: "Availability" },
+    { href: "/admin/availability", label: "Availability" },
   ];
 
   return (
