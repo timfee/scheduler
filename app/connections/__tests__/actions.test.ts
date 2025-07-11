@@ -78,11 +78,12 @@ describe('createConnectionAction validation', () => {
   });
 
   it('requires OAuth fields', async () => {
-    const connectionData = connectionVariants.google();
-    connectionData.refreshToken = '';
-    connectionData.clientId = '';
-    connectionData.clientSecret = '';
-    connectionData.tokenUrl = '';
+    const connectionData = connectionVariants.google({
+      refreshToken: '',
+      clientId: '',
+      clientSecret: '',
+      tokenUrl: ''
+    });
     
     await expect(
       actions.createConnectionAction(connectionData)
