@@ -48,6 +48,8 @@ beforeAll(async () => {
 describe('Cache Invalidation', () => {
   beforeEach(() => {
     db.run(sql`DELETE FROM calendar_integrations`);
+    mockRevalidateTag.mockClear();
+    mockRevalidatePath.mockClear();
   });
 
   it('should call revalidateTag when creating a connection', async () => {

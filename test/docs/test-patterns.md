@@ -108,6 +108,31 @@ import { appointmentTypeFactory, appointmentTypeVariants } from '@test/factories
 // Basic usage
 const appointmentType = appointmentTypeFactory.build();
 
+// Create specific types
+const intro = appointmentTypeVariants.intro();
+const consultation = appointmentTypeVariants.consultation();
+const followUp = appointmentTypeVariants.followUp();
+
+// Custom duration
+const customDuration = appointmentTypeVariants.withDuration(45);
+```
+
+#### Calendar Integration Factory
+```typescript
+import { calendarIntegrationFactory, calendarIntegrationVariants } from '@test/factories';
+
+// Basic usage
+const integration = calendarIntegrationFactory.build();
+
+// Create provider-specific integrations
+const google = calendarIntegrationVariants.google();
+const apple = calendarIntegrationVariants.apple();
+const caldav = calendarIntegrationVariants.caldav();
+
+// Custom display order
+const orderedIntegration = calendarIntegrationVariants.withDisplayOrder(5);
+```
+
 // Variants
 const intro = appointmentTypeVariants.intro();
 const consultation = appointmentTypeVariants.consultation();

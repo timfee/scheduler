@@ -8,6 +8,8 @@ import {
   connectionVariants,
   appointmentTypeFactory,
   appointmentTypeVariants,
+  calendarIntegrationFactory,
+  calendarIntegrationVariants,
   Factory,
 } from '@test/factories';
 
@@ -39,7 +41,7 @@ describe('Test Factories', () => {
 
     it('should build with sequence', () => {
       const factory = Factory.define(() => ({ name: 'test', count: 1 }));
-      const instances = factory.buildSequence(3, 'name', 'item-');
+      const instances = factory.buildSequence(3, 'name', 'string', 'item-');
       expect(instances).toHaveLength(3);
       expect(instances[0]?.name).toBe('item-1');
       expect(instances[1]?.name).toBe('item-2');
@@ -136,6 +138,38 @@ describe('Test Factories', () => {
     it('should create with custom duration', () => {
       const appointmentType = appointmentTypeVariants.withDuration(45);
       expect(appointmentType.durationMinutes).toBe(45);
+    });
+  });
+
+  describe('Calendar Integration Factory', () => {
+    it('should create calendar integration data', () => {
+      const integration = calendarIntegrationFactory.build();
+      expect(integration).toHaveProperty('id');
+      expect(integration).toHaveProperty('provider');
+      expect(integration).toHaveProperty('displayName');
+      expect(integration).toHaveProperty('encryptedConfig');
+      expect(integration).toHaveProperty('displayOrder');
+      expect(integration).toHaveProperty('createdAt');
+      expect(integration).toHaveProperty('updatedAt');
+    });
+
+    it('should create calendar integration variants', () => {
+      const google = calendarIntegrationVariants.google();
+      expect(google.provider).toBe('google');
+      expect(google.displayName).toBe('Google Calendar');
+      
+      const apple = calendarIntegrationVariants.apple();
+      expect(apple.provider).toBe('apple');
+      expect(apple.displayName).toBe('iCloud Calendar');
+      
+      const caldav = calendarIntegrationVariants.caldav();
+      expect(caldav.provider).toBe('caldav');
+      expect(caldav.displayName).toBe('CalDAV Server');
+    });
+
+    it('should create with custom display order', () => {
+      const integration = calendarIntegrationVariants.withDisplayOrder(5);
+      expect(integration.displayOrder).toBe(5);
     });
   });
 });
