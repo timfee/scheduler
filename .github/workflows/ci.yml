@@ -1,8 +1,11 @@
 name: CI
 
+<<<<<<< HEAD
 permissions:
   contents: read
 
+=======
+>>>>>>> dfc03e0 (Add GitHub environment setup, CI workflow, and documentation)
 on:
   push:
     branches: [ main ]
