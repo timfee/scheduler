@@ -34,7 +34,7 @@ test.describe('Smoke Tests', () => {
     await expect(page.locator('body')).toBeVisible();
     
     // Wait for any async operations to complete
-    await page.waitForTimeout(2000);
+    await page.waitForSelector('body');
     
     // Check that no export errors occurred
     const jsErrors: string[] = [];
