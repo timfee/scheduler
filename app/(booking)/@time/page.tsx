@@ -16,6 +16,7 @@ export default async function TimePage({
   try {
     const [apptType, busy] = await Promise.all([
       getAppointmentType(searchParams.type),
+      listBusyTimesAction(searchParams.date),
     ])
 
     if (!apptType) {
