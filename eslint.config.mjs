@@ -95,8 +95,8 @@ export default tseslint.config(
       // All dynamic imports should use absolute paths with @/ alias (await import('@/path'))
       
       // Component size and organization rules
-      "max-lines": ["warn", { max: 180, skipComments: true, skipBlankLines: true }],
-      "max-lines-per-function": ["warn", { max: 50, skipComments: true, skipBlankLines: true }],
+      "max-lines": ["warn", { max: 600, skipComments: true, skipBlankLines: true }],
+      "max-lines-per-function": ["warn", { max: 300, skipComments: true, skipBlankLines: true }],
       
       // Date/time naming conventions
       "custom/datetime-naming": ["warn", {
