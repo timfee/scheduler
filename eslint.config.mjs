@@ -3,6 +3,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import drizzle from "eslint-plugin-drizzle";
 import importPlugin from "eslint-plugin-import-x";
 import tseslint from "typescript-eslint";
+import customRules from "./eslint-rules/index.js";
 
 const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
@@ -18,6 +19,7 @@ export default tseslint.config(
     plugins: {
       drizzle,
       "import-x": importPlugin,
+      "custom": customRules,
     },
     extends: [
       ...tseslint.configs.recommended,
@@ -95,6 +97,11 @@ export default tseslint.config(
       // Component size and organization rules
       "max-lines": ["warn", { max: 180, skipComments: true, skipBlankLines: true }],
       "max-lines-per-function": ["warn", { max: 50, skipComments: true, skipBlankLines: true }],
+      
+      // Date/time naming conventions
+      "custom/datetime-naming": ["warn", {
+        allowAmbiguous: [], // Don't allow any ambiguous names
+      }],
     },
   },
   {
