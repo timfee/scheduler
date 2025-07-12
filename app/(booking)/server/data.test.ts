@@ -29,10 +29,10 @@ afterAll(() => {
 describe("booking data", () => {
   it("fetches appointment types from database", async () => {
     db.run(
-      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('1', 'Intro', DURATION.DEFAULT_APPOINTMENT_MINUTES, 1, 0, 0)`,
+      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('1', 'Intro', ${DURATION.DEFAULT_APPOINTMENT_MINUTES}, 1, 0, 0)`,
     );
     db.run(
-      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('2', 'Old', DURATION.DEFAULT_APPOINTMENT_MINUTES, 0, 0, 0)`,
+      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('2', 'Old', ${DURATION.DEFAULT_APPOINTMENT_MINUTES}, 0, 0, 0)`,
     );
 
     const list = await data.listAppointmentTypes();
