@@ -1,6 +1,6 @@
 import { getAppointmentType } from "@/app/(booking)/server/data";
 import { listBusyTimesAction } from "@/app/appointments/actions";
-import { TimeSelector } from "./time-selector";
+import { TimeSelectorWrapper } from "@/app/(booking)/components/time-selector-wrapper";
 import { calculateAvailableSlots, type BusinessHours } from "../server/availability-core";
 import { TIME_ZONES } from "@/lib/constants";
 
@@ -49,5 +49,11 @@ export default async function TimePage({
     slots = []
   }
 
-  return <TimeSelector slots={slots} error={error} />
+  return (
+    <TimeSelectorWrapper 
+      slots={slots} 
+      error={error} 
+      selectedTime={searchParams.time}
+    />
+  )
 }

@@ -1,39 +1,48 @@
-'use client'
+"use client";
 
-import { useBookingState } from '@/app/(booking)/hooks/use-booking-state'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useCallback } from 'react'
+import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useCallback } from "react";
 
 interface TimeSelectorProps {
-  type: string | null
-  date: string | null
-  slots: string[]
-  error: string | null
+  type?: string | null;
+  date?: string | null;
+  slots: string[];
+  error: string | null;
+  selectedTime?: string;
+  onSelect?: (time: string) => void;
 }
 
-export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
-  const { updateBookingStep } = useBookingState()
+export function TimeSelector({
+  type,
+  date,
+  slots,
+  error,
+  selectedTime,
+  onSelect,
+}: TimeSelectorProps) {
+  const { updateBookingStep } = useBookingState();
 
   const handleSelectTime = useCallback(
     (selectedTime: string) => {
-      updateBookingStep({ selectedTime })
+      updateBookingStep({ selectedTime });
     },
-    [updateBookingStep],
-  )
+    [updateBookingStep, onSelect],
+  );
 
   const handleButtonClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
-      const button = event.currentTarget
-      const selectedTime = button.dataset.time
+      const button = event.currentTarget;
+      const selectedTime = button.dataset.time;
       if (selectedTime) {
-        handleSelectTime(selectedTime)
+        handleSelectTime(selectedTime);
       }
     },
     [handleSelectTime],
-  )
+  );
 
-  if (!type || !date) {
-    return <p className="text-muted-foreground">Select a date first.</p>
+  if (type === null || date === null) {
+    return <p className="text-muted-foreground">Select a date first.</p>;
   }
 
   if (error) {
@@ -41,11 +50,11 @@ export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
       <Alert variant="destructive">
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   if (slots.length === 0) {
-    return <p className="text-muted-foreground">No times available</p>
+    return <p className="text-muted-foreground">No times available</p>;
   }
 
   return (
@@ -57,7 +66,9 @@ export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
             <button
               onClick={handleButtonClick}
               data-time={t}
-              className="w-full rounded border p-2 text-left hover:bg-gray-100"
+              className={`w-full rounded border p-2 text-left hover:bg-gray-100 ${
+                selectedTime === t ? "border-blue-300 bg-blue-50" : ""
+              }`}
             >
               {t}
             </button>
@@ -65,5 +76,5 @@ export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
         ))}
       </ul>
     </div>
-  )
+  );
 }
