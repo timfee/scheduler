@@ -12,54 +12,8 @@ const { addMinutes, format } = require('date-fns');
 
 console.log('🕐 Timezone Handling Demo\n');
 
-// Mock calculateAvailableSlots function for demo
-function calculateAvailableSlots(options) {
-  const { selectedDate, durationMinutes, businessHours, busyTimes } = options;
-  
-  // Get the timezone from business hours, default to UTC
-  const businessTimeZone = businessHours.timeZone || 'UTC';
-  
-  // Create business hours in the specified timezone, then convert to UTC for calculation
-  const businessStartUtc = fromZonedTime(`${selectedDate}T${businessHours.start}:00`, businessTimeZone);
-  const businessEndUtc = fromZonedTime(`${selectedDate}T${businessHours.end}:00`, businessTimeZone);
-  
-  const availableSlots = [];
-  
-  // Generate all possible slots
-  for (
-    let slotStartUtc = businessStartUtc;
-    slotStartUtc < businessEndUtc;
-    slotStartUtc = addMinutes(slotStartUtc, durationMinutes)
-  ) {
-    const slotEndUtc = addMinutes(slotStartUtc, durationMinutes);
-    
-    // Don't create slots that extend beyond business hours
-    if (slotEndUtc > businessEndUtc) {
-      break;
-    }
-    
-    // Convert slot times to UTC strings for comparison with busy times
-    const slotStartUtcString = slotStartUtc.toISOString().replace(/\.000Z$/, 'Z');
-    const slotEndUtcString = slotEndUtc.toISOString().replace(/\.000Z$/, 'Z');
-    
-    // Check if slot overlaps with any busy time
-    const hasOverlap = busyTimes.some((busy) => {
-      const busyStartUtc = busy.startUtc;
-      const busyEndUtc = busy.endUtc;
-      
-      // Check for overlap: slot starts before busy ends AND slot ends after busy starts
-      return slotStartUtcString < busyEndUtc && slotEndUtcString > busyStartUtc;
-    });
-    
-    if (!hasOverlap) {
-      // Display time in business timezone for user readability
-      const slotDisplayTime = toZonedTime(slotStartUtc, businessTimeZone);
-      availableSlots.push(format(slotDisplayTime, 'HH:mm'));
-    }
-  }
-  
-  return availableSlots;
-}
+// Import calculateAvailableSlots function from core module
+const { calculateAvailableSlots } = require('../availability-core');
 
 // Test 1: EST Business Hours
 console.log('Test 1: EST Business Hours (America/New_York)');
