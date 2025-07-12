@@ -8,7 +8,7 @@ let fetchCalendarOptions: typeof FetchCalOpt;
 beforeAll(async () => {
   jest.resetModules();
   Object.assign(process.env, { 
-    NODE_ENV: 'development',
+    NODE_ENV: 'test',
     ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
     SQLITE_PATH: ':memory:',
     WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',

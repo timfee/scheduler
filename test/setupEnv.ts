@@ -26,7 +26,7 @@ process.env.WEBHOOK_SECRET = "test-webhook-secret-that-is-long-enough-to-meet-re
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).MessagePort = MessagePort;
 
-const { fetch, ProxyAgent, setGlobalDispatcher, Response, Request, Headers } = await import("undici");
+const { fetch, ProxyAgent, setGlobalDispatcher, Response, Request, Headers } = require("undici");
 // Assign fetch globally so tests can perform network requests
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).fetch = fetch as unknown as typeof globalThis.fetch;
@@ -37,7 +37,7 @@ const { fetch, ProxyAgent, setGlobalDispatcher, Response, Request, Headers } = a
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).Headers = Headers;
 
-const { setupServer } = await import("msw/node");
+const { setupServer } = require("msw/node");
 
 export const server = setupServer();
 
