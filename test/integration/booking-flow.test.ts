@@ -61,6 +61,7 @@ const mockCalendarEvent: CalendarEvent = {
 };
 
 beforeAll(async () => {
+  jest.resetModules();
   Object.assign(process.env, {
     NODE_ENV: "development",
     ENCRYPTION_KEY:
