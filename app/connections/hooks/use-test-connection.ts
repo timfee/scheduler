@@ -2,9 +2,9 @@
 
 import { useState, useCallback } from "react";
 import { type ConnectionFormValues } from "@/lib/schemas/connection";
-import { type CalendarOption } from "../server/actions";
-import { testConnectionAction, listCalendarsAction } from "../server/actions";
-import { buildConnectionFormData } from "../utils/form-data-builder";
+import { type CalendarOption } from "@/app/connections/server/actions";
+import { testConnectionAction, listCalendarsAction } from "@/app/connections/server/actions";
+import { buildConnectionFormData } from "@/app/connections/utils/form-data-builder";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { type UseFormReturn } from "react-hook-form";
 
