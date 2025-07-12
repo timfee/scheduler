@@ -1,5 +1,22 @@
 // Use Jest globals for lifecycle hooks and import `jest` for mocking
 import { jest } from '@jest/globals';
+
+// Mock the environment config before any imports
+jest.mock('@/env.config', () => ({
+  default: {
+    SQLITE_PATH: ':memory:',
+    ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
+    WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
+    NODE_ENV: 'test',
+  },
+}));
+
+// Mock the encryption module to avoid env config issues
+jest.mock('@/lib/database/encryption', () => ({
+  encrypt: jest.fn((text: string) => `encrypted:${text}`),
+  decrypt: jest.fn((encryptedText: string) => encryptedText.replace('encrypted:', '')),
+}));
+
 import { createTestDb, cleanupTestDb } from './helpers/db';
 import { calendarIntegrations } from '@/lib/schemas/database';
 import { type CalendarCapability } from '@/lib/types/constants';
@@ -26,7 +43,7 @@ let sqlite: ReturnType<typeof createTestDb>['sqlite'];
 
 beforeAll(async () => {
   Object.assign(process.env, { 
-    NODE_ENV: "development",
+    NODE_ENV: "test",
     ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
     SQLITE_PATH: ':memory:',
     WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
@@ -36,11 +53,16 @@ beforeAll(async () => {
   db = testDb.db;
   sqlite = testDb.sqlite;
 
-  // Provide the test database to integration helpers for ESM modules
-  jest.unstable_mockModule(
-    '@/lib/database',
-    () => ({ db }),
-  );
+  // Make sure modules are reset and mocked properly
+  jest.resetModules();
+  
+  // Mock the database module before importing integrations
+  jest.unstable_mockModule('@/lib/database', () => ({ db }));
+  
+  // Mock next/cache
+  jest.unstable_mockModule('next/cache', () => ({
+    unstable_cache: <T extends (...args: any[]) => any>(fn: T) => fn,
+  }));
 
   const integrations = await import('@/lib/database/integrations');
   createCalendarIntegration = integrations.createCalendarIntegration;

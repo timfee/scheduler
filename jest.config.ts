@@ -72,6 +72,9 @@ const config: JestConfigWithTsJest = {
         "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
         "@test/(.*)": "<rootDir>/test/$1",
       },
+      transformIgnorePatterns: [
+        "node_modules/(?!(envin|zod)/)"
+      ],
       transform: {
         "^.+\\.tsx?$": [
           "ts-jest",

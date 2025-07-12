@@ -116,6 +116,9 @@ export default tseslint.config(
         requireErrorHandling: true,
       }],
       
+      // Date/time formatting rules (ADR-008)
+      "custom/consistent-date-formatting": ["warn"],
+      
       // Constants naming convention - enforce ALL_CAPS for constants
       "@typescript-eslint/naming-convention": [
         "error",

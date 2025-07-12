@@ -1,6 +1,6 @@
 import { listBusyTimesAction } from '@/lib/services/busy-times'
 import { DateSelectorWrapper } from '@/app/(booking)/components/date-selector-wrapper'
-import { addDays, format, startOfDay } from 'date-fns'
+import { createDateRange } from '@/lib/utils/date-range'
 
 export default async function DatePage({
   searchParams
@@ -11,14 +11,9 @@ export default async function DatePage({
     return <p className="text-muted-foreground">Select a type first.</p>
   }
 
-  const today = startOfDay(new Date())
-  const from = today
-  const to = addDays(today, 5)
+  const { from, to } = createDateRange(5)
 
-  const busy = await listBusyTimesAction(
-    format(from, "yyyy-MM-dd'T'HH:mm:ssXXX"),
-    format(to, "yyyy-MM-dd'T'HH:mm:ssXXX"),
-  )
+  const busy = await listBusyTimesAction(from, to)
 
   const busyDates = new Set(busy.map(b => b.startUtc.slice(0, 10)))
 
