@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import { DEV_SERVER, TEST_CONSTANTS } from './lib/constants';
+import { DEV_SERVER, TEST_CONSTANTS } from "@/lib/constants";
 
 /**
  * @see https://playwright.dev/docs/test-configuration

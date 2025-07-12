@@ -1,5 +1,5 @@
 import { type ConnectionFormValues } from "@/lib/schemas/connection";
-import { type ConnectionFormData } from "../server/actions";
+import { type ConnectionFormData } from "@/app/connections/server/actions";
 
 /**
  * Default Google OAuth token URL

@@ -90,6 +90,7 @@ export default tseslint.config(
       ],
       // Consistent imports - prefer absolute paths with @/ alias
       "import-x/no-relative-parent-imports": "error",
+      "custom/enforce-alias-imports": ["error", { allowSameDirectoryImports: true }],
       // Custom rule comment for dynamic imports
       // TODO: Add ESLint rule to catch relative dynamic imports (await import('../path'))
       // All dynamic imports should use absolute paths with @/ alias (await import('@/path'))

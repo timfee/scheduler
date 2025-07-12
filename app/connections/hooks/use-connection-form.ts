@@ -2,12 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormReturn } from "react-hook-form";
-import { type ProviderType } from "../server/actions";
+import { type ProviderType } from "@/app/connections/server/actions";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
 } from "@/lib/schemas/connection";
-import { DEFAULT_GOOGLE_TOKEN_URL } from "../utils/form-data-builder";
+import { DEFAULT_GOOGLE_TOKEN_URL } from "@/app/connections/utils/form-data-builder";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   apple: "Basic",
