@@ -73,10 +73,7 @@ jest.mock('@/lib/schemas/database', () => ({
 }));
 
 jest.mock('@/lib/errors', () => ({
-  mapErrorToUserMessage: jest.fn((error, fallback) => {
-    console.log('Mock error:', error);
-    return fallback;
-  })
+  mapErrorToUserMessage: jest.fn((error, fallback) => fallback)
 }));
 
 jest.mock('next/cache', () => ({
@@ -171,19 +168,6 @@ describe('Appointment Type Server Actions', () => {
 
   describe('getAllAppointmentTypesAction', () => {
     it('should get all appointment types successfully', async () => {
-      const mockDb = require('@/lib/database').db;
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockResolvedValue([{
-          id: 'test-id',
-          name: 'Test Type',
-          description: 'Test Description',
-          durationMinutes: 30,
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }])
-      });
-
       const result = await getAllAppointmentTypesAction();
       
       expect(Array.isArray(result)).toBe(true);
