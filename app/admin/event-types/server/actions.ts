@@ -138,9 +138,6 @@ export async function toggleAppointmentTypeAction(
     }
 
     const currentAppointmentType = current[0];
-    if (!currentAppointmentType) {
-      return { success: false, error: "Appointment type not found" };
-    }
 
     const now = new Date();
     await db
