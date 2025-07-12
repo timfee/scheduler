@@ -1,5 +1,5 @@
 import { listBusyTimesAction } from '@/app/appointments/actions'
-import { DateSelector } from './date-selector'
+import { DateSelectorWrapper } from '@/app/(booking)/components/date-selector-wrapper'
 import { addDays, format, startOfDay } from 'date-fns'
 
 export default async function DatePage({
@@ -20,9 +20,12 @@ export default async function DatePage({
     format(to, "yyyy-MM-dd'T'HH:mm:ssXXX"),
   )
 
-
   const busyDates = new Set(busy.map(b => b.startUtc.slice(0, 10)))
 
-  return <DateSelector busyDates={busyDates} />
-
+  return (
+    <DateSelectorWrapper 
+      busyDates={busyDates} 
+      selectedDate={searchParams.date}
+    />
+  )
 }

@@ -1,8 +1,17 @@
 import { listAppointmentTypes } from '@/app/(booking)/server/data'
-import { AppointmentTypeSelector } from '@/app/(booking)/components/appointment-type-selector'
+import { AppointmentTypeSelectorWrapper } from '@/app/(booking)/components/appointment-type-selector-wrapper'
 
-export default async function AppointmentTypePage() {
+export default async function AppointmentTypePage({
+  searchParams
+}: {
+  searchParams: { type?: string; date?: string; time?: string }
+}) {
   const types = await listAppointmentTypes()
 
-  return <AppointmentTypeSelector types={types} />
+  return (
+    <AppointmentTypeSelectorWrapper 
+      types={types} 
+      selectedType={searchParams.type}
+    />
+  )
 }
