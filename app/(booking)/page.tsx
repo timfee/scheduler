@@ -11,7 +11,7 @@ import { formatDateForBooking } from '@/lib/utils'
 const TOTAL_STEPS = 3
 
 export default function BookingPage() {
-  const { type: appointmentType, date, time, progress, isComplete } = useBookingState()
+  const { type: appointmentType, selectedDate, selectedTime, progress, isComplete } = useBookingState()
   
   if (!isComplete) {
     return (
@@ -36,14 +36,14 @@ export default function BookingPage() {
       }
       
       // Validate all required booking fields are present
-      if (!appointmentType || !date || !time) {
+      if (!appointmentType || !selectedDate || !selectedTime) {
         throw new Error('Missing required booking information')
       }
       
       await createBookingAction({ 
         type: appointmentType, 
-        date: typeof date === 'string' ? date : date instanceof Date ? formatDateForBooking(date) : '', 
-        time: time, 
+        selectedDate: typeof selectedDate === 'string' ? selectedDate : selectedDate instanceof Date ? formatDateForBooking(selectedDate) : '', 
+        selectedTime: selectedTime, 
         name: rawName, 
         email: rawEmail 
       })
@@ -58,8 +58,8 @@ export default function BookingPage() {
       <p className="font-medium">You selected:</p>
       <ul className="list-disc pl-4 mb-4">
         <li>Type: {appointmentType}</li>
-        <li>Date: {date ? formatDateForBooking(date) : ''}</li>
-        <li>Time: {time}</li>
+        <li>Date: {selectedDate ? formatDateForBooking(selectedDate) : ''}</li>
+        <li>Time: {selectedTime}</li>
       </ul>
       <form action={book} className="space-y-2">
         <Input name="name" placeholder="Your name" required />
