@@ -3,6 +3,7 @@
 import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
 import { addDays, format, startOfDay } from "date-fns";
 import { useCallback } from "react";
+import { formatDateForDisplay } from "@/lib/utils/date-range";
 
 interface DateSelectorProps {
   type?: string | null;
@@ -55,7 +56,7 @@ export function DateSelector({
       <h2 className="mb-3 font-medium">Select Date</h2>
       <ul className="space-y-2">
         {days.map((d) => {
-          const iso = format(d, "yyyy-MM-dd");
+          const iso = formatDateForDisplay(d);
           const isBusy = busyDatesSet.has(iso);
           const isSelected =
             selectedDate &&

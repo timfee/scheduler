@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { createTables } from "@/lib/database/migrations";
 import * as schema from "@/lib/schemas/database";
+import { v4 as uuid } from "uuid";
 
 function initDb() {
   // Initialize database
@@ -29,6 +30,50 @@ function initDb() {
           updatedAt: new Date(),
         })
         .run();
+    }
+
+    // Insert default appointment types if they don't exist
+    const existingAppointmentTypes = db
+      .select()
+      .from(schema.appointmentTypes)
+      .all();
+
+    if (existingAppointmentTypes.length === 0) {
+      const now = new Date();
+      
+      await db.insert(schema.appointmentTypes)
+        .values([
+          {
+            id: uuid(),
+            name: "Quick Chat",
+            description: "A brief 15-minute discussion",
+            durationMinutes: 15,
+            isActive: true,
+            createdAt: now,
+            updatedAt: now,
+          },
+          {
+            id: uuid(),
+            name: "Standard Meeting",
+            description: "30-minute meeting for most discussions",
+            durationMinutes: 30,
+            isActive: true,
+            createdAt: now,
+            updatedAt: now,
+          },
+          {
+            id: uuid(),
+            name: "Extended Session",
+            description: "1-hour session for detailed discussions",
+            durationMinutes: 60,
+            isActive: true,
+            createdAt: now,
+            updatedAt: now,
+          },
+        ])
+        .run();
+      
+      console.log("✅ Created default appointment types");
     }
   } catch (error) {
     console.error("Error initializing database:", error);

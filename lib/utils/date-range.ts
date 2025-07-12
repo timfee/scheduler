@@ -10,6 +10,15 @@ export function formatDateForApi(date: Date): string {
 }
 
 /**
+ * Formats a date to ISO date string for display
+ * @param date - The date to format
+ * @returns ISO date string in format: "yyyy-MM-dd"
+ */
+export function formatDateForDisplay(date: Date): string {
+  return format(date, "yyyy-MM-dd");
+}
+
+/**
  * Creates a date range from today for a specified number of days
  * @param days - Number of days from today (default: 7)
  * @returns Object with formatted 'from' and 'to' dates
