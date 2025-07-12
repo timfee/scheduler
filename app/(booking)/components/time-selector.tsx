@@ -5,20 +5,33 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useCallback } from 'react'
 
 interface TimeSelectorProps {
-  type: string | null
-  date: string | null
+  type?: string | null
+  date?: string | null
   slots: string[]
   error: string | null
+  selectedTime?: string
+  onSelect?: (time: string) => void
 }
 
-export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
+export function TimeSelector({ 
+  type, 
+  date, 
+  slots, 
+  error, 
+  selectedTime, 
+  onSelect 
+}: TimeSelectorProps) {
   const { updateBookingStep } = useBookingState()
 
   const handleSelectTime = useCallback(
     (time: string) => {
-      updateBookingStep({ time })
+      if (onSelect) {
+        onSelect(time)
+      } else {
+        updateBookingStep({ time })
+      }
     },
-    [updateBookingStep],
+    [updateBookingStep, onSelect],
   )
 
   const handleButtonClick = useCallback(
@@ -32,7 +45,7 @@ export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
     [handleSelectTime],
   )
 
-  if (!type || !date) {
+  if (type === null || date === null) {
     return <p className="text-muted-foreground">Select a date first.</p>
   }
 
@@ -57,7 +70,9 @@ export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
             <button
               onClick={handleButtonClick}
               data-time={t}
-              className="w-full rounded border p-2 text-left hover:bg-gray-100"
+              className={`w-full rounded border p-2 text-left hover:bg-gray-100 ${
+                selectedTime === t ? 'bg-blue-50 border-blue-300' : ''
+              }`}
             >
               {t}
             </button>

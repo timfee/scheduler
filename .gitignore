@@ -44,4 +44,13 @@ next-env.d.ts
 scheduler.db
 test.db
 *.db
-test-results
+
+# test artifacts
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+
+# IDE and editor files
+.vscode/settings.json
+.idea/
