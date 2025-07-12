@@ -41,7 +41,7 @@ function initDb() {
     if (existingAppointmentTypes.length === 0) {
       const now = new Date();
       
-      db.insert(schema.appointmentTypes)
+      await db.insert(schema.appointmentTypes)
         .values([
           {
             id: uuid(),
