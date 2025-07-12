@@ -1,11 +1,11 @@
 "use server";
 
 import { z } from "zod";
-import { db } from "@/infrastructure/database";
+import { db } from "@/lib/database";
 import {
   buildConfigFromValues,
   mergeConfig,
-} from "@/infrastructure/database/config-utils";
+} from "@/lib/database/config-utils";
 import {
   createCalendarIntegration,
   createDAVClientFromConfig,
@@ -22,7 +22,7 @@ import {
   type CreateCalendarIntegrationInput,
   type ProviderType,
   type UpdateCalendarIntegrationInput,
-} from "@/infrastructure/database/integrations";
+} from "@/lib/database/integrations";
 import { calendarIntegrations } from "@/lib/schemas/database";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { eq } from "drizzle-orm";

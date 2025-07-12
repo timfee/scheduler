@@ -5,8 +5,8 @@ import { mapErrorToUserMessage } from "@/lib/errors";
 import {
   createDAVClientFromIntegration,
   getBookingCalendar,
-} from "@/infrastructure/database/integrations";
-import { createCalDavProvider } from "@/infrastructure/providers/caldav";
+} from "@/lib/database/integrations";
+import { createCalDavProvider } from "@/lib/providers/caldav";
 import { DEFAULT_TIME_ZONE } from "@/lib/types/constants";
 
 import { getAppointmentType } from "./data";

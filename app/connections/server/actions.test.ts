@@ -24,7 +24,7 @@ import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import {
   cleanupTestDb,
   createTestDb,
-} from "../../../infrastructure/database/__tests__/helpers/db";
+} from "../../../lib/database/__tests__/helpers/db";
 import * as schema from "@/lib/schemas/database";
 
 jest.mock("next/cache", () => ({
@@ -45,7 +45,7 @@ let actions: typeof import("../actions");
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let calendarActions: typeof import("../calendar-actions");
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-let integrations: typeof import("../../../infrastructure/database/integrations");
+let integrations: typeof import("../../../lib/database/integrations");
 let db: BetterSQLite3Database<typeof schema>;
 let sqlite: DatabaseType;
 
@@ -63,9 +63,9 @@ beforeAll(async () => {
   sqlite = testDb.sqlite;
 
   // Mock the database module to use our test database
-  jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
+  jest.unstable_mockModule("@/lib/database", () => ({ db }));
 
-  integrations = await import("@/infrastructure/database/integrations");
+  integrations = await import("@/lib/database/integrations");
   actions = await import("@/app/connections/server/actions");
   calendarActions = await import("@/app/connections/server/calendar-actions");
 });

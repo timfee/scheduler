@@ -21,7 +21,7 @@ beforeAll(async () => {
   sqlite = testDb.sqlite;
 
   jest.unstable_mockModule(
-    '@/infrastructure/database',
+    '@/lib/database',
     () => ({ db }),
   );
 
@@ -43,7 +43,7 @@ beforeAll(async () => {
     },
   );
 
-  const integrations = await import('@/infrastructure/database/integrations');
+  const integrations = await import('@/lib/database/integrations');
   getCachedCalendars = integrations.getCachedCalendars;
 });
 

@@ -1,8 +1,8 @@
 import "server-only";
 
-import { db } from "@/infrastructure/database";
+import { db } from "@/lib/database";
 import { unstable_cache } from 'next/cache'
-import { decrypt, encrypt } from "@/infrastructure/database/encryption";
+import { decrypt, encrypt } from "@/lib/database/encryption";
 import {
   calendarIntegrations,
   calendars,

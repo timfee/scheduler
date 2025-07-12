@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import { type createDAVClient } from 'tsdav';
-import { type fetchCalendarOptions as FetchCalOpt } from '@/infrastructure/database/integrations';
+import { type fetchCalendarOptions as FetchCalOpt } from '@/lib/database/integrations';
 
 let fetchCalendarOptions: typeof FetchCalOpt;
 
@@ -14,7 +14,7 @@ beforeAll(async () => {
     WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
   });
 
-  ({ fetchCalendarOptions } = await import('@/infrastructure/database/integrations'));
+  ({ fetchCalendarOptions } = await import('@/lib/database/integrations'));
 });
 
 describe('fetchCalendarOptions', () => {

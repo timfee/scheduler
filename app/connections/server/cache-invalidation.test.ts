@@ -34,7 +34,7 @@ beforeAll(async () => {
     "C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148";
     process.env.SQLITE_PATH = TEST_CONSTANTS.SQLITE_PATH;
 
-  const dbModule = await import("@/infrastructure/database");
+  const dbModule = await import("@/lib/database");
   db = dbModule.db;
   db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
