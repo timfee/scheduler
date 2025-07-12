@@ -6,7 +6,7 @@ import {
   getBookingCalendar,
 } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { DEFAULT_TIMEZONE } from "@/lib/types/constants";
+import { DEFAULT_TIME_ZONE } from "@/lib/types/constants";
 
 import { getAppointmentType } from "./data";
 import { bookingFormSchema, type BookingFormData } from "@/lib/schemas/booking";
@@ -67,7 +67,7 @@ function getTimeSlotKey(startTime: Date, endTime: Date): string {
  */
 export async function createBookingAction(formData: BookingFormData) {
   try {
-    const { type, date, time, name, email } = bookingFormSchema.parse(formData);
+    const { type, selectedDate, selectedTime, name, email } = bookingFormSchema.parse(formData);
 
     // Clean up old entries before rate limit check
     cleanupOldEntries();
@@ -84,7 +84,7 @@ export async function createBookingAction(formData: BookingFormData) {
       throw new Error("Invalid appointment type");
     }
 
-    const start = new Date(`${date}T${time}:00Z`);
+    const start = new Date(`${selectedDate}T${selectedTime}:00Z`);
     const end = new Date(
       start.getTime() + apptType.durationMinutes * 60 * 1000,
     );
@@ -136,7 +136,7 @@ export async function createBookingAction(formData: BookingFormData) {
           description: `Scheduled via booking form for ${email}`,
           startUtc: start.toISOString(),
           endUtc: end.toISOString(),
-          ownerTimeZone: DEFAULT_TIMEZONE,
+          ownerTimeZone: DEFAULT_TIME_ZONE,
           location: "",
         });
       } finally {

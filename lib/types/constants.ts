@@ -1,4 +1,4 @@
-export const DEFAULT_TIMEZONE = "UTC" as const;
+export const DEFAULT_TIME_ZONE = "UTC" as const;
 
 export const ICAL_PROD_ID = {
   company: "example.com",

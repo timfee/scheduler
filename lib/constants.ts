@@ -3,7 +3,7 @@
  */
 
 // Timezone constants
-export const TIMEZONES = {
+export const TIME_ZONES = {
   DEFAULT: 'America/New_York',
 } as const;
 

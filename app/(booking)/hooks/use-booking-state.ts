@@ -2,8 +2,8 @@ import { parseAsString, parseAsIsoDateTime, useQueryStates } from 'nuqs'
 
 export const bookingParsers = {
   type: parseAsString.withDefault(''),
-  date: parseAsIsoDateTime,
-  time: parseAsString.withDefault(''),
+  selectedDate: parseAsIsoDateTime,
+  selectedTime: parseAsString.withDefault(''),
 }
 
 export function useBookingState() {
@@ -15,8 +15,8 @@ export function useBookingState() {
     })
   }
 
-  const progress = [state.type, state.date, state.time].filter(Boolean).length
-  const isComplete = Boolean(state.type && state.date && state.time)
+  const progress = [state.type, state.selectedDate, state.selectedTime].filter(Boolean).length
+  const isComplete = Boolean(state.type && state.selectedDate && state.selectedTime)
 
   return {
     ...state,

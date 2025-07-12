@@ -12,16 +12,16 @@ interface DateSelectorProps {
 export function DateSelector({ type, busyDates }: DateSelectorProps) {
   const { updateBookingStep } = useBookingState()
 
-  const handleSelectDate = useCallback((date: Date) => {
-    updateBookingStep({ date })
+  const handleSelectDate = useCallback((selectedDate: Date) => {
+    updateBookingStep({ selectedDate })
   }, [updateBookingStep])
 
   const handleButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     const button = event.currentTarget
     const dateStr = button.dataset.date
     if (dateStr) {
-      const date = new Date(dateStr)
-      handleSelectDate(date)
+      const selectedDate = new Date(dateStr)
+      handleSelectDate(selectedDate)
     }
   }, [handleSelectDate])
 

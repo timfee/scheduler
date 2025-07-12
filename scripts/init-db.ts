@@ -24,8 +24,8 @@ function initDb() {
     if (existingPrefs.length === 0) {
       db.insert(schema.preferences)
         .values({
-          key: "timezone",
-          value: JSON.stringify({ timezone: "UTC" }),
+          key: "timeZone",
+          value: JSON.stringify({ timeZone: "UTC" }),
           updatedAt: new Date(),
         })
         .run();

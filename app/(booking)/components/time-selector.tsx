@@ -15,8 +15,8 @@ export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
   const { updateBookingStep } = useBookingState()
 
   const handleSelectTime = useCallback(
-    (time: string) => {
-      updateBookingStep({ time })
+    (selectedTime: string) => {
+      updateBookingStep({ selectedTime })
     },
     [updateBookingStep],
   )
@@ -24,9 +24,9 @@ export function TimeSelector({ type, date, slots, error }: TimeSelectorProps) {
   const handleButtonClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const button = event.currentTarget
-      const time = button.dataset.time
-      if (time) {
-        handleSelectTime(time)
+      const selectedTime = button.dataset.time
+      if (selectedTime) {
+        handleSelectTime(selectedTime)
       }
     },
     [handleSelectTime],
