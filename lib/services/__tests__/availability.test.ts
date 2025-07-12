@@ -1,59 +1,37 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
-// Mock the dependencies
+// Mock the dependencies using jest.mock
 const mockGetPreference = jest.fn();
 const mockSetPreference = jest.fn();
-jest.unstable_mockModule('@/lib/utils/preferences', () => ({
+jest.mock('@/lib/utils/preferences', () => ({
   getPreference: mockGetPreference,
   setPreference: mockSetPreference,
 }));
 
 const mockParse = jest.fn();
-jest.unstable_mockModule('@/lib/schemas/availability', () => ({
+jest.mock('@/lib/schemas/availability', () => ({
   weeklyAvailabilitySchema: {
     parse: mockParse,
   },
 }));
 
 const mockMapErrorToUserMessage = jest.fn();
-jest.unstable_mockModule('@/lib/errors', () => ({
+jest.mock('@/lib/errors', () => ({
   mapErrorToUserMessage: mockMapErrorToUserMessage,
 }));
 
 const mockRevalidatePath = jest.fn();
-jest.unstable_mockModule('next/cache', () => ({
+jest.mock('next/cache', () => ({
   revalidatePath: mockRevalidatePath,
 }));
 
-describe('availability service', () => {
-  let saveAvailabilityTemplateAction: (availability: any) => Promise<void>;
-  let loadAvailabilityTemplateAction: () => Promise<any>;
-  let getPreference: jest.MockedFunction<any>;
-  let setPreference: jest.MockedFunction<any>;
-  let weeklyAvailabilitySchema: { parse: jest.MockedFunction<any> };
-  let mapErrorToUserMessage: jest.MockedFunction<any>;
-  let revalidatePath: jest.MockedFunction<any>;
+// Import the service after mocking
+import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from '../availability';
 
-  beforeEach(async () => {
+describe('availability service', () => {
+  beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
-    
-    // Import the mocked dependencies
-    const preferencesModule = await import('@/lib/utils/preferences');
-    const availabilityModule = await import('@/lib/schemas/availability');
-    const errorsModule = await import('@/lib/errors');
-    const nextCacheModule = await import('next/cache');
-    
-    getPreference = preferencesModule.getPreference as jest.MockedFunction<any>;
-    setPreference = preferencesModule.setPreference as jest.MockedFunction<any>;
-    weeklyAvailabilitySchema = availabilityModule.weeklyAvailabilitySchema as { parse: jest.MockedFunction<any> };
-    mapErrorToUserMessage = errorsModule.mapErrorToUserMessage as jest.MockedFunction<any>;
-    revalidatePath = nextCacheModule.revalidatePath as jest.MockedFunction<any>;
-    
-    // Import the module under test
-    const availabilityServiceModule = await import('../availability');
-    saveAvailabilityTemplateAction = availabilityServiceModule.saveAvailabilityTemplateAction;
-    loadAvailabilityTemplateAction = availabilityServiceModule.loadAvailabilityTemplateAction;
   });
 
   describe('saveAvailabilityTemplateAction', () => {
