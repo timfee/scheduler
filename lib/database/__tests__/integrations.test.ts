@@ -17,27 +17,29 @@ jest.mock('@/lib/database/encryption', () => ({
   decrypt: jest.fn((encryptedText: string) => encryptedText.replace('encrypted:', '')),
 }));
 
+// Create test database and mock it before all imports
 import { createTestDb, cleanupTestDb } from './helpers/db';
+const testDb = createTestDb();
+
+// Mock the database instance before any other imports
+jest.mock('@/lib/database', () => ({
+  db: testDb.db,
+}));
+
+// Now import everything else
 import { calendarIntegrations } from '@/lib/schemas/database';
 import { type CalendarCapability } from '@/lib/types/constants';
 import {
+  createCalendarIntegration,
+  updateCalendarIntegration,
+  listCalendarIntegrations,
+  getCalendarIntegration,
+  getBookingCalendar,
+  getCalendarIntegrationsByCapability,
+  deleteCalendarIntegration,
   type OAuthConfig,
-  type createCalendarIntegration as createCal,
-  type updateCalendarIntegration as updateCal,
-  type listCalendarIntegrations as listCals,
-  type getCalendarIntegration as getCal,
-  type getBookingCalendar as getBookingCal,
-  type getCalendarIntegrationsByCapability as getByCap,
-  type deleteCalendarIntegration as deleteCal,
 } from '../integrations';
 
-let createCalendarIntegration: typeof createCal;
-let updateCalendarIntegration: typeof updateCal;
-let listCalendarIntegrations: typeof listCals;
-let getCalendarIntegration: typeof getCal;
-let getBookingCalendar: typeof getBookingCal;
-let getCalendarIntegrationsByCapability: typeof getByCap;
-let deleteCalendarIntegration: typeof deleteCal;
 let db: ReturnType<typeof createTestDb>['db'];
 let sqlite: ReturnType<typeof createTestDb>['sqlite'];
 
@@ -49,34 +51,12 @@ beforeAll(async () => {
     WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
   });
 
-  const testDb = createTestDb();
   db = testDb.db;
   sqlite = testDb.sqlite;
-
-  // Make sure modules are reset and mocked properly
-  jest.resetModules();
-  
-  // Mock the database module before importing integrations
-  jest.unstable_mockModule('@/lib/database', () => ({ db }));
-  
-  // Mock next/cache
-  jest.unstable_mockModule('next/cache', () => ({
-    unstable_cache: <T extends (...args: any[]) => any>(fn: T) => fn,
-  }));
-
-  const integrations = await import('@/lib/database/integrations');
-  createCalendarIntegration = integrations.createCalendarIntegration;
-  updateCalendarIntegration = integrations.updateCalendarIntegration;
-  listCalendarIntegrations = integrations.listCalendarIntegrations;
-  getCalendarIntegration = integrations.getCalendarIntegration;
-  getBookingCalendar = integrations.getBookingCalendar;
-  getCalendarIntegrationsByCapability = integrations.getCalendarIntegrationsByCapability;
-  deleteCalendarIntegration = integrations.deleteCalendarIntegration;
 });
 
 afterAll(() => {
   cleanupTestDb(sqlite);
-  jest.resetModules();
 });
 
 beforeEach(() => {
