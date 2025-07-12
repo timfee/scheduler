@@ -3,8 +3,51 @@ import { type CalDavProvider } from "@/lib/providers/caldav";
 import { type CalendarEvent } from "@/lib/schemas/calendar-event";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 
-let createBookingAction: (d: BookingFormData) => Promise<void>;
+// Mock the data module using jest.mock
+jest.mock("@/app/(booking)/server/data", () => ({
+  getAppointmentType: jest.fn(async () => ({
+    id: "intro",
+    name: "Intro",  
+    durationMinutes: 30,
+    isActive: true,
+    createdAt: 0,
+    updatedAt: 0,
+  })),
+}));
+
+// Mock the database integrations module
+jest.mock("@/lib/database/integrations", () => ({
+  getBookingCalendar: jest.fn(async () => ({
+    id: "1",
+    provider: "caldav",
+    displayName: "Main",
+    encryptedConfig: "",
+    displayOrder: 0,
+    createdAt: 0,
+    updatedAt: 0,
+    config: {
+      calendarUrl: "https://cal",
+      serverUrl: "https://cal",
+      authMethod: "Basic",
+      username: "u",
+      password: "p",
+      capabilities: ["booking"],
+    },
+  })),
+  createDAVClientFromIntegration: jest.fn(async () => ({})),
+}));
+
+// Mock the CalDAV provider
 let provider: Pick<CalDavProvider, "listBusyTimes" | "createAppointment">;
+
+jest.mock("@/lib/providers/caldav", () => ({
+  createCalDavProvider: jest.fn(() => provider),
+}));
+
+// Import the module after mocking
+import { getAppointmentType } from "@/app/(booking)/server/data";
+
+let createBookingAction: (d: BookingFormData) => Promise<void>;
 
 const mockCalendarEvent: CalendarEvent = {
   id: "test-id",
@@ -18,7 +61,6 @@ const mockCalendarEvent: CalendarEvent = {
 };
 
 beforeAll(async () => {
-  jest.resetModules();
   Object.assign(process.env, {
     NODE_ENV: "development",
     ENCRYPTION_KEY:
@@ -32,41 +74,6 @@ beforeAll(async () => {
     listBusyTimes: jest.fn(async () => []),
   };
 
-  jest.unstable_mockModule("@/lib/database/integrations", () => ({
-    getBookingCalendar: jest.fn(async () => ({
-      id: "1",
-      provider: "caldav",
-      displayName: "Main",
-      encryptedConfig: "",
-      displayOrder: 0,
-      createdAt: 0,
-      updatedAt: 0,
-      config: {
-        calendarUrl: "https://cal",
-        serverUrl: "https://cal",
-        authMethod: "Basic",
-        username: "u",
-        password: "p",
-        capabilities: ["booking"],
-      },
-    })),
-    createDAVClientFromIntegration: jest.fn(async () => ({})),
-  }));
-
-  jest.unstable_mockModule("@/lib/providers/caldav", () => ({
-    createCalDavProvider: jest.fn(() => provider),
-  }));
-
-  jest.unstable_mockModule("@/app/(booking)/server/data", () => ({
-    getAppointmentType: jest.fn(async () => ({
-      id: "intro",
-      name: "Intro",
-      durationMinutes: 30,
-      isActive: true,
-      createdAt: 0,
-      updatedAt: 0,
-    })),
-  }));
   ({ createBookingAction } = await import("@/app/(booking)/server/actions"));
 });
 
@@ -74,8 +81,8 @@ describe("booking flow integration", () => {
   it("creates a calendar event", async () => {
     const data: BookingFormData = {
       type: "intro",
-      date: "2024-01-01",
-      time: "10:00",
+      selectedDate: "2024-01-01",
+      selectedTime: "10:00",
       name: "Tester",
       email: "test@example.com",
     };
