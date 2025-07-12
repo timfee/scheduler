@@ -1,12 +1,11 @@
 import { Calendar } from "@/components/ui/calendar";
 import { listBusyTimesAction } from "./actions";
-import { addDays, startOfDay, format } from "date-fns";
+import { createDateRange } from "@/lib/utils/date-range";
 
 export default async function AppointmentsPage() {
-  const from = startOfDay(new Date());
-  const to = addDays(from, 7);
+  const { from, to } = createDateRange(7);
 
-  const busy = await listBusyTimesAction(format(from, "yyyy-MM-dd'T'HH:mm:ssXXX"), format(to, "yyyy-MM-dd'T'HH:mm:ssXXX"));
+  const busy = await listBusyTimesAction(from, to);
 
   return (
     <div className="container mx-auto px-4 py-8">

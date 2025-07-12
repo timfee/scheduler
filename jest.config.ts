@@ -32,15 +32,57 @@ const config: JestConfigWithTsJest = {
   moduleNameMapper: {
     ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),
     "server-only": "<rootDir>/test/__mocks__/server-only.ts",
+    "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
     "@test/(.*)": "<rootDir>/test/$1",
   },
-
-  transform: {
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      { useESM: true, tsconfig: "./tsconfig.jest.json" },
-    ],
-  },
+  
+  // Use node environment for database tests
+  projects: [
+    {
+      displayName: "client",
+      testEnvironment: "jsdom",
+      testMatch: ["<rootDir>/**/*.test.ts", "<rootDir>/**/*.test.tsx"],
+      testPathIgnorePatterns: ["<rootDir>/lib/database/__tests__/.*", "<rootDir>/app/.*/server/.*\\.test\\.ts$"],
+      setupFilesAfterEnv: ["<rootDir>/test/setupEnv.ts"],
+      roots: ["<rootDir>"],
+      modulePaths: [compilerOptions.baseUrl],
+      moduleNameMapper: {
+        ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),
+        "server-only": "<rootDir>/test/__mocks__/server-only.ts",
+        "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
+        "@test/(.*)": "<rootDir>/test/$1",
+      },
+      transform: {
+        "^.+\\.tsx?$": [
+          "ts-jest",
+          { useESM: true, tsconfig: "./tsconfig.jest.json" },
+        ],
+      },
+    },
+    {
+      displayName: "server",
+      testEnvironment: "node",
+      testMatch: ["<rootDir>/lib/database/__tests__/**/*.test.ts", "<rootDir>/app/**/server/**/*.test.ts"],
+      setupFilesAfterEnv: ["<rootDir>/test/setupEnv.ts"],
+      roots: ["<rootDir>"],
+      modulePaths: [compilerOptions.baseUrl],
+      moduleNameMapper: {
+        ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),
+        "server-only": "<rootDir>/test/__mocks__/server-only.ts",
+        "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
+        "@test/(.*)": "<rootDir>/test/$1",
+      },
+      transformIgnorePatterns: [
+        "node_modules/(?!(envin|zod)/)"
+      ],
+      transform: {
+        "^.+\\.tsx?$": [
+          "ts-jest",
+          { useESM: true, tsconfig: "./tsconfig.jest.json" },
+        ],
+      },
+    },
+  ],
 };
 
 export default config;

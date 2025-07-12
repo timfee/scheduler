@@ -4,5 +4,6 @@ module.exports = {
     'file-organization': require('./file-organization'),
     'server-action-patterns': require('./server-action-patterns'),
     'enforce-alias-imports': require('./enforce-alias-imports'),
+    'consistent-date-formatting': require('./consistent-date-formatting'),
   },
 };

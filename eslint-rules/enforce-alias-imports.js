@@ -43,7 +43,16 @@ module.exports = {
             message: `Use alias import (@/) instead of relative import "${source}". Consider using the full path from the project root.`,
             fix(fixer) {
               const currentFile = context.getFilename();
-              const aliasPath = constructAliasPath(context, source, currentFile);
+              const relativePath = require('path').relative(process.cwd(), currentFile);
+              const currentDir = require('path').dirname(relativePath);
+              
+              // Resolve the path
+              let resolvedPath = require('path').resolve(currentDir, source);
+              resolvedPath = require('path').relative(process.cwd(), resolvedPath);
+              
+              // Convert to alias path
+              const aliasPath = '@/' + resolvedPath.replace(/\\/g, '/');
+              
               return fixer.replaceText(node.source, `"${aliasPath}"`);
             },
           });
