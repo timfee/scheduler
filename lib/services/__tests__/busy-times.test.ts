@@ -1,20 +1,20 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 // Mock the dependencies
-jest.unstable_mockModule('next/cache', () => ({
+jest.mock('next/cache', () => ({
   unstable_cache: jest.fn(),
 }));
 
-jest.unstable_mockModule('@/lib/database/integrations', () => ({
+jest.mock('@/lib/database/integrations', () => ({
   getBookingCalendar: jest.fn(),
   createDAVClientFromIntegration: jest.fn(),
 }));
 
-jest.unstable_mockModule('@/lib/providers/caldav', () => ({
+jest.mock('@/lib/providers/caldav', () => ({
   createCalDavProvider: jest.fn(),
 }));
 
-jest.unstable_mockModule('@/lib/errors', () => ({
+jest.mock('@/lib/errors', () => ({
   mapErrorToUserMessage: jest.fn(),
 }));
 

@@ -2,7 +2,7 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 import { type ConnectionListItem } from '../connections';
 
 // Mock the dependencies
-jest.unstable_mockModule('@/lib/database/integrations', () => ({
+jest.mock('@/lib/database/integrations', () => ({
   listCalendarIntegrations: jest.fn(),
   isProviderType: jest.fn(),
 }));
@@ -13,7 +13,7 @@ describe('connections service', () => {
   let isProviderType: jest.MockedFunction<any>;
 
   beforeEach(async () => {
-    // Reset mocks before each test
+    // Reset all mocks
     jest.clearAllMocks();
     
     // Import the mocked dependencies
