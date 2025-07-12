@@ -1,25 +1,25 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EventTypeManager } from "@/app/admin/event-types/components";
+import { AppointmentTypeManager } from "@/app/admin/event-types/components/appointment-type-manager";
 
 export default function AdminEventTypesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Event Type Configuration</h2>
+        <h2 className="text-2xl font-bold">Appointment Type Configuration</h2>
         <p className="text-gray-600 mt-1">
-          Configure different meeting types with durations, locations, and booking rules
+          Configure different appointment types with durations and descriptions
         </p>
       </div>
       
       <Card>
         <CardHeader>
-          <CardTitle>Event Types</CardTitle>
+          <CardTitle>Appointment Types</CardTitle>
           <CardDescription>
-            Define different types of meetings with specific settings for duration, location, and booking rules.
+            Define different types of appointments with specific durations and descriptions.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <EventTypeManager />
+          <AppointmentTypeManager />
         </CardContent>
       </Card>
     </div>
