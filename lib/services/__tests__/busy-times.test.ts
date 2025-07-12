@@ -1,20 +1,20 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 // Mock the dependencies
-jest.unstable_mockModule('next/cache', () => ({
+jest.mock('next/cache', () => ({
   unstable_cache: jest.fn(),
 }));
 
-jest.unstable_mockModule('@/infrastructure/database/integrations', () => ({
+jest.mock('@/lib/database/integrations', () => ({
   getBookingCalendar: jest.fn(),
   createDAVClientFromIntegration: jest.fn(),
 }));
 
-jest.unstable_mockModule('@/infrastructure/providers/caldav', () => ({
+jest.mock('@/lib/providers/caldav', () => ({
   createCalDavProvider: jest.fn(),
 }));
 
-jest.unstable_mockModule('@/lib/errors', () => ({
+jest.mock('@/lib/errors', () => ({
   mapErrorToUserMessage: jest.fn(),
 }));
 
@@ -32,8 +32,8 @@ describe('busy-times service', () => {
     
     // Import the mocked dependencies
     const nextCacheModule = await import('next/cache');
-    const integrationsModule = await import('@/infrastructure/database/integrations');
-    const caldavModule = await import('@/infrastructure/providers/caldav');
+    const integrationsModule = await import('@/lib/database/integrations');
+    const caldavModule = await import('@/lib/providers/caldav');
     const errorsModule = await import('@/lib/errors');
     
     unstable_cache = nextCacheModule.unstable_cache as jest.MockedFunction<any>;

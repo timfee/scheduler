@@ -3,14 +3,15 @@ import {
   createTestDb,
 } from "@/lib/database/__tests__/helpers/db";
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
-import { sql } from "drizzle-orm";
 import { DURATION } from "@/lib/constants";
 
 import type * as bookingData from "../data";
+import type * as adminActions from "../../admin/event-types/server/actions";
 
 let db: ReturnType<typeof createTestDb>["db"];
 let sqlite: ReturnType<typeof createTestDb>["sqlite"];
 let data: typeof bookingData;
+let actions: typeof adminActions;
 
 beforeAll(async () => {
   const testDb = createTestDb();
@@ -19,6 +20,7 @@ beforeAll(async () => {
   jest.unstable_mockModule("@/lib/database", () => ({ db }));
 
   data = await import("@/app/(booking)/server/data");
+  actions = await import("@/app/admin/event-types/server/actions");
 });
 
 afterAll(() => {
@@ -28,18 +30,30 @@ afterAll(() => {
 
 describe("booking data", () => {
   it("fetches appointment types from database", async () => {
-    db.run(
-      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('1', 'Intro', DURATION.DEFAULT_APPOINTMENT_MINUTES, 1, 0, 0)`,
-    );
-    db.run(
-      sql`INSERT INTO appointment_types (id, name, duration_minutes, is_active, created_at, updated_at) VALUES ('2', 'Old', DURATION.DEFAULT_APPOINTMENT_MINUTES, 0, 0, 0)`,
-    );
+    // Use the proper action to create appointment types
+    await actions.createAppointmentTypeAction({
+      name: "Intro",
+      durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
+    });
+    
+    // Create an inactive appointment type
+    await actions.createAppointmentTypeAction({
+      name: "Old",
+      durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
+    });
+    
+    // Toggle the second one to inactive
+    const allTypes = await actions.getAllAppointmentTypesAction();
+    const oldType = allTypes.find(t => t.name === "Old");
+    if (oldType) {
+      await actions.toggleAppointmentTypeAction(oldType.id);
+    }
 
     const list = await data.listAppointmentTypes();
     expect(list).toHaveLength(1);
     expect(list[0]!.name).toBe("Intro");
 
-    const single = await data.getAppointmentType("1");
+    const single = await data.getAppointmentType(list[0]!.id);
     expect(single?.name).toBe("Intro");
   });
 });

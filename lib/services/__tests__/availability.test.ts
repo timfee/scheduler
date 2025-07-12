@@ -1,54 +1,37 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
-// Mock the dependencies
-jest.unstable_mockModule('@/lib/utils/preferences', () => ({
-  getPreference: jest.fn(),
-  setPreference: jest.fn(),
+// Mock the dependencies using jest.mock
+const mockGetPreference = jest.fn();
+const mockSetPreference = jest.fn();
+jest.mock('@/lib/utils/preferences', () => ({
+  getPreference: mockGetPreference,
+  setPreference: mockSetPreference,
 }));
 
-jest.unstable_mockModule('@/lib/schemas/availability', () => ({
+const mockParse = jest.fn();
+jest.mock('@/lib/schemas/availability', () => ({
   weeklyAvailabilitySchema: {
-    parse: jest.fn(),
+    parse: mockParse,
   },
 }));
 
-jest.unstable_mockModule('@/lib/errors', () => ({
-  mapErrorToUserMessage: jest.fn(),
+const mockMapErrorToUserMessage = jest.fn();
+jest.mock('@/lib/errors', () => ({
+  mapErrorToUserMessage: mockMapErrorToUserMessage,
 }));
 
-jest.unstable_mockModule('next/cache', () => ({
-  revalidatePath: jest.fn(),
+const mockRevalidatePath = jest.fn();
+jest.mock('next/cache', () => ({
+  revalidatePath: mockRevalidatePath,
 }));
+
+// Import the service after mocking
+import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from '../availability';
 
 describe('availability service', () => {
-  let saveAvailabilityTemplateAction: (availability: any) => Promise<void>;
-  let loadAvailabilityTemplateAction: () => Promise<any>;
-  let getPreference: jest.MockedFunction<any>;
-  let setPreference: jest.MockedFunction<any>;
-  let weeklyAvailabilitySchema: { parse: jest.MockedFunction<any> };
-  let mapErrorToUserMessage: jest.MockedFunction<any>;
-  let revalidatePath: jest.MockedFunction<any>;
-
-  beforeEach(async () => {
+  beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
-    
-    // Import the mocked dependencies
-    const preferencesModule = await import('@/lib/utils/preferences');
-    const availabilityModule = await import('@/lib/schemas/availability');
-    const errorsModule = await import('@/lib/errors');
-    const nextCacheModule = await import('next/cache');
-    
-    getPreference = preferencesModule.getPreference as jest.MockedFunction<any>;
-    setPreference = preferencesModule.setPreference as jest.MockedFunction<any>;
-    weeklyAvailabilitySchema = availabilityModule.weeklyAvailabilitySchema as { parse: jest.MockedFunction<any> };
-    mapErrorToUserMessage = errorsModule.mapErrorToUserMessage as jest.MockedFunction<any>;
-    revalidatePath = nextCacheModule.revalidatePath as jest.MockedFunction<any>;
-    
-    // Import the module under test
-    const availabilityServiceModule = await import('../availability');
-    saveAvailabilityTemplateAction = availabilityServiceModule.saveAvailabilityTemplateAction;
-    loadAvailabilityTemplateAction = availabilityServiceModule.loadAvailabilityTemplateAction;
   });
 
   describe('saveAvailabilityTemplateAction', () => {
@@ -64,13 +47,13 @@ describe('availability service', () => {
       };
 
       const validatedAvailability = { ...mockAvailability };
-      weeklyAvailabilitySchema.parse.mockReturnValue(validatedAvailability);
-      setPreference.mockResolvedValue(undefined);
+      mockParse.mockReturnValue(validatedAvailability);
+      mockSetPreference.mockResolvedValue(undefined);
 
       await saveAvailabilityTemplateAction(mockAvailability);
 
-      expect(weeklyAvailabilitySchema.parse).toHaveBeenCalledWith(mockAvailability);
-      expect(setPreference).toHaveBeenCalledWith('availability_template', validatedAvailability);
+      expect(mockParse).toHaveBeenCalledWith(mockAvailability);
+      expect(mockSetPreference).toHaveBeenCalledWith('availability_template', validatedAvailability);
     });
 
     it('should revalidate admin pages after saving', async () => {
@@ -84,13 +67,13 @@ describe('availability service', () => {
         sunday: { enabled: false, slots: [] },
       };
 
-      weeklyAvailabilitySchema.parse.mockReturnValue(mockAvailability);
-      setPreference.mockResolvedValue(undefined);
+      mockParse.mockReturnValue(mockAvailability);
+      mockSetPreference.mockResolvedValue(undefined);
 
       await saveAvailabilityTemplateAction(mockAvailability);
 
-      expect(revalidatePath).toHaveBeenCalledWith('/admin/availability');
-      expect(revalidatePath).toHaveBeenCalledWith('/admin');
+      expect(mockRevalidatePath).toHaveBeenCalledWith('/admin/availability');
+      expect(mockRevalidatePath).toHaveBeenCalledWith('/admin');
     });
 
     it('should handle validation errors and map them to user-friendly messages', async () => {
@@ -98,14 +81,14 @@ describe('availability service', () => {
       const validationError = new Error('Invalid availability format');
       const mappedError = 'Failed to save availability template';
 
-      weeklyAvailabilitySchema.parse.mockImplementation(() => {
+      mockParse.mockImplementation(() => {
         throw validationError;
       });
-      mapErrorToUserMessage.mockReturnValue(mappedError);
+      mockMapErrorToUserMessage.mockReturnValue(mappedError);
 
       await expect(saveAvailabilityTemplateAction(mockAvailability)).rejects.toThrow(mappedError);
       
-      expect(mapErrorToUserMessage).toHaveBeenCalledWith(
+      expect(mockMapErrorToUserMessage).toHaveBeenCalledWith(
         validationError,
         'Failed to save availability template'
       );
@@ -125,13 +108,13 @@ describe('availability service', () => {
       const preferenceSaveError = new Error('Database connection failed');
       const mappedError = 'Failed to save availability template';
 
-      weeklyAvailabilitySchema.parse.mockReturnValue(mockAvailability);
-      setPreference.mockRejectedValue(preferenceSaveError);
-      mapErrorToUserMessage.mockReturnValue(mappedError);
+      mockParse.mockReturnValue(mockAvailability);
+      mockSetPreference.mockRejectedValue(preferenceSaveError);
+      mockMapErrorToUserMessage.mockReturnValue(mappedError);
 
       await expect(saveAvailabilityTemplateAction(mockAvailability)).rejects.toThrow(mappedError);
       
-      expect(mapErrorToUserMessage).toHaveBeenCalledWith(
+      expect(mockMapErrorToUserMessage).toHaveBeenCalledWith(
         preferenceSaveError,
         'Failed to save availability template'
       );
@@ -140,12 +123,12 @@ describe('availability service', () => {
 
   describe('loadAvailabilityTemplateAction', () => {
     it('should return null when no template is stored', async () => {
-      getPreference.mockResolvedValue(null);
+      mockGetPreference.mockResolvedValue(null);
 
       const result = await loadAvailabilityTemplateAction();
 
       expect(result).toBeNull();
-      expect(getPreference).toHaveBeenCalledWith('availability_template');
+      expect(mockGetPreference).toHaveBeenCalledWith('availability_template');
     });
 
     it('should return validated template when stored data exists', async () => {
@@ -161,14 +144,14 @@ describe('availability service', () => {
 
       const validatedTemplate = { ...storedTemplate };
 
-      getPreference.mockResolvedValue(storedTemplate);
-      weeklyAvailabilitySchema.parse.mockReturnValue(validatedTemplate);
+      mockGetPreference.mockResolvedValue(storedTemplate);
+      mockParse.mockReturnValue(validatedTemplate);
 
       const result = await loadAvailabilityTemplateAction();
 
       expect(result).toEqual(validatedTemplate);
-      expect(getPreference).toHaveBeenCalledWith('availability_template');
-      expect(weeklyAvailabilitySchema.parse).toHaveBeenCalledWith(storedTemplate);
+      expect(mockGetPreference).toHaveBeenCalledWith('availability_template');
+      expect(mockParse).toHaveBeenCalledWith(storedTemplate);
     });
 
     it('should handle validation errors for stored corrupted data', async () => {
@@ -176,15 +159,15 @@ describe('availability service', () => {
       const validationError = new Error('Invalid stored template');
       const mappedError = 'Failed to load availability template';
 
-      getPreference.mockResolvedValue(corruptedTemplate);
-      weeklyAvailabilitySchema.parse.mockImplementation(() => {
+      mockGetPreference.mockResolvedValue(corruptedTemplate);
+      mockParse.mockImplementation(() => {
         throw validationError;
       });
-      mapErrorToUserMessage.mockReturnValue(mappedError);
+      mockMapErrorToUserMessage.mockReturnValue(mappedError);
 
       await expect(loadAvailabilityTemplateAction()).rejects.toThrow(mappedError);
       
-      expect(mapErrorToUserMessage).toHaveBeenCalledWith(
+      expect(mockMapErrorToUserMessage).toHaveBeenCalledWith(
         validationError,
         'Failed to load availability template'
       );
@@ -194,12 +177,12 @@ describe('availability service', () => {
       const preferenceLoadError = new Error('Database connection failed');
       const mappedError = 'Failed to load availability template';
 
-      getPreference.mockRejectedValue(preferenceLoadError);
-      mapErrorToUserMessage.mockReturnValue(mappedError);
+      mockGetPreference.mockRejectedValue(preferenceLoadError);
+      mockMapErrorToUserMessage.mockReturnValue(mappedError);
 
       await expect(loadAvailabilityTemplateAction()).rejects.toThrow(mappedError);
       
-      expect(mapErrorToUserMessage).toHaveBeenCalledWith(
+      expect(mockMapErrorToUserMessage).toHaveBeenCalledWith(
         preferenceLoadError,
         'Failed to load availability template'
       );
@@ -216,19 +199,19 @@ describe('availability service', () => {
         sunday: { enabled: false, slots: [] },
       };
 
-      getPreference.mockResolvedValue(storedTemplate);
+      mockGetPreference.mockResolvedValue(storedTemplate);
       
       // Mock schema validation to modify the data slightly
       const validatedTemplate = { 
         ...storedTemplate,
         validated: true 
       };
-      weeklyAvailabilitySchema.parse.mockReturnValue(validatedTemplate);
+      mockParse.mockReturnValue(validatedTemplate);
 
       const result = await loadAvailabilityTemplateAction();
 
       expect(result).toEqual(validatedTemplate);
-      expect(weeklyAvailabilitySchema.parse).toHaveBeenCalledWith(storedTemplate);
+      expect(mockParse).toHaveBeenCalledWith(storedTemplate);
     });
   });
 });

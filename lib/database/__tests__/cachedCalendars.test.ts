@@ -11,15 +11,36 @@ jest.mock('@/env.config', () => ({
   },
 }));
 
+// Create test database and mock it before all imports
 import { createTestDb, cleanupTestDb, createTestIntegration } from './helpers/db';
-import { type getCachedCalendars as GetCachedCalendars } from '../integrations';
+const testDb = createTestDb();
 
-let getCachedCalendars: typeof GetCachedCalendars;
+// Mock the database instance before any other imports
+jest.mock('@/lib/database', () => ({
+  db: testDb.db,
+}));
+
+// Mock next/cache to provide caching behavior
+let cached: unknown;
+jest.mock('next/cache', () => ({
+  revalidatePath: jest.fn(),
+  unstable_cache: <T extends (...args: unknown[]) => Promise<unknown>>(fn: T) => {
+    return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+      if (cached === undefined) {
+        cached = await fn(...args);
+      }
+      return cached as ReturnType<T>;
+    };
+  },
+}));
+
+// Now import everything else
+import { getCachedCalendars } from '../integrations';
+
 let db: ReturnType<typeof createTestDb>['db'];
 let sqlite: ReturnType<typeof createTestDb>['sqlite'];
 
 beforeAll(async () => {
-  jest.resetModules();
   Object.assign(process.env, { 
     NODE_ENV: 'test',
     ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
@@ -27,45 +48,18 @@ beforeAll(async () => {
     WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
   });
 
-  const testDb = createTestDb();
   db = testDb.db;
   sqlite = testDb.sqlite;
-
-  jest.unstable_mockModule(
-    '@/lib/database',
-    () => ({ db }),
-  );
-
-  jest.unstable_mockModule(
-    'next/cache',
-    () => {
-      let cached: unknown;
-      return {
-        revalidatePath: jest.fn(),
-        unstable_cache: <T extends (...args: unknown[]) => Promise<unknown>>(fn: T) => {
-          return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
-            if (cached === undefined) {
-              cached = await fn(...args);
-            }
-            return cached as ReturnType<T>;
-          };
-        },
-      };
-    },
-  );
-
-  const integrations = await import('@/lib/database/integrations');
-  getCachedCalendars = integrations.getCachedCalendars;
 });
 
 afterAll(() => {
   cleanupTestDb(sqlite);
-  jest.resetModules();
 });
 
 beforeEach(() => {
   jest.restoreAllMocks();
   db.run(sql`DELETE FROM calendar_integrations`);
+  cached = undefined; // Reset cache for each test
 });
 
 it('caches calendar list between calls', async () => {

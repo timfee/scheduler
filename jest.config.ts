@@ -34,6 +34,9 @@ const config: JestConfigWithTsJest = {
     "server-only": "<rootDir>/test/__mocks__/server-only.ts",
     "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
     "@test/(.*)": "<rootDir>/test/$1",
+    "envin": "<rootDir>/test/__mocks__/envin.ts",
+    "nuqs": "<rootDir>/test/__mocks__/nuqs.ts",
+    "nuqs/adapters/testing": "<rootDir>/test/__mocks__/nuqs.ts",
   },
   
   // Use node environment for database tests
@@ -51,6 +54,9 @@ const config: JestConfigWithTsJest = {
         "server-only": "<rootDir>/test/__mocks__/server-only.ts",
         "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
         "@test/(.*)": "<rootDir>/test/$1",
+        "envin": "<rootDir>/test/__mocks__/envin.ts",
+        "nuqs": "<rootDir>/test/__mocks__/nuqs.ts",
+        "nuqs/adapters/testing": "<rootDir>/test/__mocks__/nuqs.ts",
       },
       transform: {
         "^.+\\.tsx?$": [
@@ -71,6 +77,9 @@ const config: JestConfigWithTsJest = {
         "server-only": "<rootDir>/test/__mocks__/server-only.ts",
         "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
         "@test/(.*)": "<rootDir>/test/$1",
+        "envin": "<rootDir>/test/__mocks__/envin.ts",
+        "nuqs": "<rootDir>/test/__mocks__/nuqs.ts",
+        "nuqs/adapters/testing": "<rootDir>/test/__mocks__/nuqs.ts",
       },
       transformIgnorePatterns: [
         "node_modules/(?!(envin|zod)/)"

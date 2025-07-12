@@ -53,8 +53,8 @@ describe('Test Factories', () => {
     it('should create booking data', () => {
       const booking = bookingFactory.build();
       expect(booking).toHaveProperty('type');
-      expect(booking).toHaveProperty('date');
-      expect(booking).toHaveProperty('time');
+      expect(booking).toHaveProperty('selectedDate');
+      expect(booking).toHaveProperty('selectedTime');
       expect(booking).toHaveProperty('name');
       expect(booking).toHaveProperty('email');
       expect(booking.email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
@@ -70,7 +70,7 @@ describe('Test Factories', () => {
 
     it('should create booking with custom time', () => {
       const booking = bookingVariants.withCustomTime('14:30');
-      expect(booking.time).toBe('14:30');
+      expect(booking.selectedTime).toBe('14:30');
     });
   });
 

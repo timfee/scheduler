@@ -6,11 +6,48 @@ import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@t
 import { DURATION, TEST_CONSTANTS } from '@/lib/constants'
 import '@test/setup/jest.setup'
 
+// Mock the appointment type data
+jest.mock('@/app/(booking)/server/data', () => ({
+  getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
+    id: 'intro',
+    name: 'Intro',
+    durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
+    isActive: true,
+  })),
+}))
+
+// Mock the database integrations
+jest.mock('@/lib/database/integrations', () => ({
+  getBookingCalendar: jest.fn(async () => ({
+    id: "1",
+    provider: "caldav",
+    displayName: "Main",
+    encryptedConfig: "",
+    displayOrder: 0,
+    createdAt: 0,
+    updatedAt: 0,
+    config: {
+      calendarUrl: "https://cal",
+      serverUrl: "https://cal",
+      authMethod: "Basic",
+      username: "u",
+      password: "p",
+      capabilities: ["booking"],
+    },
+  })),
+  createDAVClientFromIntegration: jest.fn(async () => ({})),
+}))
+
+// Mock the CalDAV provider  
+let provider: Pick<CalDavProvider, 'listBusyTimes' | 'createAppointment'>
+
+jest.mock('@/lib/providers/caldav', () => ({
+  createCalDavProvider: jest.fn(() => provider),
+}))
+
 let createBookingAction: (data: BookingFormData) => Promise<void>
 let clearRateLimiter: () => void
 let clearBookingLocks: () => void
-// Create a mock calendar provider with proper typing
-let provider: Pick<CalDavProvider, 'listBusyTimes' | 'createAppointment'>
 
 const mockCalendarEvent: CalendarEvent = calendarEventFactory.build({
   id: 'test-id',
@@ -33,49 +70,6 @@ beforeAll(async () => {
     listBusyTimes: jest.fn(async () => []),
     createAppointment: jest.fn(async () => mockCalendarEvent),
   }
-
-  jest.unstable_mockModule(
-    '@/lib/database/integrations',
-    () => ({
-      getBookingCalendar: jest.fn(async () => ({
-        id: '1',
-        provider: 'caldav',
-        displayName: 'Main',
-        encryptedConfig: '',
-        displayOrder: 0,
-        createdAt: 0,
-        updatedAt: 0,
-        config: {
-          calendarUrl: 'https://cal',
-          serverUrl: 'https://cal',
-          authMethod: 'Basic',
-          username: 'u',
-          password: 'p',
-          capabilities: ['booking'],
-        },
-      })),
-      createDAVClientFromIntegration: jest.fn(async () => ({})),
-    })
-  )
-
-  jest.unstable_mockModule(
-    '@/infrastructure/providers/caldav',
-    () => ({
-      createCalDavProvider: jest.fn(() => provider),
-    })
-  )
-
-  jest.unstable_mockModule(
-    '@/app/(booking)/server/data',
-    () => ({
-      getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
-        id: 'intro',
-        name: 'Intro',
-        durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
-        isActive: true,
-      })),
-    })
-  )
 
   ;({ createBookingAction, clearRateLimiter, clearBookingLocks } = await import('@/app/(booking)/server/actions'))
 })

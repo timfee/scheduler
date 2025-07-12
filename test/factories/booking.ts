@@ -6,8 +6,8 @@ import { type BookingFormData } from '@/lib/schemas/booking';
  */
 export const bookingFactory = Factory.define<BookingFormData>(() => ({
   type: 'intro',
-  date: '2024-01-01',
-  time: '10:00',
+  selectedDate: '2024-01-01',
+  selectedTime: '10:00',
   name: 'Test User',
   email: 'test@example.com',
 }));
@@ -19,7 +19,7 @@ export const bookingVariants = {
   intro: () => bookingFactory.build({ type: 'intro' }),
   followUp: () => bookingFactory.build({ type: 'follow-up' }),
   consultation: () => bookingFactory.build({ type: 'consultation' }),
-  withCustomTime: (time: string) => bookingFactory.build({ time }),
-  withCustomDate: (date: string) => bookingFactory.build({ date }),
+  withCustomTime: (selectedTime: string) => bookingFactory.build({ selectedTime }),
+  withCustomDate: (selectedDate: string) => bookingFactory.build({ selectedDate }),
   withCustomEmail: (email: string) => bookingFactory.build({ email }),
 };

@@ -13,39 +13,67 @@ import {
 jest.mock('@/lib/database', () => ({
   db: {
     insert: jest.fn().mockReturnValue({
-      values: jest.fn().mockResolvedValue({ changes: 1 })
+      values: jest.fn().mockReturnValue({
+        run: jest.fn().mockReturnValue({ changes: 1 })
+      })
     }),
     update: jest.fn().mockReturnValue({
       set: jest.fn().mockReturnValue({
-        where: jest.fn().mockResolvedValue({ changes: 1 })
+        where: jest.fn().mockReturnValue({
+          run: jest.fn().mockReturnValue({ changes: 1 })
+        })
       })
     }),
     delete: jest.fn().mockReturnValue({
-      where: jest.fn().mockResolvedValue({ changes: 1 })
-    }),
-    select: jest.fn().mockReturnValue({
-      from: jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue([{
-            id: 'test-id',
-            name: 'Test Type',
-            description: 'Test Description',
-            durationMinutes: 30,
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }])
-        })
+      where: jest.fn().mockReturnValue({
+        run: jest.fn().mockReturnValue({ changes: 1 })
       })
-    })
+    }),
+    select: jest.fn(() => ({
+      from: jest.fn(() => ({
+        where: jest.fn(() => ({
+          limit: jest.fn(() => ({
+            all: jest.fn(() => [{
+              id: 'test-id',
+              name: 'Test Type',
+              description: 'Test Description',
+              durationMinutes: 30,
+              isActive: true,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }])
+          }))
+        })),
+        all: jest.fn(() => [{
+          id: 'test-id',
+          name: 'Test Type',
+          description: 'Test Description',
+          durationMinutes: 30,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }])
+      }))
+    }))
   }
 }));
 
 jest.mock('@/lib/schemas/database', () => ({
   appointmentTypes: {
     $inferSelect: {},
-    $inferInsert: {}
+    $inferInsert: {},
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    durationMinutes: 'durationMinutes',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   }
+}));
+
+jest.mock('@/lib/errors', () => ({
+  mapErrorToUserMessage: jest.fn((error, fallback) => fallback)
 }));
 
 jest.mock('next/cache', () => ({
@@ -140,19 +168,6 @@ describe('Appointment Type Server Actions', () => {
 
   describe('getAllAppointmentTypesAction', () => {
     it('should get all appointment types successfully', async () => {
-      const mockDb = require('@/lib/database').db;
-      mockDb.select.mockReturnValue({
-        from: jest.fn().mockResolvedValue([{
-          id: 'test-id',
-          name: 'Test Type',
-          description: 'Test Description',
-          durationMinutes: 30,
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }])
-      });
-
       const result = await getAllAppointmentTypesAction();
       
       expect(Array.isArray(result)).toBe(true);

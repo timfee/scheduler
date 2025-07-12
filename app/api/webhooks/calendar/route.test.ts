@@ -1,7 +1,16 @@
 import { TEST_CONSTANTS } from "@/lib/constants";
-import { describe, expect, it, beforeAll } from "@jest/globals";
+import { describe, expect, it, beforeAll, jest } from "@jest/globals";
 import { createHmac } from "crypto";
 import { z } from "zod";
+
+// Mock the webhook signature verification function
+jest.mock("@/lib/webhook-signature", () => ({
+  verifyWebhookSignature: jest.fn(),
+}));
+
+// Now import the route module
+import { POST } from "@/app/api/webhooks/calendar/route";
+import { verifyWebhookSignature } from "@/lib/webhook-signature";
 
 // Response schemas for type-safe API testing
 const successResponseSchema = z.object({
@@ -20,7 +29,7 @@ async function parseApiResponse(response: Response) {
   return apiResponseSchema.parse(data);
 }
 
-// Set up environment variables before importing modules
+// Set up environment variables before running tests
 beforeAll(() => {
   Object.assign(process.env, {
     NODE_ENV: 'development',
@@ -28,14 +37,6 @@ beforeAll(() => {
     SQLITE_PATH: TEST_CONSTANTS.SQLITE_PATH,
     WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
   });
-});
-
-// Import after setting up environment
-let POST: (request: Request) => Promise<Response>;
-
-beforeAll(async () => {
-  const route = await import("@/app/api/webhooks/calendar/route");
-  POST = route.POST;
 });
 
 describe("POST /api/webhooks/calendar", () => {
@@ -66,9 +67,16 @@ describe("POST /api/webhooks/calendar", () => {
     return mockRequest as Request;
   }
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("should return 200 for valid signature", async () => {
     const validSignature = createValidSignature(testPayload, testSecret);
     const request = createMockRequest(testPayload, validSignature);
+
+    // Mock the signature verification to return true
+    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(true);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);
@@ -81,6 +89,9 @@ describe("POST /api/webhooks/calendar", () => {
     const validSignature = createValidSignature(testPayload, testSecret);
     const request = createMockRequest(testPayload, `sha256=${validSignature}`);
 
+    // Mock the signature verification to return true
+    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(true);
+
     const response = await POST(request);
     const data = await parseApiResponse(response);
 
@@ -89,8 +100,10 @@ describe("POST /api/webhooks/calendar", () => {
   });
 
   it("should return 401 for invalid signature", async () => {
-    const invalidSignature = "invalid-signature";
-    const request = createMockRequest(testPayload, invalidSignature);
+    const request = createMockRequest(testPayload, "invalid-signature");
+
+    // Mock the signature verification to return false
+    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(false);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);
@@ -101,6 +114,9 @@ describe("POST /api/webhooks/calendar", () => {
 
   it("should return 401 for missing signature", async () => {
     const request = createMockRequest(testPayload, "");
+
+    // Mock the signature verification to return false
+    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(false);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);
@@ -113,6 +129,9 @@ describe("POST /api/webhooks/calendar", () => {
     const wrongSecret = "wrong-secret-key";
     const invalidSignature = createValidSignature(testPayload, wrongSecret);
     const request = createMockRequest(testPayload, invalidSignature);
+
+    // Mock the signature verification to return false
+    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(false);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);

@@ -6,10 +6,51 @@ import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@t
 import { TEST_CONSTANTS } from '@/lib/constants'
 import '@test/setup/jest.setup'
 
+// Mock the appointment type data
+jest.mock('@/app/(booking)/server/data', () => ({
+  getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
+    id: 'intro',
+    name: 'Intro',
+    durationMinutes: 30,
+    isActive: true,
+  })),
+}))
+
+// Mock the database integrations
+const mockGetBookingCalendar = jest.fn(async () => ({
+  id: "1",
+  provider: "caldav",
+  displayName: "Main",
+  encryptedConfig: "",
+  displayOrder: 0,
+  createdAt: 0,
+  updatedAt: 0,
+  config: {
+    calendarUrl: "https://cal",
+    serverUrl: "https://cal",
+    authMethod: "Basic",
+    username: "u",
+    password: "p",
+    capabilities: ["booking"],
+  },
+}))
+
+const mockCreateDAVClientFromIntegration = jest.fn(async () => ({}))
+
+jest.mock('@/lib/database/integrations', () => ({
+  getBookingCalendar: mockGetBookingCalendar,
+  createDAVClientFromIntegration: mockCreateDAVClientFromIntegration,
+}))
+
+// Mock the CalDAV provider
+let provider: Pick<CalDavProvider, 'listBusyTimes' | 'createAppointment'>
+
+jest.mock('@/lib/providers/caldav', () => ({
+  createCalDavProvider: jest.fn(() => provider),
+}))
+
 let createBookingAction: (data: BookingFormData) => Promise<void>
 let clearRateLimiter: () => void
-// Create a mock calendar provider with proper typing
-let provider: Pick<CalDavProvider, 'listBusyTimes' | 'createAppointment'>
 const validData: BookingFormData = bookingFactory.build()
 
 const mockCalendarEvent: CalendarEvent = calendarEventFactory.build({
@@ -32,49 +73,6 @@ beforeAll(async () => {
     createAppointment: jest.fn(async () => mockCalendarEvent),
   }
 
-  jest.unstable_mockModule(
-    '@/lib/database/integrations',
-    () => ({
-      getBookingCalendar: jest.fn(async () => ({
-        id: '1',
-        provider: 'caldav',
-        displayName: 'Main',
-        encryptedConfig: '',
-        displayOrder: 0,
-        createdAt: 0,
-        updatedAt: 0,
-        config: {
-          calendarUrl: 'https://cal',
-          serverUrl: 'https://cal',
-          authMethod: 'Basic',
-          username: 'u',
-          password: 'p',
-          capabilities: ['booking'],
-        },
-      })),
-      createDAVClientFromIntegration: jest.fn(async () => ({})),
-    })
-  )
-
-  jest.unstable_mockModule(
-    '@/infrastructure/providers/caldav',
-    () => ({
-      createCalDavProvider: jest.fn(() => provider),
-    })
-  )
-
-  jest.unstable_mockModule(
-    '@/app/(booking)/server/data',
-    () => ({
-      getAppointmentType: jest.fn(async () => appointmentTypeFactory.build({
-        id: 'intro',
-        name: 'Intro',
-        durationMinutes: 30,
-        isActive: true,
-      })),
-    })
-  )
-
   ;({ createBookingAction, clearRateLimiter } = await import('@/app/(booking)/server/actions'))
 })
 
@@ -95,16 +93,10 @@ describe('createBookingAction', () => {
   })
 
   it('handles calendar connection errors gracefully', async () => {
-    jest.resetModules()
-    jest.unstable_mockModule(
-      '@/lib/database/integrations',
-      () => ({
-        getBookingCalendar: jest.fn(async () => null),
-        createDAVClientFromIntegration: jest.fn(async () => ({})),
-      })
-    )
-    const { createBookingAction: action } = await import('@/app/(booking)/server/actions')
-    await expect(action(validData)).rejects.toThrow('No booking calendar configured')
+    // Mock getBookingCalendar to return null for this test
+    mockGetBookingCalendar.mockResolvedValueOnce(null)
+    
+    await expect(createBookingAction(validData)).rejects.toThrow('No booking calendar configured')
   })
 
   it('enforces rate limiting per email', async () => {
