@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import {
   createDAVClientFromIntegration,
@@ -148,6 +149,9 @@ export async function createBookingAction(formData: BookingFormData) {
     // Store the lock and await the booking
     bookingLocks.set(timeSlotKey, bookingPromise);
     await bookingPromise;
+    
+    // Invalidate busy times cache after successful booking
+    revalidateTag('busy-times');
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to create booking"));
   }

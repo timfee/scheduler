@@ -86,7 +86,7 @@ module.exports = createRule({
 
       // Check for timezone naming - improved logic
       if ((name.toLowerCase().includes('timezone') || name.toLowerCase().includes('zone')) && 
-          !name.includes('timeZone') && !name.includes('TimeZone')) {
+          !name.includes('timeZone') && !name.includes('TimeZone') && !name.includes('TIME_ZONE')) {
         let suggestion = name;
         if (name.toLowerCase().includes('timezone')) {
           suggestion = name.replace(/[Tt]imezone/g, 'timeZone');

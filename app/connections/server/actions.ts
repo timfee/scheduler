@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { db } from "@/infrastructure/database";
 import {
   buildConfigFromValues,
@@ -184,6 +185,9 @@ export async function deleteConnectionAction(id: string): Promise<void> {
  */
 export async function listConnectionsAction(): Promise<ConnectionListItem[]> {
   try {
+    // Validate - no parameters to validate
+    z.void().parse(undefined);
+    
     const data = await getConnections();
     return data;
   } catch (error) {
@@ -260,7 +264,10 @@ export async function getConnectionDetailsAction(
   id: string,
 ): Promise<ConnectionDetails> {
   try {
-    const integration = await getCalendarIntegration(id);
+    // Validate input
+    const validatedId = z.string().uuid().parse(id);
+    
+    const integration = await getCalendarIntegration(validatedId);
     if (!integration) {
       throw new Error("Connection not found");
     }
@@ -278,7 +285,10 @@ export async function listCalendarsForConnectionAction(
   id: string,
 ): Promise<CalendarOption[]> {
   try {
-    const integration = await getCalendarIntegration(id);
+    // Validate input
+    const validatedId = z.string().uuid().parse(id);
+    
+    const integration = await getCalendarIntegration(validatedId);
     if (!integration) {
       throw new Error("Connection not found");
     }

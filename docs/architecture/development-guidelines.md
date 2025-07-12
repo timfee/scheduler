@@ -279,7 +279,8 @@ feature/
 - **Files:** kebab-case (e.g., `connection-form.tsx`)
 - **Functions:** camelCase (e.g., `createConnection`)
 - **Types:** PascalCase (e.g., `ConnectionFormData`)
-- **Constants:** UPPER_CASE (e.g., `MAX_CONNECTIONS`)
+- **Constants:** UPPER_CASE (e.g., `MAX_CONNECTIONS`, `TIME_ZONES`, `DEFAULT_TIME_ZONE`)
+- **Environment Variables:** UPPER_CASE (e.g., `ENCRYPTION_KEY`, `WEBHOOK_SECRET`)
 
 ### 4. Use TypeScript Strictly
 - Define interfaces for all props and data

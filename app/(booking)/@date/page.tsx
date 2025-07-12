@@ -1,4 +1,4 @@
-import { listBusyTimesAction } from '@/app/appointments/actions'
+import { listBusyTimesAction } from '@/lib/services/busy-times'
 import { DateSelectorWrapper } from '@/app/(booking)/components/date-selector-wrapper'
 import { addDays, format, startOfDay } from 'date-fns'
 

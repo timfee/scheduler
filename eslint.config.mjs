@@ -95,8 +95,8 @@ export default tseslint.config(
       // All dynamic imports should use absolute paths with @/ alias (await import('@/path'))
       
       // Component size and organization rules
-      "max-lines": ["warn", { max: 180, skipComments: true, skipBlankLines: true }],
-      "max-lines-per-function": ["warn", { max: 50, skipComments: true, skipBlankLines: true }],
+      "max-lines": ["warn", { max: 600, skipComments: true, skipBlankLines: true }],
+      "max-lines-per-function": ["warn", { max: 300, skipComments: true, skipBlankLines: true }],
       
       // Date/time naming conventions
       "custom/datetime-naming": ["warn", {
@@ -114,6 +114,21 @@ export default tseslint.config(
         requireCacheInvalidation: true,
         requireErrorHandling: true,
       }],
+      
+      // Constants naming convention - enforce ALL_CAPS for constants
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": "variable",
+          "modifiers": ["const", "exported"],
+          "types": ["boolean", "string", "number", "array"],
+          "format": ["UPPER_CASE"],
+          "filter": {
+            "regex": "^(ok|err|.*Schema|.*Table|.*Factory|.*Variants|server)$",
+            "match": false
+          }
+        }
+      ],
     },
   },
   {

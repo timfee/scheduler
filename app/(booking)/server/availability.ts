@@ -1,5 +1,5 @@
 import { getDay } from 'date-fns';
-import { loadAvailabilityTemplateAction } from '@/app/admin/availability/server/actions';
+import { loadAvailabilityTemplateAction } from '@/lib/services/availability';
 import { type DayOfWeek } from '@/lib/schemas/availability';
 import { TIME_ZONES, BUSINESS_HOURS } from '@/lib/constants';
 
