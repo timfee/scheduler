@@ -17,25 +17,29 @@ jest.mock('@/app/(booking)/server/data', () => ({
 }))
 
 // Mock the database integrations
+const mockGetBookingCalendar = jest.fn(async () => ({
+  id: "1",
+  provider: "caldav",
+  displayName: "Main",
+  encryptedConfig: "",
+  displayOrder: 0,
+  createdAt: 0,
+  updatedAt: 0,
+  config: {
+    calendarUrl: "https://cal",
+    serverUrl: "https://cal",
+    authMethod: "Basic",
+    username: "u",
+    password: "p",
+    capabilities: ["booking"],
+  },
+}))
+
+const mockCreateDAVClientFromIntegration = jest.fn(async () => ({}))
+
 jest.mock('@/lib/database/integrations', () => ({
-  getBookingCalendar: jest.fn(async () => ({
-    id: "1",
-    provider: "caldav",
-    displayName: "Main",
-    encryptedConfig: "",
-    displayOrder: 0,
-    createdAt: 0,
-    updatedAt: 0,
-    config: {
-      calendarUrl: "https://cal",
-      serverUrl: "https://cal",
-      authMethod: "Basic",
-      username: "u",
-      password: "p",
-      capabilities: ["booking"],
-    },
-  })),
-  createDAVClientFromIntegration: jest.fn(async () => ({})),
+  getBookingCalendar: mockGetBookingCalendar,
+  createDAVClientFromIntegration: mockCreateDAVClientFromIntegration,
 }))
 
 // Mock the CalDAV provider
@@ -89,16 +93,10 @@ describe('createBookingAction', () => {
   })
 
   it('handles calendar connection errors gracefully', async () => {
-    jest.resetModules()
-    jest.unstable_mockModule(
-      '@/lib/database/integrations',
-      () => ({
-        getBookingCalendar: jest.fn(async () => null),
-        createDAVClientFromIntegration: jest.fn(async () => ({})),
-      })
-    )
-    const { createBookingAction: action } = await import('@/app/(booking)/server/actions')
-    await expect(action(validData)).rejects.toThrow('No booking calendar configured')
+    // Mock getBookingCalendar to return null for this test
+    mockGetBookingCalendar.mockResolvedValueOnce(null)
+    
+    await expect(createBookingAction(validData)).rejects.toThrow('No booking calendar configured')
   })
 
   it('enforces rate limiting per email', async () => {

@@ -11,7 +11,29 @@ export const useSearchParams = () => ({
 
 export const useQueryState = (key: string) => [null, () => {}];
 
-export const useQueryStates = (keys: Record<string, any>) => [{}, () => {}];
+export const useQueryStates = (parsers: Record<string, any>) => {
+  // Create a simple state object with default values from parsers
+  const [state, setState] = React.useState(() => {
+    const defaultState: Record<string, any> = {};
+    for (const [key, parser] of Object.entries(parsers)) {
+      // Get default value from parser if it has withDefault
+      if (parser && parser.parse && typeof parser.parse === 'function') {
+        // For parsers with withDefault, try to get the default value
+        if (key === 'type') defaultState[key] = '';
+        else if (key === 'selectedTime') defaultState[key] = '';
+        else if (key === 'selectedDate') defaultState[key] = null;
+        else defaultState[key] = null;
+      }
+    }
+    return defaultState;
+  });
+
+  const updateState = (updates: Record<string, any>) => {
+    setState(prevState => ({ ...prevState, ...updates }));
+  };
+
+  return [state, updateState];
+};
 
 export const parseAsInteger = {
   parse: (value: string) => parseInt(value, 10),

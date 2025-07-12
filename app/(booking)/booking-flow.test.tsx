@@ -13,18 +13,18 @@ const mockUseSearchParams = jest.fn()
 jest.mock('next/navigation', () => ({ useSearchParams: mockUseSearchParams }))
 
 function TestComponent() {
-  const { type, date, time, progress, isComplete, updateBookingStep } = useBookingState()
+  const { type, selectedDate, selectedTime, progress, isComplete, updateBookingStep } = useBookingState()
   return (
     <div>
       <span data-testid="type">{type}</span>
-      <span data-testid="date">{date?.toISOString() ?? ''}</span>
-      <span data-testid="time">{time}</span>
+      <span data-testid="date">{selectedDate?.toISOString() ?? ''}</span>
+      <span data-testid="time">{selectedTime}</span>
       <span data-testid="progress">{progress}</span>
       <span data-testid="complete">{isComplete ? 'true' : 'false'}</span>
       <button onClick={() => updateBookingStep({ type: 'intro' })}>set type</button>
-      <button onClick={() => updateBookingStep({ date: new Date('2024-01-01') })}>set date</button>
-      <button onClick={() => updateBookingStep({ time: '10:00' })}>set time</button>
-      <button onClick={() => updateBookingStep({ type: 'intro', date: new Date('2024-01-01'), time: '10:00' })}>set all</button>
+      <button onClick={() => updateBookingStep({ selectedDate: new Date('2024-01-01') })}>set date</button>
+      <button onClick={() => updateBookingStep({ selectedTime: '10:00' })}>set time</button>
+      <button onClick={() => updateBookingStep({ type: 'intro', selectedDate: new Date('2024-01-01'), selectedTime: '10:00' })}>set all</button>
     </div>
   )
 }

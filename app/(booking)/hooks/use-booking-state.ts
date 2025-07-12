@@ -10,9 +10,13 @@ export function useBookingState() {
   const [state, setState] = useQueryStates(bookingParsers)
 
   const updateBookingStep = (updates: Partial<typeof state>) => {
-    setState(updates).catch((error) => {
-      console.error('Failed to update booking state:', error)
-    })
+    const result = setState(updates)
+    // Handle both cases: when setState returns a Promise and when it doesn't
+    if (result && typeof result.catch === 'function') {
+      result.catch((error) => {
+        console.error('Failed to update booking state:', error)
+      })
+    }
   }
 
   const progress = [state.type, state.selectedDate, state.selectedTime].filter(Boolean).length
