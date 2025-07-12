@@ -12,8 +12,9 @@ export function useBookingState() {
   const updateBookingStep = (updates: Partial<typeof state>) => {
     const result = setState(updates)
     // Handle both cases: when setState returns a Promise and when it doesn't
-    if (result && typeof result.catch === 'function') {
-      result.catch((error) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    if (result && typeof result === 'object' && 'catch' in result && typeof result.catch === 'function') {
+      void result.catch((error) => {
         console.error('Failed to update booking state:', error)
       })
     }
