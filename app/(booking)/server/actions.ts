@@ -1,12 +1,13 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import {
   createDAVClientFromIntegration,
   getBookingCalendar,
 } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { DEFAULT_TIME_ZONE } from "@/lib/types/constants";
+import { defaultTimeZone } from "@/lib/types/constants";
 
 import { getAppointmentType } from "./data";
 import { bookingFormSchema, type BookingFormData } from "@/lib/schemas/booking";
@@ -136,7 +137,7 @@ export async function createBookingAction(formData: BookingFormData) {
           description: `Scheduled via booking form for ${email}`,
           startUtc: start.toISOString(),
           endUtc: end.toISOString(),
-          ownerTimeZone: DEFAULT_TIME_ZONE,
+          ownerTimeZone: defaultTimeZone,
           location: "",
         });
       } finally {
@@ -148,6 +149,9 @@ export async function createBookingAction(formData: BookingFormData) {
     // Store the lock and await the booking
     bookingLocks.set(timeSlotKey, bookingPromise);
     await bookingPromise;
+    
+    // Invalidate busy times cache after successful booking
+    revalidateTag('busy-times');
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to create booking"));
   }

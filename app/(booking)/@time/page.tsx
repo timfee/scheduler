@@ -1,8 +1,8 @@
 import { getAppointmentType } from "@/app/(booking)/server/data";
-import { listBusyTimesAction } from "@/app/appointments/actions";
+import { listBusyTimesAction } from "@/lib/services/busy-times";
 import { TimeSelectorWrapper } from "@/app/(booking)/components/time-selector-wrapper";
 import { calculateAvailableSlots, type BusinessHours } from "../server/availability-core";
-import { TIME_ZONES } from "@/lib/constants";
+import { timeZones } from "@/lib/constants";
 
 export default async function TimePage({
   searchParams
@@ -32,7 +32,7 @@ export default async function TimePage({
       const businessHours: BusinessHours = {
         start: '09:00',
         end: '17:00',
-        timeZone: TIME_ZONES.DEFAULT
+        timeZone: timeZones.DEFAULT
       };
 
       // Use the centralized availability calculation function

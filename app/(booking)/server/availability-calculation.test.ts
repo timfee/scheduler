@@ -1,12 +1,12 @@
 import { describe, it, expect } from '@jest/globals';
 import { calculateAvailableSlots, type BusyTime, type BusinessHours } from '../server/availability-core';
-import { TIME_ZONES, BUSINESS_HOURS, DURATION } from '@/lib/constants';
+import { timeZones, BUSINESS_HOURS, DURATION } from '@/lib/constants';
 
 describe('Availability Calculation', () => {
   const defaultBusinessHours: BusinessHours = {
     start: BUSINESS_HOURS.DEFAULT_START,
     end: BUSINESS_HOURS.DEFAULT_END,
-    timeZone: TIME_ZONES.DEFAULT
+    timeZone: timeZones.DEFAULT
   };
 
   describe('Basic slot generation', () => {
@@ -268,7 +268,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_END,
-        timeZone: TIME_ZONES.DEFAULT
+        timeZone: timeZones.DEFAULT
       };
 
       const options = {
@@ -450,7 +450,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_END,
-        timeZone: TIME_ZONES.DEFAULT
+        timeZone: timeZones.DEFAULT
       };
 
       const options = {
@@ -474,7 +474,7 @@ describe('Availability Calculation', () => {
       const businessHours: BusinessHours = {
         start: '22:00',
         end: '23:59',
-        timeZone: TIME_ZONES.DEFAULT
+        timeZone: timeZones.DEFAULT
       };
 
       const options = {
