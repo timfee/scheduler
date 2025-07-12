@@ -25,7 +25,11 @@ export function TimeSelector({
 
   const handleSelectTime = useCallback(
     (selectedTime: string) => {
-      updateBookingStep({ selectedTime });
+      if (onSelect) {
+        onSelect(selectedTime);
+      } else {
+        updateBookingStep({ selectedTime });
+      }
     },
     [updateBookingStep, onSelect],
   );
