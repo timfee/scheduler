@@ -2,6 +2,12 @@
 
 This directory contains Architecture Decision Records (ADRs) and development guidelines for the Scheduler application.
 
+## Quick Start
+
+- **[Architecture Overview](./overview.md)** - High-level architectural approach and patterns
+- **[ADR Template](./templates/adr-template.md)** - Template for documenting new architectural decisions
+- **[Feature Template](./templates/feature-template.md)** - Template for creating new features
+
 ## Architecture Decision Records (ADRs)
 
 ADRs document the important architectural decisions made for this project, including the context, decision, and consequences.
@@ -21,7 +27,8 @@ ADRs document the important architectural decisions made for this project, inclu
 
 ## Templates
 
-- [Feature Template](./templates/feature-template.md)
+- [ADR Template](./templates/adr-template.md) - For documenting architectural decisions
+- [Feature Template](./templates/feature-template.md) - For creating new features
 
 ## Purpose
 
@@ -30,3 +37,4 @@ This documentation serves to:
 - **Maintain consistency**: Help new developers understand established patterns
 - **Preserve working solutions**: Document why current approaches work well
 - **Guide decisions**: Provide clear criteria for architectural choices
+- **Enforce patterns**: Custom ESLint rules automatically detect violations
