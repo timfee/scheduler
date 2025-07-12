@@ -59,7 +59,7 @@ beforeAll(async () => {
   )
 
   jest.unstable_mockModule(
-    '@/infrastructure/providers/caldav',
+    '@/lib/providers/caldav',
     () => ({
       createCalDavProvider: jest.fn(() => provider),
     })

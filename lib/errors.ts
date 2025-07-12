@@ -25,7 +25,23 @@ export type Result<T, E = Error> =
 export const ok = <T>(data: T): Result<T> => ({ success: true, data });
 export const err = <E = Error>(error: E): Result<never, E> => ({ success: false, error });
 
-// Convert errors to user-friendly messages
+/**
+ * Converts unknown errors to user-friendly messages
+ * 
+ * @param error - The error to convert (can be any type)
+ * @param fallback - Optional fallback message if error type is unknown
+ * @returns User-friendly error message string
+ * 
+ * @example
+ * ```ts
+ * try {
+ *   // some operation
+ * } catch (error) {
+ *   const userMessage = mapErrorToUserMessage(error, "Operation failed");
+ *   // Display userMessage to user
+ * }
+ * ```
+ */
 export function mapErrorToUserMessage(error: unknown, fallback?: string): string {
   if (error instanceof CalendarConnectionError) {
     switch (error.code) {

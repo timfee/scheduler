@@ -42,7 +42,7 @@ export async function createAppointmentTypeAction(
       updatedAt: now,
     };
 
-    await db.insert(appointmentTypes).values(newAppointmentType).run();
+    db.insert(appointmentTypes).values(newAppointmentType).run();
     
     // Revalidate cache
     revalidateTag("appointment-types");
@@ -65,7 +65,7 @@ export async function updateAppointmentTypeAction(
   try {
     const now = new Date();
     
-    const result = await db
+    const result = db
       .update(appointmentTypes)
       .set({
         name: data.name,
@@ -74,7 +74,8 @@ export async function updateAppointmentTypeAction(
         isActive: data.isActive,
         updatedAt: now,
       })
-      .where(eq(appointmentTypes.id, data.id));
+      .where(eq(appointmentTypes.id, data.id))
+      .run();
 
     if (result.changes === 0) {
       return { success: false, error: "Appointment type not found" };
@@ -99,9 +100,10 @@ export async function deleteAppointmentTypeAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const result = await db
+    const result = db
       .delete(appointmentTypes)
-      .where(eq(appointmentTypes.id, id));
+      .where(eq(appointmentTypes.id, id))
+      .run();
 
     if (result.changes === 0) {
       return { success: false, error: "Appointment type not found" };
@@ -127,26 +129,28 @@ export async function toggleAppointmentTypeAction(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // First get the current state
-    const current = await db
+    const current = db
       .select()
       .from(appointmentTypes)
       .where(eq(appointmentTypes.id, id))
-      .limit(1);
+      .limit(1)
+      .all();
 
     if (current.length === 0) {
       return { success: false, error: "Appointment type not found" };
     }
 
-    const currentAppointmentType = current[0];
+    const currentAppointmentType = current[0]!;
 
     const now = new Date();
-    await db
+    db
       .update(appointmentTypes)
       .set({
         isActive: !currentAppointmentType.isActive,
         updatedAt: now,
       })
-      .where(eq(appointmentTypes.id, id));
+      .where(eq(appointmentTypes.id, id))
+      .run();
     
     // Revalidate cache
     revalidateTag("appointment-types");
@@ -170,7 +174,7 @@ export async function getAllAppointmentTypesAction(
     // Validate input (no parameters needed but required for linter)
     z.object({}).parse(_input);
     
-    return await db.select().from(appointmentTypes);
+    return db.select().from(appointmentTypes).all();
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to fetch appointment types"));
   }
