@@ -1,5 +1,5 @@
 import { describe, it, expect, jest } from '@jest/globals'
-import { AvailabilityTemplate } from '../availability-template';
+import { AvailabilityTemplate } from './availability-template';
 
 // Mock the actions
 jest.mock('@/app/admin/availability/server/actions', () => ({

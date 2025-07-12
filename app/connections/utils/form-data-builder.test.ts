@@ -1,4 +1,4 @@
-import { buildConnectionFormData } from "../form-data-builder";
+import { buildConnectionFormData } from "./form-data-builder";
 import { type ConnectionFormValues } from "@/lib/schemas/connection";
 
 describe("buildConnectionFormData", () => {
