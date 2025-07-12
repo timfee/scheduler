@@ -114,6 +114,21 @@ export default tseslint.config(
         requireCacheInvalidation: true,
         requireErrorHandling: true,
       }],
+      
+      // Constants naming convention - enforce ALL_CAPS for constants
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": "variable",
+          "modifiers": ["const", "exported"],
+          "types": ["boolean", "string", "number", "array"],
+          "format": ["UPPER_CASE"],
+          "filter": {
+            "regex": "^(ok|err|.*Schema|.*Table|.*Factory|.*Variants|server)$",
+            "match": false
+          }
+        }
+      ],
     },
   },
   {

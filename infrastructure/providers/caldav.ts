@@ -4,7 +4,7 @@ import {
   type CalendarEvent,
   type CalendarEventInput,
 } from "@/lib/schemas/calendar-event";
-import { defaultTimeZone, ICAL_PROD_ID } from "@/lib/types/constants";
+import { DEFAULT_TIME_ZONE, ICAL_PROD_ID } from "@/lib/types/constants";
 import { formatISO, parseISO } from "date-fns";
 import { type createDAVClient } from "tsdav";
 import ical from "ical-generator";
@@ -112,7 +112,7 @@ export function createCalDavProvider(
       id: uid,
       createdUtc: dtstampIso,
       updatedUtc: dtstampIso,
-      ownerTimeZone: validatedInput.ownerTimeZone ?? defaultTimeZone,
+      ownerTimeZone: validatedInput.ownerTimeZone ?? DEFAULT_TIME_ZONE,
       metadata: {},
     };
 

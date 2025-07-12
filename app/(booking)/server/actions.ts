@@ -7,7 +7,7 @@ import {
   getBookingCalendar,
 } from "@/infrastructure/database/integrations";
 import { createCalDavProvider } from "@/infrastructure/providers/caldav";
-import { defaultTimeZone } from "@/lib/types/constants";
+import { DEFAULT_TIME_ZONE } from "@/lib/types/constants";
 
 import { getAppointmentType } from "./data";
 import { bookingFormSchema, type BookingFormData } from "@/lib/schemas/booking";
@@ -137,7 +137,7 @@ export async function createBookingAction(formData: BookingFormData) {
           description: `Scheduled via booking form for ${email}`,
           startUtc: start.toISOString(),
           endUtc: end.toISOString(),
-          ownerTimeZone: defaultTimeZone,
+          ownerTimeZone: DEFAULT_TIME_ZONE,
           location: "",
         });
       } finally {

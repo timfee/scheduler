@@ -1,7 +1,7 @@
 import { getDay } from 'date-fns';
 import { loadAvailabilityTemplateAction } from '@/lib/services/availability';
 import { type DayOfWeek } from '@/lib/schemas/availability';
-import { timeZones, BUSINESS_HOURS } from '@/lib/constants';
+import { TIME_ZONES, BUSINESS_HOURS } from '@/lib/constants';
 
 // Re-export types and functions from the core module
 export { 
@@ -47,7 +47,7 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
       return {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_END,
-        timeZone: timeZones.DEFAULT
+        timeZone: TIME_ZONES.DEFAULT
       };
     }
     
@@ -58,7 +58,7 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
       return {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_START, // No availability
-        timeZone: timeZones.DEFAULT
+        timeZone: TIME_ZONES.DEFAULT
       };
     }
     
@@ -69,14 +69,14 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
       return {
         start: BUSINESS_HOURS.DEFAULT_START,
         end: BUSINESS_HOURS.DEFAULT_START, // No availability
-        timeZone: timeZones.DEFAULT
+        timeZone: TIME_ZONES.DEFAULT
       };
     }
     
     return {
       start: firstSlot.start,
       end: firstSlot.end,
-      timeZone: timeZones.DEFAULT
+      timeZone: TIME_ZONES.DEFAULT
     };
     
   } catch (error) {
@@ -85,7 +85,7 @@ export async function getBusinessHoursForDate(date: string): Promise<BusinessHou
     return {
       start: BUSINESS_HOURS.DEFAULT_START,
       end: BUSINESS_HOURS.DEFAULT_END,
-      timeZone: timeZones.DEFAULT
+      timeZone: TIME_ZONES.DEFAULT
     };
   }
 }
