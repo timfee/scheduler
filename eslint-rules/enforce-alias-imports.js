@@ -42,19 +42,8 @@ module.exports = {
             node: node.source,
             message: `Use alias import (@/) instead of relative import "${source}". Consider using the full path from the project root.`,
             fix(fixer) {
-              // For parent directory imports, we need to construct the full path
-              // This is a simplified fix - in a real implementation, we'd need to resolve the actual path
               const currentFile = context.getFilename();
-              const relativePath = require('path').relative(process.cwd(), currentFile);
-              const currentDir = require('path').dirname(relativePath);
-              
-              // Attempt to resolve the path (this is basic and may need refinement)
-              let resolvedPath = require('path').resolve(currentDir, source);
-              resolvedPath = require('path').relative(process.cwd(), resolvedPath);
-              
-              // Convert to alias path
-              const aliasPath = '@/' + resolvedPath.replace(/\\/g, '/');
-              
+              const aliasPath = constructAliasPath(context, source, currentFile);
               return fixer.replaceText(node.source, `"${aliasPath}"`);
             },
           });
