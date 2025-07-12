@@ -1,5 +1,5 @@
 import { unstable_cache } from 'next/cache'
-import { db } from "@/infrastructure/database";
+import { db } from "@/lib/database";
 import { appointmentTypes } from "@/lib/schemas/database";
 import { eq } from "drizzle-orm";
 

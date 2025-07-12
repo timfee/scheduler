@@ -2,7 +2,7 @@
  
 // Use Jest's injected globals and import `jest` for mocking functions.
 import { jest } from '@jest/globals';
-import { createCalDavProvider } from '@/infrastructure/providers/caldav';
+import { createCalDavProvider } from '@/lib/providers/caldav';
 import { ICAL_PROD_ID } from '@/lib/types/constants';
 import { type createDAVClient } from 'tsdav';
 

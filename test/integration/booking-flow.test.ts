@@ -1,5 +1,5 @@
 import { type BookingFormData } from "@/lib/schemas/booking";
-import { type CalDavProvider } from "@/infrastructure/providers/caldav";
+import { type CalDavProvider } from "@/lib/providers/caldav";
 import { type CalendarEvent } from "@/lib/schemas/calendar-event";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 
@@ -32,7 +32,7 @@ beforeAll(async () => {
     listBusyTimes: jest.fn(async () => []),
   };
 
-  jest.unstable_mockModule("@/infrastructure/database/integrations", () => ({
+  jest.unstable_mockModule("@/lib/database/integrations", () => ({
     getBookingCalendar: jest.fn(async () => ({
       id: "1",
       provider: "caldav",
@@ -53,7 +53,7 @@ beforeAll(async () => {
     createDAVClientFromIntegration: jest.fn(async () => ({})),
   }));
 
-  jest.unstable_mockModule("@/infrastructure/providers/caldav", () => ({
+  jest.unstable_mockModule("@/lib/providers/caldav", () => ({
     createCalDavProvider: jest.fn(() => provider),
   }));
 

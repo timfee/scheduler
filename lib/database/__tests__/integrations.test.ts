@@ -38,11 +38,11 @@ beforeAll(async () => {
 
   // Provide the test database to integration helpers for ESM modules
   jest.unstable_mockModule(
-    '@/infrastructure/database',
+    '@/lib/database',
     () => ({ db }),
   );
 
-  const integrations = await import('@/infrastructure/database/integrations');
+  const integrations = await import('@/lib/database/integrations');
   createCalendarIntegration = integrations.createCalendarIntegration;
   updateCalendarIntegration = integrations.updateCalendarIntegration;
   listCalendarIntegrations = integrations.listCalendarIntegrations;

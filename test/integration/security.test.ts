@@ -15,7 +15,7 @@ const mockDb = {
 };
 
 // Mock database connection using jest.mock - must be at top level before any imports
-jest.mock('@/infrastructure/database', () => ({
+jest.mock('@/lib/database', () => ({
   db: mockDb,
 }));
 

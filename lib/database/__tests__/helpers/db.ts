@@ -1,6 +1,6 @@
 import Database, { type Database as DatabaseType } from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { createTables, dropTables } from "@/infrastructure/database/migrations";
+import { createTables, dropTables } from "@/lib/database/migrations";
 import * as schema from "@/lib/schemas/database";
 
 export function createTestDb() {

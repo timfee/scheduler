@@ -1,8 +1,8 @@
 "use server";
 
 import { unstable_cache } from 'next/cache'
-import { getBookingCalendar, createDAVClientFromIntegration } from "@/infrastructure/database/integrations";
-import { createCalDavProvider } from "@/infrastructure/providers/caldav";
+import { getBookingCalendar, createDAVClientFromIntegration } from "@/lib/database/integrations";
+import { createCalDavProvider } from "@/lib/providers/caldav";
 import { mapErrorToUserMessage } from "@/lib/errors";
 
 const cachedListBusyTimes = async (from: string, to: string) => {

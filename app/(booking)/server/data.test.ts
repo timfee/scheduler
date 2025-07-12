@@ -1,7 +1,7 @@
 import {
   cleanupTestDb,
   createTestDb,
-} from "@/infrastructure/database/__tests__/helpers/db";
+} from "@/lib/database/__tests__/helpers/db";
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { sql } from "drizzle-orm";
 import { DURATION } from "@/lib/constants";
@@ -16,7 +16,7 @@ beforeAll(async () => {
   const testDb = createTestDb();
   db = testDb.db;
   sqlite = testDb.sqlite;
-  jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
+  jest.unstable_mockModule("@/lib/database", () => ({ db }));
 
   data = await import("@/app/(booking)/server/data");
 });

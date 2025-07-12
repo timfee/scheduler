@@ -1,6 +1,6 @@
 import { beforeAll, afterEach, describe, expect, it, jest } from '@jest/globals'
 import { type BookingFormData } from '@/lib/schemas/booking'
-import { type CalDavProvider } from '@/infrastructure/providers/caldav'
+import { type CalDavProvider } from '@/lib/providers/caldav'
 import { type CalendarEvent } from '@/lib/schemas/calendar-event'
 import { bookingFactory, calendarEventFactory, appointmentTypeFactory } from '@test/factories'
 import { TEST_CONSTANTS } from '@/lib/constants'
@@ -33,7 +33,7 @@ beforeAll(async () => {
   }
 
   jest.unstable_mockModule(
-    '@/infrastructure/database/integrations',
+    '@/lib/database/integrations',
     () => ({
       getBookingCalendar: jest.fn(async () => ({
         id: '1',
@@ -97,7 +97,7 @@ describe('createBookingAction', () => {
   it('handles calendar connection errors gracefully', async () => {
     jest.resetModules()
     jest.unstable_mockModule(
-      '@/infrastructure/database/integrations',
+      '@/lib/database/integrations',
       () => ({
         getBookingCalendar: jest.fn(async () => null),
         createDAVClientFromIntegration: jest.fn(async () => ({})),
