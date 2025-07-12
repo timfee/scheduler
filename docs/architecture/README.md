@@ -11,6 +11,8 @@ ADRs document the important architectural decisions made for this project, inclu
 - [ADR-003: Feature-based Architecture](./adr-003-feature-based-architecture.md)
 - [ADR-004: Minimal Dependencies Approach](./adr-004-minimal-dependencies.md)
 - [ADR-005: In-memory Solutions Over External Services](./adr-005-in-memory-solutions.md)
+- [ADR-006: File Organization Patterns](./adr-006-file-organization-patterns.md)
+- [ADR-007: Client-Server Communication Patterns](./adr-007-client-server-communication.md)
 
 ## Development Guidelines
 

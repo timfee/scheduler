@@ -102,6 +102,18 @@ export default tseslint.config(
       "custom/datetime-naming": ["warn", {
         allowAmbiguous: [], // Don't allow any ambiguous names
       }],
+      
+      // File organization patterns (ADR-006)
+      "custom/file-organization": ["error", {
+        features: ["booking", "connections", "admin", "appointments"],
+      }],
+      
+      // Server action patterns (ADR-007)
+      "custom/server-action-patterns": ["error", {
+        requireValidation: true,
+        requireCacheInvalidation: true,
+        requireErrorHandling: true,
+      }],
     },
   },
   {
