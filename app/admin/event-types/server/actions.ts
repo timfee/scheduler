@@ -42,7 +42,7 @@ export async function createAppointmentTypeAction(
       updatedAt: now,
     };
 
-    await db.insert(appointmentTypes).values(newAppointmentType).run();
+    await db.insert(appointmentTypes).values(newAppointmentType);
     
     // Revalidate cache
     revalidateTag("appointment-types");
@@ -137,7 +137,7 @@ export async function toggleAppointmentTypeAction(
       return { success: false, error: "Appointment type not found" };
     }
 
-    const currentAppointmentType = current[0];
+    const currentAppointmentType = current[0]!;
 
     const now = new Date();
     await db
