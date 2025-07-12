@@ -42,7 +42,7 @@ export async function createAppointmentTypeAction(
       updatedAt: now,
     };
 
-    await db.insert(appointmentTypes).values(newAppointmentType);
+    await db.insert(appointmentTypes).values(newAppointmentType).run();
     
     // Revalidate cache
     revalidateTag("appointment-types");
