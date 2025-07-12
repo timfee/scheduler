@@ -22,8 +22,11 @@ export function DateSelector({
   const handleSelectDate = useCallback(
     (selectedDate: Date) => {
       updateBookingStep({ selectedDate });
+      if (onSelect) {
+        onSelect(selectedDate);
+      }
     },
-    [updateBookingStep],
+    [updateBookingStep, onSelect],
   );
 
   const handleButtonClick = useCallback(
