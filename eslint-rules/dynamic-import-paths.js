@@ -81,9 +81,9 @@ module.exports = createRule({
         }
       },
       
-      // Note: await import() expressions are already handled by the ImportExpression handler above
-      
-      // Removed as modern parsers represent dynamic imports as ImportExpression.
+      // Note: Both AwaitExpression > ImportExpression and CallExpression[callee.type="Import"] handlers
+      // were removed as modern parsers represent all dynamic imports as ImportExpression nodes.
+      // The remaining ImportExpression listener above covers all dynamic import scenarios.
     };
   },
 });
