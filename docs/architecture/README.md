@@ -19,6 +19,11 @@ ADRs document the important architectural decisions made for this project, inclu
 - [ADR-005: In-memory Solutions Over External Services](./adr-005-in-memory-solutions.md)
 - [ADR-006: File Organization Patterns](./adr-006-file-organization-patterns.md)
 - [ADR-007: Client-Server Communication Patterns](./adr-007-client-server-communication.md)
+- [ADR-008: Date and Time Handling](./adr-008-date-time-handling.md)
+- [ADR-009: Test Environment Setup](./adr-009-test-environment-setup.md)
+- [ADR-010: Error Handling and User Feedback Patterns](./adr-010-error-handling-patterns.md)
+- [ADR-011: Database Schema Evolution and Migration Patterns](./adr-011-database-schema-evolution.md)
+- [ADR-012: Performance Optimization Strategies](./adr-012-performance-optimization.md)
 
 ## Development Guidelines
 
