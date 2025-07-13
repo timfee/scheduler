@@ -157,9 +157,11 @@ module.exports = createRule({
           );
           
           if (isLargeLibrary && node.specifiers.length > 0) {
-            const specifierType = node.specifiers[0].type;
+            const hasProblematicSpecifier = node.specifiers.some(specifier => 
+              specifier.type === 'ImportNamespaceSpecifier' || specifier.type === 'ImportDefaultSpecifier'
+            );
             
-            if (specifierType === 'ImportNamespaceSpecifier' || specifierType === 'ImportDefaultSpecifier') {
+            if (hasProblematicSpecifier) {
               context.report({
                 node,
                 messageId: 'largeBundle',
