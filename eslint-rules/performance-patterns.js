@@ -156,13 +156,17 @@ module.exports = createRule({
             importPath === lib || importPath.startsWith(`${lib}/`)
           );
           
-          if (isLargeLibrary && 
-              node.specifiers.length > 0 &&
-              node.specifiers[0].type === 'ImportNamespaceSpecifier') {
-            context.report({
-              node,
-              messageId: 'largeBundle',
-            });
+          if (isLargeLibrary && node.specifiers.length > 0) {
+            const hasProblematicSpecifier = node.specifiers.some(specifier => 
+              specifier.type === 'ImportNamespaceSpecifier' || specifier.type === 'ImportDefaultSpecifier'
+            );
+            
+            if (hasProblematicSpecifier) {
+              context.report({
+                node,
+                messageId: 'largeBundle',
+              });
+            }
           }
         }
       },
