@@ -8,6 +8,39 @@ import { mapErrorToUserMessage } from "@/lib/errors";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
 
+/**
+ * Validates appointment type name
+ * @param name - The name to validate
+ * @throws Error if name is invalid
+ */
+function validateAppointmentTypeName(name: string): void {
+  if (!name || name.trim().length === 0) {
+    throw new Error("Name is required");
+  }
+}
+
+/**
+ * Validates appointment type duration
+ * @param durationMinutes - The duration in minutes to validate
+ * @throws Error if duration is invalid
+ */
+function validateAppointmentTypeDuration(durationMinutes: number): void {
+  if (durationMinutes < 1 || durationMinutes > 480) {
+    throw new Error("Duration must be between 1 and 480 minutes");
+  }
+}
+
+/**
+ * Validates appointment type ID
+ * @param id - The ID to validate
+ * @throws Error if ID is invalid
+ */
+function validateAppointmentTypeId(id: string): void {
+  if (!id || id.trim().length === 0) {
+    throw new Error("ID is required");
+  }
+}
+
 export interface CreateAppointmentTypeData {
   name: string;
   description?: string;
@@ -29,13 +62,9 @@ export async function createAppointmentTypeAction(
   data: CreateAppointmentTypeData
 ): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
-    // Basic validation
-    if (!data.name || data.name.trim().length === 0) {
-      throw new Error("Name is required");
-    }
-    if (data.durationMinutes < 1 || data.durationMinutes > 480) {
-      throw new Error("Duration must be between 1 and 480 minutes");
-    }
+    // Validate input data
+    validateAppointmentTypeName(data.name);
+    validateAppointmentTypeDuration(data.durationMinutes);
 
     const now = new Date();
     const id = uuid();
@@ -70,16 +99,10 @@ export async function updateAppointmentTypeAction(
   data: UpdateAppointmentTypeData
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Basic validation
-    if (!data.id || data.id.trim().length === 0) {
-      throw new Error("ID is required");
-    }
-    if (!data.name || data.name.trim().length === 0) {
-      throw new Error("Name is required");
-    }
-    if (data.durationMinutes < 1 || data.durationMinutes > 480) {
-      throw new Error("Duration must be between 1 and 480 minutes");
-    }
+    // Validate input data
+    validateAppointmentTypeId(data.id);
+    validateAppointmentTypeName(data.name);
+    validateAppointmentTypeDuration(data.durationMinutes);
 
     const now = new Date();
     
@@ -117,10 +140,8 @@ export async function deleteAppointmentTypeAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Basic validation
-    if (!id || id.trim().length === 0) {
-      throw new Error("ID is required");
-    }
+    // Validate input data
+    validateAppointmentTypeId(id);
 
     const result = db
       .delete(appointmentTypes)
@@ -149,10 +170,8 @@ export async function toggleAppointmentTypeAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Basic validation
-    if (!id || id.trim().length === 0) {
-      throw new Error("ID is required");
-    }
+    // Validate input data
+    validateAppointmentTypeId(id);
 
     // First get the current state
     const current = db
