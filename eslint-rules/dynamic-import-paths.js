@@ -80,64 +80,6 @@ module.exports = createRule({
           }
         }
       },
-      
-      // Handle dynamic imports in await expressions: await import('path')
-      'AwaitExpression > ImportExpression'(node) {
-        // Skip test files if configured to allow them
-        if (options.allowTestFiles && isTestFile(filename)) {
-          return;
-        }
-        
-        if (node.source.type === 'Literal' && typeof node.source.value === 'string') {
-          const importPath = node.source.value;
-          
-          if (isRelativePath(importPath)) {
-            if (isParentDirectoryPath(importPath)) {
-              context.report({
-                node: node.source,
-                messageId: 'parentDirectoryImport',
-                data: { path: importPath },
-              });
-            } else {
-              context.report({
-                node: node.source,
-                messageId: 'relativeDynamicImport',
-                data: { path: importPath },
-              });
-            }
-          }
-        }
-      },
-      
-      // Handle dynamic imports in call expressions: import('path')
-      'CallExpression[callee.type="Import"]'(node) {
-        // Skip test files if configured to allow them
-        if (options.allowTestFiles && isTestFile(filename)) {
-          return;
-        }
-        
-        if (node.arguments[0] && 
-            node.arguments[0].type === 'Literal' && 
-            typeof node.arguments[0].value === 'string') {
-          const importPath = node.arguments[0].value;
-          
-          if (isRelativePath(importPath)) {
-            if (isParentDirectoryPath(importPath)) {
-              context.report({
-                node: node.arguments[0],
-                messageId: 'parentDirectoryImport',
-                data: { path: importPath },
-              });
-            } else {
-              context.report({
-                node: node.arguments[0],
-                messageId: 'relativeDynamicImport',
-                data: { path: importPath },
-              });
-            }
-          }
-        }
-      },
     };
   },
 });
