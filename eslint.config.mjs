@@ -91,10 +91,14 @@ export default tseslint.config(
       // Consistent imports - prefer absolute paths with @/ alias
       "import-x/no-relative-parent-imports": "error",
       "custom/enforce-alias-imports": ["error", { allowSameDirectoryImports: true }],
-      // Custom rule comment for dynamic imports
-      // TODO: Add ESLint rule to catch relative dynamic imports in production code (await import('../path'))
-      // All dynamic imports in production code should use absolute paths with @/ alias (await import('@/path'))
-      // Test files are excluded as they commonly use relative imports for modules under test
+      // Dynamic import paths should use absolute paths with @/ alias
+      "custom/dynamic-import-paths": ["error", { allowTestFiles: true }],
+      
+      // Performance optimization patterns
+      "custom/performance-patterns": ["warn", {
+        maxQueryResults: 100,
+        warnOnLargeImports: true,
+      }],
       
       // Component size and organization rules
       "max-lines": ["warn", { max: 600, skipComments: true, skipBlankLines: true }],

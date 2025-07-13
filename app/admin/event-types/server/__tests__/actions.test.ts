@@ -6,7 +6,7 @@ import {
   getAllAppointmentTypesAction,
   toggleAppointmentTypeAction,
   type CreateAppointmentTypeData,
-  type UpdateAppointmentTypeData 
+  type UpdateAppointmentTypeData,
 } from '../actions';
 
 // Mock the database and dependencies

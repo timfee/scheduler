@@ -29,13 +29,21 @@ export async function createAppointmentTypeAction(
   data: CreateAppointmentTypeData
 ): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
+    // Basic validation
+    if (!data.name || data.name.trim().length === 0) {
+      throw new Error("Name is required");
+    }
+    if (data.durationMinutes < 1 || data.durationMinutes > 480) {
+      throw new Error("Duration must be between 1 and 480 minutes");
+    }
+
     const now = new Date();
     const id = uuid();
     
     const newAppointmentType: NewAppointmentType = {
       id,
-      name: data.name,
-      description: data.description ?? null,
+      name: data.name.trim(),
+      description: data.description?.trim() ?? null,
       durationMinutes: data.durationMinutes,
       isActive: true,
       createdAt: now,
@@ -44,7 +52,6 @@ export async function createAppointmentTypeAction(
 
     db.insert(appointmentTypes).values(newAppointmentType).run();
     
-    // Revalidate cache
     revalidateTag("appointment-types");
     
     return { success: true, id };
@@ -63,13 +70,24 @@ export async function updateAppointmentTypeAction(
   data: UpdateAppointmentTypeData
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Basic validation
+    if (!data.id || data.id.trim().length === 0) {
+      throw new Error("ID is required");
+    }
+    if (!data.name || data.name.trim().length === 0) {
+      throw new Error("Name is required");
+    }
+    if (data.durationMinutes < 1 || data.durationMinutes > 480) {
+      throw new Error("Duration must be between 1 and 480 minutes");
+    }
+
     const now = new Date();
     
     const result = db
       .update(appointmentTypes)
       .set({
-        name: data.name,
-        description: data.description ?? null,
+        name: data.name.trim(),
+        description: data.description?.trim() ?? null,
         durationMinutes: data.durationMinutes,
         isActive: data.isActive,
         updatedAt: now,
@@ -81,7 +99,6 @@ export async function updateAppointmentTypeAction(
       return { success: false, error: "Appointment type not found" };
     }
     
-    // Revalidate cache
     revalidateTag("appointment-types");
     
     return { success: true };
@@ -100,6 +117,11 @@ export async function deleteAppointmentTypeAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Basic validation
+    if (!id || id.trim().length === 0) {
+      throw new Error("ID is required");
+    }
+
     const result = db
       .delete(appointmentTypes)
       .where(eq(appointmentTypes.id, id))
@@ -109,7 +131,6 @@ export async function deleteAppointmentTypeAction(
       return { success: false, error: "Appointment type not found" };
     }
     
-    // Revalidate cache
     revalidateTag("appointment-types");
     
     return { success: true };
@@ -128,6 +149,11 @@ export async function toggleAppointmentTypeAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Basic validation
+    if (!id || id.trim().length === 0) {
+      throw new Error("ID is required");
+    }
+
     // First get the current state
     const current = db
       .select()
@@ -152,7 +178,6 @@ export async function toggleAppointmentTypeAction(
       .where(eq(appointmentTypes.id, id))
       .run();
     
-    // Revalidate cache
     revalidateTag("appointment-types");
     
     return { success: true };
