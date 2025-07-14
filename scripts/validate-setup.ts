@@ -171,13 +171,40 @@ function generateEnvFile(variables: Record<string, string>): void {
   writeFileSync(envPath, envContent);
 }
 
-function initializeDatabase(): void {
+async function initializeDatabase(): Promise<void> {
   const dbPath = process.env.SQLITE_PATH ?? "scheduler.db";
   
   // Create or recreate database
   if (existsSync(dbPath)) {
-    // Remove existing database
+    console.log(`⚠️ Database file "${dbPath}" already exists.`);
+    
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmDelete',
+      message: 'Do you want to delete the existing database file? This will result in data loss.',
+      initial: false,
+    });
+    
+    if (!response.confirmDelete) {
+      console.log("❌ Database deletion aborted.");
+      process.exit(0);
+    }
+    
+    const backupResponse = await prompts({
+      type: 'confirm',
+      name: 'backup',
+      message: 'Do you want to back up the existing database file before deletion?',
+      initial: true,
+    });
+    
+    if (backupResponse.backup) {
+      const backupPath = `${dbPath}.backup-${Date.now()}`;
+      writeFileSync(backupPath, readFileSync(dbPath));
+      console.log(`✅ Database backed up to "${backupPath}".`);
+    }
+    
     unlinkSync(dbPath);
+    console.log(`✅ Deleted database file "${dbPath}".`);
   }
 
   const sqlite = new Database(dbPath);
@@ -322,7 +349,7 @@ async function main(): Promise<void> {
     });
 
     if (response.create) {
-      initializeDatabase();
+      await initializeDatabase();
       console.log("✅ Database created successfully\n");
     } else {
       console.log("❌ Setup cancelled. Please run 'pnpm db:init' to create the database.");
@@ -342,7 +369,7 @@ async function main(): Promise<void> {
     });
 
     if (response.recreate) {
-      initializeDatabase();
+      await initializeDatabase();
       console.log("✅ Database recreated successfully\n");
     } else {
       console.log("❌ Setup cancelled. Please run 'pnpm db:init' to recreate the database.");
