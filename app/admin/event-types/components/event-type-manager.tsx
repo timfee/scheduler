@@ -365,7 +365,7 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
             <Label className="text-base font-medium">Durations (minutes)</Label>
             <div className="space-y-2 mt-2">
               {formData.durations.map((duration, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={`duration-${duration}-${index}`} className="flex items-center gap-2">
                   <Input
                     type="number"
                     value={duration}
@@ -400,7 +400,7 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
             <Label className="text-base font-medium">Locations</Label>
             <div className="space-y-2 mt-2">
               {formData.locations.map((location, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={`location-${location.type}-${location.details ?? ''}-${index}`} className="flex items-center gap-2">
                   <Select 
                     value={location.type} 
                     onValueChange={(value) => updateLocation(index, 'type', value)}

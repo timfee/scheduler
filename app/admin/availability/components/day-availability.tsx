@@ -54,7 +54,7 @@ export function DayAvailability({
           <div className="space-y-3">
             {availability.slots.map((slot, index) => (
               <TimeSlotEditor
-                key={index}
+                key={slot.id ?? `${slot.start}-${slot.end}-${index}`}
                 slot={slot}
                 index={index}
                 dayKey={dayKey}
