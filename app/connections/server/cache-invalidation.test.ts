@@ -63,7 +63,7 @@ describe("Cache Invalidation", () => {
     const result = await createConnectionAction(connectionData);
 
     expect(result).toBeDefined();
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/connections");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/connections");
     expect(mockRevalidateTag).toHaveBeenCalledWith("calendars");
   });
 
@@ -83,7 +83,7 @@ describe("Cache Invalidation", () => {
     // Delete it
     await deleteConnectionAction(created.id);
 
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/connections");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/connections");
     expect(mockRevalidateTag).toHaveBeenCalledWith("calendars");
   });
 
@@ -105,7 +105,7 @@ describe("Cache Invalidation", () => {
       displayName: "Updated Calendar",
     });
 
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/connections");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/connections");
     expect(mockRevalidateTag).toHaveBeenCalledWith("calendars");
   });
 
@@ -131,7 +131,7 @@ describe("Cache Invalidation", () => {
     // Update order
     await updateCalendarOrderAction(second.id, "up");
 
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/connections");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/connections");
     expect(mockRevalidateTag).toHaveBeenCalledWith("calendars");
   });
 });

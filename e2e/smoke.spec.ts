@@ -29,7 +29,7 @@ test.describe("Smoke Tests", () => {
   });
 
   test("connections page loads and functions", async ({ page }) => {
-    await page.goto("/connections");
+    await page.goto("/admin/connections");
 
     // Check that page title is correct
     await expect(page).toHaveTitle(/Scheduler/);
