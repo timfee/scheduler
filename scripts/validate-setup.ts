@@ -200,7 +200,7 @@ async function initializeDatabase(): Promise<void> {
     
     if (backupResponse.backup) {
       const backupPath = `${dbPath}.backup-${Date.now()}`;
-      writeFileSync(backupPath, readFileSync(dbPath));
+      copyFileSync(dbPath, backupPath);
       console.log(`✅ Database backed up to "${backupPath}".`);
     }
     
