@@ -13,6 +13,7 @@ import prompts from "prompts";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { createTables } from "@/lib/database/migrations";
+import * as schema from "@/lib/schemas/database";
 import { v4 as uuid } from "uuid";
 
 // Load environment variables from .env.local if it exists
@@ -171,13 +172,40 @@ function generateEnvFile(variables: Record<string, string>): void {
   writeFileSync(envPath, envContent);
 }
 
-function initializeDatabase(): void {
+async function initializeDatabase(): Promise<void> {
   const dbPath = process.env.SQLITE_PATH ?? "scheduler.db";
   
   // Create or recreate database
   if (existsSync(dbPath)) {
-    // Remove existing database
+    console.log(`⚠️ Database file "${dbPath}" already exists.`);
+    
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmDelete',
+      message: 'Do you want to delete the existing database file? This will result in data loss.',
+      initial: false,
+    });
+    
+    if (!response.confirmDelete) {
+      console.log("❌ Database deletion aborted.");
+      process.exit(0);
+    }
+    
+    const backupResponse = await prompts({
+      type: 'confirm',
+      name: 'backup',
+      message: 'Do you want to back up the existing database file before deletion?',
+      initial: true,
+    });
+    
+    if (backupResponse.backup) {
+      const backupPath = `${dbPath}.backup-${Date.now()}`;
+      writeFileSync(backupPath, readFileSync(dbPath));
+      console.log(`✅ Database backed up to "${backupPath}".`);
+    }
+    
     unlinkSync(dbPath);
+    console.log(`✅ Deleted database file "${dbPath}".`);
   }
 
   const sqlite = new Database(dbPath);
@@ -198,43 +226,37 @@ function initializeDatabase(): void {
     `);
     
     // Insert default appointment types
-    const appointmentTypes = [
-      {
-        id: uuid(),
-        name: "Quick Chat",
-        description: "A brief 15-minute discussion",
-        duration_minutes: 15,
-        is_active: 1,
-        created_at: now.getTime(),
-        updated_at: now.getTime(),
-      },
-      {
-        id: uuid(),
-        name: "Standard Meeting", 
-        description: "30-minute meeting for most discussions",
-        duration_minutes: 30,
-        is_active: 1,
-        created_at: now.getTime(),
-        updated_at: now.getTime(),
-      },
-      {
-        id: uuid(),
-        name: "Extended Session",
-        description: "1-hour session for detailed discussions", 
-        duration_minutes: 60,
-        is_active: 1,
-        created_at: now.getTime(),
-        updated_at: now.getTime(),
-      },
-    ];
-    
-    for (const appointmentType of appointmentTypes) {
-      // eslint-disable-next-line custom/performance-patterns
-      db.run(sql`
-        INSERT INTO appointment_types (id, name, description, duration_minutes, is_active, created_at, updated_at)
-        VALUES (${appointmentType.id}, ${appointmentType.name}, ${appointmentType.description}, ${appointmentType.duration_minutes}, ${appointmentType.is_active}, ${appointmentType.created_at}, ${appointmentType.updated_at})
-      `);
-    }
+    db.insert(schema.appointmentTypes)
+      .values([
+        {
+          id: uuid(),
+          name: "Quick Chat",
+          description: "A brief 15-minute discussion",
+          durationMinutes: 15,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: uuid(),
+          name: "Standard Meeting", 
+          description: "30-minute meeting for most discussions",
+          durationMinutes: 30,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: uuid(),
+          name: "Extended Session",
+          description: "1-hour session for detailed discussions", 
+          durationMinutes: 60,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ])
+      .run();
     
     console.log("✅ Created default appointment types");
     
@@ -322,7 +344,7 @@ async function main(): Promise<void> {
     });
 
     if (response.create) {
-      initializeDatabase();
+      await initializeDatabase();
       console.log("✅ Database created successfully\n");
     } else {
       console.log("❌ Setup cancelled. Please run 'pnpm db:init' to create the database.");
@@ -342,7 +364,7 @@ async function main(): Promise<void> {
     });
 
     if (response.recreate) {
-      initializeDatabase();
+      await initializeDatabase();
       console.log("✅ Database recreated successfully\n");
     } else {
       console.log("❌ Setup cancelled. Please run 'pnpm db:init' to recreate the database.");
