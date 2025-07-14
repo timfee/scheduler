@@ -5,6 +5,7 @@ import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { createBookingAction } from "@/app/(booking)/server/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { formatDateForBooking } from "@/lib/utils";
 
@@ -38,12 +39,12 @@ export default function BookingPage() {
       const rawName = formData.get("name");
       const rawEmail = formData.get("email");
       if (typeof rawName !== "string" || typeof rawEmail !== "string") {
-        throw new Error("Invalid form submission");
+        throw new Error(ERROR_MESSAGES.INVALID_FORM_SUBMISSION);
       }
 
       // Validate all required booking fields are present
       if (!appointmentType || !selectedDate || !selectedTime) {
-        throw new Error("Missing required booking information");
+        throw new Error(ERROR_MESSAGES.MISSING_REQUIRED_BOOKING_INFO);
       }
 
       await createBookingAction({
@@ -59,7 +60,7 @@ export default function BookingPage() {
         email: rawEmail,
       });
     } catch (error) {
-      throw new Error(mapErrorToUserMessage(error, "Failed to submit booking"));
+      throw new Error(mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_SUBMIT_BOOKING));
     }
   }
 
