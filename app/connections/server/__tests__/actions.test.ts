@@ -25,7 +25,7 @@ import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import {
   cleanupTestDb,
   createTestDb,
-} from "../../../lib/database/__tests__/helpers/db";
+} from "../../../../lib/database/__tests__/helpers/db";
 
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),

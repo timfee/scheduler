@@ -5,7 +5,7 @@ import {
   calculateAvailableSlots,
   type BusinessHours,
   type BusyTime,
-} from "../server/availability-core";
+} from "../availability-core";
 
 describe("Availability Calculation", () => {
   const defaultBusinessHours: BusinessHours = {
