@@ -35,7 +35,7 @@ export async function createAppointmentTypeAction(
 ): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
     // Validate input data
-    validateAppointmentTypeName(data.name);
+    const sanitizedName = validateAppointmentTypeName(data.name);
     validateAppointmentTypeDuration(data.durationMinutes);
 
     const now = new Date();
@@ -43,7 +43,7 @@ export async function createAppointmentTypeAction(
     
     const newAppointmentType: NewAppointmentType = {
       id,
-      name: data.name.trim(),
+      name: sanitizedName,
       description: data.description?.trim() ?? null,
       durationMinutes: data.durationMinutes,
       isActive: true,
@@ -72,8 +72,8 @@ export async function updateAppointmentTypeAction(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate input data
-    validateAppointmentTypeId(data.id);
-    validateAppointmentTypeName(data.name);
+    const sanitizedId = validateAppointmentTypeId(data.id);
+    const sanitizedName = validateAppointmentTypeName(data.name);
     validateAppointmentTypeDuration(data.durationMinutes);
 
     const now = new Date();
@@ -81,13 +81,13 @@ export async function updateAppointmentTypeAction(
     const result = db
       .update(appointmentTypes)
       .set({
-        name: data.name.trim(),
+        name: sanitizedName,
         description: data.description?.trim() ?? null,
         durationMinutes: data.durationMinutes,
         isActive: data.isActive,
         updatedAt: now,
       })
-      .where(eq(appointmentTypes.id, data.id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .run();
 
     if (result.changes === 0) {
@@ -113,11 +113,11 @@ export async function deleteAppointmentTypeAction(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate input data
-    validateAppointmentTypeId(id);
+    const sanitizedId = validateAppointmentTypeId(id);
 
     const result = db
       .delete(appointmentTypes)
-      .where(eq(appointmentTypes.id, id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .run();
 
     if (result.changes === 0) {
@@ -143,13 +143,13 @@ export async function toggleAppointmentTypeAction(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate input data
-    validateAppointmentTypeId(id);
+    const sanitizedId = validateAppointmentTypeId(id);
 
     // First get the current state
     const current = db
       .select()
       .from(appointmentTypes)
-      .where(eq(appointmentTypes.id, id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .limit(1)
       .all();
 
@@ -166,7 +166,7 @@ export async function toggleAppointmentTypeAction(
         isActive: !currentAppointmentType.isActive,
         updatedAt: now,
       })
-      .where(eq(appointmentTypes.id, id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .run();
     
     revalidateTag("appointment-types");

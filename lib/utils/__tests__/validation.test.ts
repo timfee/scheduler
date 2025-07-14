@@ -7,20 +7,20 @@ import {
 
 describe('Appointment Type Validation Utils', () => {
   describe('validateAppointmentTypeName', () => {
-    it('should pass with valid name', () => {
-      expect(() => validateAppointmentTypeName('Valid Name')).not.toThrow();
+    it('should pass with valid name and return trimmed name', () => {
+      expect(validateAppointmentTypeName('Valid Name')).toBe('Valid Name');
     });
 
     it('should pass with name containing spaces', () => {
-      expect(() => validateAppointmentTypeName('Name with spaces')).not.toThrow();
+      expect(validateAppointmentTypeName('Name with spaces')).toBe('Name with spaces');
     });
 
     it('should pass with name containing special characters', () => {
-      expect(() => validateAppointmentTypeName('Name-with_special.chars')).not.toThrow();
+      expect(validateAppointmentTypeName('Name-with_special.chars')).toBe('Name-with_special.chars');
     });
 
-    it('should pass with name that has leading/trailing spaces (will be trimmed)', () => {
-      expect(() => validateAppointmentTypeName('  Valid Name  ')).not.toThrow();
+    it('should pass with name that has leading/trailing spaces and return trimmed name', () => {
+      expect(validateAppointmentTypeName('  Valid Name  ')).toBe('Valid Name');
     });
 
     it('should throw error with empty string', () => {
@@ -79,28 +79,28 @@ describe('Appointment Type Validation Utils', () => {
   });
 
   describe('validateAppointmentTypeId', () => {
-    it('should pass with valid UUID', () => {
-      expect(() => validateAppointmentTypeId('550e8400-e29b-41d4-a716-446655440000')).not.toThrow();
+    it('should pass with valid UUID and return trimmed ID', () => {
+      expect(validateAppointmentTypeId('550e8400-e29b-41d4-a716-446655440000')).toBe('550e8400-e29b-41d4-a716-446655440000');
     });
 
     it('should pass with valid string ID', () => {
-      expect(() => validateAppointmentTypeId('valid-id')).not.toThrow();
+      expect(validateAppointmentTypeId('valid-id')).toBe('valid-id');
     });
 
     it('should pass with numeric string ID', () => {
-      expect(() => validateAppointmentTypeId('12345')).not.toThrow();
+      expect(validateAppointmentTypeId('12345')).toBe('12345');
     });
 
     it('should pass with alphanumeric ID', () => {
-      expect(() => validateAppointmentTypeId('abc123')).not.toThrow();
+      expect(validateAppointmentTypeId('abc123')).toBe('abc123');
     });
 
     it('should pass with ID containing hyphens and underscores', () => {
-      expect(() => validateAppointmentTypeId('test-id_123')).not.toThrow();
+      expect(validateAppointmentTypeId('test-id_123')).toBe('test-id_123');
     });
 
-    it('should pass with ID that has leading/trailing spaces (will be trimmed)', () => {
-      expect(() => validateAppointmentTypeId('  valid-id  ')).not.toThrow();
+    it('should pass with ID that has leading/trailing spaces and return trimmed ID', () => {
+      expect(validateAppointmentTypeId('  valid-id  ')).toBe('valid-id');
     });
 
     it('should throw error with empty string', () => {

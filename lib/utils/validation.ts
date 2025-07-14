@@ -5,12 +5,14 @@
 /**
  * Validates appointment type name
  * @param name - The name to validate
+ * @returns The trimmed name
  * @throws Error if name is invalid
  */
-export function validateAppointmentTypeName(name: string): void {
+export function validateAppointmentTypeName(name: string): string {
   if (!name || name.trim().length === 0) {
     throw new Error("Name is required");
   }
+  return name.trim();
 }
 
 /**
@@ -27,10 +29,12 @@ export function validateAppointmentTypeDuration(durationMinutes: number): void {
 /**
  * Validates appointment type ID
  * @param id - The ID to validate
+ * @returns The trimmed ID
  * @throws Error if ID is invalid
  */
-export function validateAppointmentTypeId(id: string): void {
+export function validateAppointmentTypeId(id: string): string {
   if (!id || id.trim().length === 0) {
     throw new Error("ID is required");
   }
+  return id.trim();
 }
