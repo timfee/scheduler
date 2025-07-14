@@ -30,8 +30,7 @@ describe("validate-setup script", () => {
     expect(existsSync(validateSetupPath)).toBe(true);
     
     // Read the file content to verify the fix is present
-    const fs = require("fs");
-    const content = fs.readFileSync(validateSetupPath, "utf-8");
+    const content = readFileSync(validateSetupPath, "utf-8");
     
     // Verify that loadEnvFile is called after generateEnvFile
     expect(content).toContain("generateEnvFile(generatedVars);");
