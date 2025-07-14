@@ -6,7 +6,7 @@
  */
 
 import { randomBytes } from "crypto";
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
+import { existsSync, readFileSync, unlinkSync, copyFileSync } from "fs";
 import { join } from "path";
 import Database from "better-sqlite3";
 import prompts from "prompts";
@@ -200,7 +200,7 @@ async function initializeDatabase(): Promise<void> {
     
     if (backupResponse.backup) {
       const backupPath = `${dbPath}.backup-${Date.now()}`;
-      writeFileSync(backupPath, readFileSync(dbPath));
+      copyFileSync(dbPath, backupPath);
       console.log(`✅ Database backed up to "${backupPath}".`);
     }
     
