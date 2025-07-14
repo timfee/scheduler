@@ -1,7 +1,6 @@
 "use client";
 
 /* eslint-disable max-lines -- Complex admin component with comprehensive form and validation */
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

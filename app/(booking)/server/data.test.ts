@@ -5,7 +5,9 @@ import {
 } from "@/lib/database/__tests__/helpers/db";
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 
+// prettier-ignore
 import type * as adminActions from "../../admin/event-types/server/actions";
+// prettier-ignore
 import type * as bookingData from "../data";
 
 let db: ReturnType<typeof createTestDb>["db"];
