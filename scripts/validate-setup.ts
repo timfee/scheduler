@@ -196,7 +196,7 @@ function initializeDatabase(): void {
       .values({
         key: "timeZone",
         value: JSON.stringify({ timeZone: "UTC" }),
-        updatedAt: new Date(),
+        updatedAt: now,
       })
       .run();
     
