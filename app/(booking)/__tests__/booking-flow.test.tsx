@@ -1,5 +1,5 @@
 /** @jest-environment jsdom */
-import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
+import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { describe, expect, it, jest } from "@jest/globals";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import React, { act } from "react";

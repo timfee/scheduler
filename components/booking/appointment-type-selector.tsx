@@ -1,6 +1,6 @@
 "use client";
 
-import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
+import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { type AppointmentType } from "@/app/(booking)/server/data";
 import { useCallback } from "react";
 

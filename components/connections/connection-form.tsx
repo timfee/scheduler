@@ -1,6 +1,6 @@
 "use client";
 
-import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
+import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
 import {
   type CalendarOption,
   type ProviderType,
