@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("Connections E2E", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the connections page
-    await page.goto("/connections");
+    await page.goto("/admin/connections");
   });
 
   test("should load connections page without import errors", async ({

@@ -93,7 +93,7 @@ export default function Home() {
                 more.
               </p>
               <Button asChild className="w-full">
-                <Link href="/connections">Manage Connections</Link>
+                <Link href="/admin/connections">Manage Connections</Link>
               </Button>
             </CardContent>
           </Card>

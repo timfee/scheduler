@@ -70,7 +70,7 @@ export async function createConnectionAction(
 
     const integration = await createCalendarIntegration(input);
 
-    revalidatePath("/connections");
+    revalidatePath("/admin/connections");
     revalidateTag("calendars");
 
     return {
@@ -144,7 +144,7 @@ export async function updateConnectionAction(
       throw new Error("Failed to update connection");
     }
 
-    revalidatePath("/connections");
+    revalidatePath("/admin/connections");
     revalidateTag("calendars");
 
     return {
@@ -168,7 +168,7 @@ export async function deleteConnectionAction(id: string): Promise<void> {
       throw new Error("Connection not found");
     }
 
-    revalidatePath("/connections");
+    revalidatePath("/admin/connections");
     revalidateTag("calendars");
 
     return;
@@ -331,7 +331,7 @@ export async function updateCalendarOrderAction(
         .run();
     });
 
-    revalidatePath("/connections");
+    revalidatePath("/admin/connections");
     revalidateTag("calendars");
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to update order"));
