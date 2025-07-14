@@ -131,7 +131,7 @@ function useAvailabilityLoader(
           setAvailability(template);
         }
       } catch (error) {
-        console.error("Failed to load availability template:", error);
+        console.error(ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE, error);
         setError(
           mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE),
         );
@@ -160,7 +160,7 @@ function useAvailabilitySaver(
         await saveAvailabilityTemplateAction(availability);
         // Success - could add a toast notification here
       } catch (error) {
-        console.error("Failed to save availability template:", error);
+        console.error(ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE, error);
         setError(
           mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE),
         );
