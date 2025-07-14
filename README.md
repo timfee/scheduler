@@ -4,6 +4,24 @@ Scheduler is a Next.js application for managing calendar connections, availabili
 
 ## Setup
 
+### Quick Start
+
+Simply run the development server, and the setup validation will guide you through any missing requirements:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+The validation script will automatically:
+- Check for required environment variables and offer to generate them
+- Verify database health and offer to create/recreate it if needed
+- Guide you through the setup process with user-friendly prompts
+
+### Manual Setup
+
+If you prefer to set up manually or need to troubleshoot:
+
 ### Install dependencies
 ```bash
 pnpm install
@@ -48,13 +66,15 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 | Command | Description |
 | ------- | ----------- |
-| `pnpm dev` | Start the development server |
+| `pnpm dev` | Start the development server with setup validation |
+| `pnpm dev:skip-validation` | Start the development server without setup validation |
 | `pnpm build` | Build the application |
 | `pnpm start` | Run the production server |
 | `pnpm db:init` | Initialize the SQLite database |
 | `pnpm db:generate` | Generate database types |
 | `pnpm db:push` | Apply SQLite migrations |
 | `pnpm env:generate` | Generate secure environment variables |
+| `pnpm validate-setup` | Run setup validation without starting the server |
 | `pnpm lint` | Run ESLint |
 | `pnpm test` | Execute tests |
 | `pnpm format` | Format code with Prettier |
