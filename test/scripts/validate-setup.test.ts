@@ -1,4 +1,4 @@
-import { existsSync, writeFileSync, unlinkSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
 import { join } from "path";
 
 /**
