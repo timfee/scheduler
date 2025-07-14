@@ -4,8 +4,8 @@ import {
   PROVIDER_AUTH_METHODS,
   useConnectionForm,
   type ConnectionFormValues,
-} from "@/app/connections/hooks/use-connection-form";
-import { useTestConnection } from "@/app/connections/hooks/use-test-connection";
+} from "@/lib/hooks/use-connection-form";
+import { useTestConnection } from "@/lib/hooks/use-test-connection";
 import {
   createConnectionAction,
   deleteConnectionAction,

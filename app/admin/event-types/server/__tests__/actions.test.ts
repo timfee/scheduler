@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "@jest/globals";
 
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import {
   createAppointmentTypeAction,
   deleteAppointmentTypeAction,
@@ -187,7 +188,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await createAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to create appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_CREATE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for whitespace-only name", async () => {
@@ -200,7 +201,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await createAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to create appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_CREATE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for invalid duration (too low)", async () => {
@@ -213,7 +214,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await createAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to create appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_CREATE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for invalid duration (too high)", async () => {
@@ -226,7 +227,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await createAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to create appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_CREATE_APPOINTMENT_TYPE);
     });
 
     it("should handle database errors gracefully", async () => {
@@ -275,7 +276,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await updateAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to update appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_UPDATE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for whitespace-only ID", async () => {
@@ -290,7 +291,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await updateAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to update appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_UPDATE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for empty name", async () => {
@@ -305,7 +306,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await updateAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to update appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_UPDATE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for invalid duration", async () => {
@@ -320,7 +321,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await updateAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to update appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_UPDATE_APPOINTMENT_TYPE);
     });
 
     it("should handle appointment type not found", async () => {
@@ -344,7 +345,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await updateAppointmentTypeAction(data);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Appointment type not found");
+      expect(result.error).toBe(ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND);
     });
   });
 
@@ -359,14 +360,14 @@ describe("Appointment Type Server Actions", () => {
       const result = await deleteAppointmentTypeAction("");
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to delete appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_DELETE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for whitespace-only ID", async () => {
       const result = await deleteAppointmentTypeAction("   ");
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to delete appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_DELETE_APPOINTMENT_TYPE);
     });
 
     it("should handle appointment type not found", async () => {
@@ -380,7 +381,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await deleteAppointmentTypeAction("nonexistent-id");
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Appointment type not found");
+      expect(result.error).toBe(ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND);
     });
   });
 
@@ -395,14 +396,14 @@ describe("Appointment Type Server Actions", () => {
       const result = await toggleAppointmentTypeAction("");
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to toggle appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_TOGGLE_APPOINTMENT_TYPE);
     });
 
     it("should throw validation error for whitespace-only ID", async () => {
       const result = await toggleAppointmentTypeAction("   ");
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to toggle appointment type");
+      expect(result.error).toBe(ERROR_MESSAGES.FAILED_TO_TOGGLE_APPOINTMENT_TYPE);
     });
 
     it("should handle appointment type not found", async () => {
@@ -420,7 +421,7 @@ describe("Appointment Type Server Actions", () => {
       const result = await toggleAppointmentTypeAction("nonexistent-id");
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Appointment type not found");
+      expect(result.error).toBe(ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND);
     });
   });
 

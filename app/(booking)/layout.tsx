@@ -2,7 +2,7 @@ import {
   AppointmentTypeSkeleton,
   DateSkeleton,
   TimeSkeleton,
-} from "@/app/(booking)/components/booking-skeletons";
+} from "@/components/booking/booking-skeletons";
 import { Suspense } from "react";
 
 export default function BookingLayout({

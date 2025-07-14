@@ -1,4 +1,4 @@
-import { AppointmentTypeManager } from "@/app/admin/event-types/components/appointment-type-manager";
+import { AppointmentTypeManager } from "@/components/admin/appointment-type-manager";
 import {
   Card,
   CardContent,

@@ -1,7 +1,7 @@
 const { ESLintUtils } = require('@typescript-eslint/utils');
 
 const createRule = ESLintUtils.RuleCreator(
-  name => `https://github.com/timfee/scheduler/blob/main/docs/DATETIME_NAMING_CONVENTIONS.md#${name}`
+  name => `https://github.com/timfee/scheduler/blob/main/docs/datetime-naming-conventions.md#${name}`
 );
 
 module.exports = createRule({

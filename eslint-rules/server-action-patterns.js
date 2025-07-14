@@ -1,7 +1,7 @@
 const { ESLintUtils } = require('@typescript-eslint/utils');
 
 const createRule = ESLintUtils.RuleCreator(
-  name => `https://github.com/timfee/scheduler/blob/main/docs/architecture/adr-007-client-server-communication.md#${name}`
+  name => `https://github.com/timfee/scheduler/blob/main/docs/adr-007-client-server-communication.md#${name}`
 );
 
 module.exports = createRule({

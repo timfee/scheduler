@@ -94,7 +94,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 - **components/**: Shared UI components and feature-specific client components.
 - **infrastructure/**: Database access, encryption utilities, and provider integrations.
 - **lib/**: Miscellaneous shared helpers and validation.
-- **docs/architecture/**: Architecture Decision Records (ADRs) and development guidelines.
+- **docs/**: Architecture Decision Records (ADRs) and development guidelines.
 
 Server actions now throw `Error` objects on failure. Client components should catch these and display a user-friendly message using helpers from `lib/errors.ts`.
 
@@ -102,11 +102,11 @@ Server actions now throw `Error` objects on failure. Client components should ca
 
 For detailed information about architectural decisions, patterns, and development guidelines, see:
 
-- **[Architecture Overview](./docs/architecture/README.md)**: Complete guide to the application architecture
-- **[Architecture Decision Records](./docs/architecture/)**: Documented decisions about state management, server actions, dependencies, and more
-- **[Development Guidelines](./docs/architecture/development-guidelines.md)**: Guidelines for maintaining simplicity and consistency
-- **[Feature Development](./docs/architecture/feature-development-guidelines.md)**: Patterns for developing new features
-- **[Feature Template](./docs/architecture/templates/feature-template.md)**: Template for creating new features
+- **[Architecture Overview](./docs/architecture-readme.md)**: Complete guide to the application architecture
+- **[Architecture Decision Records](./docs/)**: Documented decisions about state management, server actions, dependencies, and more
+- **[Development Guidelines](./docs/development-guidelines.md)**: Guidelines for maintaining simplicity and consistency
+- **[Feature Development](./docs/feature-development-guidelines.md)**: Patterns for developing new features
+- **[Feature Template](./docs/templates/feature-template.md)**: Template for creating new features
 - **[Environment Variables](./docs/environment-variables.md)**: Environment setup and configuration guide
 
 ### Key Architectural Patterns
@@ -129,7 +129,7 @@ The application follows a consistent feature-based organization pattern. Each fe
 - **Client code** (`_components/`, `_hooks/`): Interactive components and client-side state
 - **Schemas** (`/lib/schemas/`): Centralized data validation and types
 
-📖 **See [Feature Organization Documentation](./docs/architecture/feature-organization.md) for detailed architecture guidelines.**
+📖 **See [Feature Organization Documentation](./docs/feature-organization.md) for detailed architecture guidelines.**
 
 ## Code Quality
 
@@ -148,4 +148,4 @@ A pre-commit hook automatically runs all quality checks. To run them manually:
 pnpm pre-commit
 ```
 
-📖 **See [Code Quality Documentation](./docs/CODE_QUALITY.md) for detailed requirements and workflow.**
+📖 **See [Code Quality Documentation](./docs/code-quality.md) for detailed requirements and workflow.**

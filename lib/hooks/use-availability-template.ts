@@ -3,6 +3,7 @@ import {
   saveAvailabilityTemplateAction,
 } from "@/app/admin/availability/server/actions";
 import { BUSINESS_HOURS } from "@/lib/constants";
+import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import {
   type DayOfWeek,
@@ -130,9 +131,9 @@ function useAvailabilityLoader(
           setAvailability(template);
         }
       } catch (error) {
-        console.error("Failed to load availability template:", error);
+        console.error(ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE, error);
         setError(
-          mapErrorToUserMessage(error, "Failed to load availability template"),
+          mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE),
         );
       } finally {
         setIsLoading(false);
@@ -159,9 +160,9 @@ function useAvailabilitySaver(
         await saveAvailabilityTemplateAction(availability);
         // Success - could add a toast notification here
       } catch (error) {
-        console.error("Failed to save availability template:", error);
+        console.error(ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE, error);
         setError(
-          mapErrorToUserMessage(error, "Failed to save availability template"),
+          mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE),
         );
       }
     });

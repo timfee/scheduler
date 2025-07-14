@@ -1,4 +1,4 @@
-import { AvailabilityTemplate } from "@/app/admin/availability/components";
+import { AvailabilityTemplate } from "@/components/admin/availability-template";
 import {
   Card,
   CardContent,

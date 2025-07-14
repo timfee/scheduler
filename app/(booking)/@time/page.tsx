@@ -1,4 +1,4 @@
-import { TimeSelectorWrapper } from "@/app/(booking)/components/time-selector-wrapper";
+import { TimeSelectorWrapper } from "@/components/booking/time-selector-wrapper";
 import {
   calculateAvailableSlots,
   type BusinessHours,

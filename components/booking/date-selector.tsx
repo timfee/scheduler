@@ -1,6 +1,6 @@
 "use client";
 
-import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
+import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { formatDateForDisplay } from "@/lib/utils/date-range";
 import { addDays, format, startOfDay } from "date-fns";
 import { useCallback } from "react";
