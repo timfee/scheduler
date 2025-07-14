@@ -181,6 +181,10 @@ function generateEnvFile(variables: Record<string, string>): void {
   writeFileSync(envPath, envContent);
 }
 
+function logSkippingVariable(key: string, reason: "missing" | "invalid", action: "set" | "fix"): void {
+  console.log(`⚠️  Skipping ${key} - you'll need to ${action} this manually`);
+}
+
 async function initializeDatabase(): Promise<void> {
   const dbPath = process.env.SQLITE_PATH ?? "scheduler.db";
 
@@ -325,7 +329,7 @@ async function main(): Promise<void> {
       if (response.generate) {
         generatedVars[key] = config.generator();
       } else {
-        console.log(`⚠️  Skipping ${key} - you'll need to set this manually`);
+        logSkippingVariable(key, "missing", "set");
       }
     }
 
@@ -342,7 +346,7 @@ async function main(): Promise<void> {
       if (response.generate) {
         generatedVars[key] = config.generator();
       } else {
-        console.log(`⚠️  Skipping ${key} - you'll need to fix this manually`);
+        logSkippingVariable(key, "invalid", "fix");
       }
     }
 
