@@ -13,8 +13,14 @@ export function formatDateForApi(date: Date): string {
  * Formats a date to ISO date string for display
  * @param date - The date to format
  * @returns ISO date string in format: "yyyy-MM-dd"
+ * @throws Error if the date is invalid
  */
 export function formatDateForDisplay(date: Date): string {
+  // Check if the date is valid
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date format');
+  }
+  
   return format(date, "yyyy-MM-dd");
 }
 
@@ -24,9 +30,7 @@ export function formatDateForDisplay(date: Date): string {
  * @returns Object with formatted 'from' and 'to' dates
  */
 export function createDateRange(days = 7): { from: string; to: string } {
-  const from = startOfDay(new Date());
-  const to = addDays(from, days);
-
+  const { from, to } = createDateRangeObjects(days);
   return {
     from: formatDateForApi(from),
     to: formatDateForApi(to),
