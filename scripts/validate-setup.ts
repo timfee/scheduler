@@ -181,6 +181,10 @@ function generateEnvFile(variables: Record<string, string>): void {
   writeFileSync(envPath, envContent);
 }
 
+function logSkippingVariable(key: string, reason: "missing" | "invalid", action: "set" | "fix"): void {
+  console.log(`⚠️  Skipping ${key} - you'll need to ${action} this manually`);
+}
+
 async function initializeDatabase(): Promise<void> {
   const dbPath = process.env.SQLITE_PATH ?? "scheduler.db";
 
@@ -310,36 +314,51 @@ async function main(): Promise<void> {
       console.log();
     }
 
-    const response = await prompts({
-      type: "confirm",
-      name: "generate",
-      message:
-        "Would you like to auto-generate secure environment variables and save to .env.local?",
-      initial: true,
-    });
+    const generatedVars: Record<string, string> = {};
 
-    if (response.generate) {
-      const generatedVars: Record<string, string> = {};
+    // Process missing required variables individually
+    for (const key of envValidation.missing) {
+      const config = REQUIRED_ENV_VARS[key as keyof typeof REQUIRED_ENV_VARS];
+      const response = await prompts({
+        type: "confirm",
+        name: "generate",
+        message: `Would you like to generate ${key}? (${config.description})`,
+        initial: true,
+      });
 
-      // Generate missing required variables
-      for (const key of envValidation.missing) {
-        const config = REQUIRED_ENV_VARS[key as keyof typeof REQUIRED_ENV_VARS];
+      if (response.generate) {
         generatedVars[key] = config.generator();
+      } else {
+        logSkippingVariable(key, "missing", "set");
       }
+    }
 
-      // Generate invalid variables
-      for (const key of envValidation.invalid) {
-        const config = REQUIRED_ENV_VARS[key as keyof typeof REQUIRED_ENV_VARS];
+    // Process invalid variables individually
+    for (const key of envValidation.invalid) {
+      const config = REQUIRED_ENV_VARS[key as keyof typeof REQUIRED_ENV_VARS];
+      const response = await prompts({
+        type: "confirm",
+        name: "generate",
+        message: `Would you like to generate a new ${key}? (${config.description})`,
+        initial: true,
+      });
+
+      if (response.generate) {
         generatedVars[key] = config.generator();
+      } else {
+        logSkippingVariable(key, "invalid", "fix");
       }
+    }
 
+    // Generate .env.local file if any variables were generated
+    if (Object.keys(generatedVars).length > 0) {
       generateEnvFile(generatedVars);
       loadEnvFile();
       console.log("🔄 Environment variables reloaded successfully\n");
       console.log("✅ Generated .env.local with secure values");
     } else {
       console.log(
-        "❌ Setup cancelled. Please set the required environment variables manually.",
+        "❌ No variables were generated. Please set the required environment variables manually.",
       );
       process.exit(1);
     }
