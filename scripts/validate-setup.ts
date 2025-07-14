@@ -223,7 +223,7 @@ async function initializeDatabase(): Promise<void> {
       .values({
         key: 'timeZone',
         value: '{"timeZone":"UTC"}',
-        updatedAt: new Date(now.getTime()),
+        updatedAt: now,
       })
       .run();
     
