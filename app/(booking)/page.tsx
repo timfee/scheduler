@@ -1,6 +1,6 @@
 "use client";
 
-import { BookingProgress } from "@/app/(booking)/components/booking-progress";
+import { BookingProgress } from "@/components/booking/booking-progress";
 import { useBookingState } from "@/app/(booking)/hooks/use-booking-state";
 import { createBookingAction } from "@/app/(booking)/server/actions";
 import { Button } from "@/components/ui/button";

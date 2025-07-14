@@ -1,4 +1,4 @@
-import { AdminNavigation } from "@/app/admin/components/navigation";
+import { AdminNavigation } from "@/components/admin/navigation";
 import { type ReactNode } from "react";
 
 interface AdminLayoutProps {

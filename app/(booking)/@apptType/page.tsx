@@ -1,4 +1,4 @@
-import { AppointmentTypeSelectorWrapper } from "@/app/(booking)/components/appointment-type-selector-wrapper";
+import { AppointmentTypeSelectorWrapper } from "@/components/booking/appointment-type-selector-wrapper";
 import { listAppointmentTypes } from "@/app/(booking)/server/data";
 
 export default async function AppointmentTypePage({

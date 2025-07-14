@@ -1,4 +1,4 @@
-import { DateSelectorWrapper } from "@/app/(booking)/components/date-selector-wrapper";
+import { DateSelectorWrapper } from "@/components/booking/date-selector-wrapper";
 import { listBusyTimesAction } from "@/lib/services/busy-times";
 import { createDateRange } from "@/lib/utils/date-range";
 

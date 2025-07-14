@@ -1,4 +1,4 @@
-import { ConnectionsClient } from "@/app/connections/components";
+import ConnectionsClient from "@/components/connections/connections-client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getConnections } from "@/lib/services/connections";
 import { AlertCircle } from "lucide-react";

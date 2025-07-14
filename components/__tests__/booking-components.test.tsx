@@ -1,9 +1,9 @@
-import { BookingProgress } from "@/app/(booking)/components/booking-progress";
+import { BookingProgress } from "@/components/booking/booking-progress";
 import {
   AppointmentTypeSkeleton,
   DateSkeleton,
   TimeSkeleton,
-} from "@/app/(booking)/components/booking-skeletons";
+} from "@/components/booking/booking-skeletons";
 import { describe, expect, it } from "@jest/globals";
 
 describe("Booking Components", () => {
