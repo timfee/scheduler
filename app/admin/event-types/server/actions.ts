@@ -7,6 +7,11 @@ import { revalidateTag } from "next/cache";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
+import { 
+  validateAppointmentTypeName, 
+  validateAppointmentTypeDuration, 
+  validateAppointmentTypeId 
+} from "@/lib/utils/validation";
 
 export interface CreateAppointmentTypeData {
   name: string;
@@ -29,20 +34,16 @@ export async function createAppointmentTypeAction(
   data: CreateAppointmentTypeData
 ): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
-    // Basic validation
-    if (!data.name || data.name.trim().length === 0) {
-      throw new Error("Name is required");
-    }
-    if (data.durationMinutes < 1 || data.durationMinutes > 480) {
-      throw new Error("Duration must be between 1 and 480 minutes");
-    }
+    // Validate input data
+    const sanitizedName = validateAppointmentTypeName(data.name);
+    validateAppointmentTypeDuration(data.durationMinutes);
 
     const now = new Date();
     const id = uuid();
     
     const newAppointmentType: NewAppointmentType = {
       id,
-      name: data.name.trim(),
+      name: sanitizedName,
       description: data.description?.trim() ?? null,
       durationMinutes: data.durationMinutes,
       isActive: true,
@@ -70,29 +71,23 @@ export async function updateAppointmentTypeAction(
   data: UpdateAppointmentTypeData
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Basic validation
-    if (!data.id || data.id.trim().length === 0) {
-      throw new Error("ID is required");
-    }
-    if (!data.name || data.name.trim().length === 0) {
-      throw new Error("Name is required");
-    }
-    if (data.durationMinutes < 1 || data.durationMinutes > 480) {
-      throw new Error("Duration must be between 1 and 480 minutes");
-    }
+    // Validate input data
+    const sanitizedId = validateAppointmentTypeId(data.id);
+    const sanitizedName = validateAppointmentTypeName(data.name);
+    validateAppointmentTypeDuration(data.durationMinutes);
 
     const now = new Date();
     
     const result = db
       .update(appointmentTypes)
       .set({
-        name: data.name.trim(),
+        name: sanitizedName,
         description: data.description?.trim() ?? null,
         durationMinutes: data.durationMinutes,
         isActive: data.isActive,
         updatedAt: now,
       })
-      .where(eq(appointmentTypes.id, data.id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .run();
 
     if (result.changes === 0) {
@@ -117,14 +112,12 @@ export async function deleteAppointmentTypeAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Basic validation
-    if (!id || id.trim().length === 0) {
-      throw new Error("ID is required");
-    }
+    // Validate input data
+    const sanitizedId = validateAppointmentTypeId(id);
 
     const result = db
       .delete(appointmentTypes)
-      .where(eq(appointmentTypes.id, id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .run();
 
     if (result.changes === 0) {
@@ -149,16 +142,14 @@ export async function toggleAppointmentTypeAction(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Basic validation
-    if (!id || id.trim().length === 0) {
-      throw new Error("ID is required");
-    }
+    // Validate input data
+    const sanitizedId = validateAppointmentTypeId(id);
 
     // First get the current state
     const current = db
       .select()
       .from(appointmentTypes)
-      .where(eq(appointmentTypes.id, id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .limit(1)
       .all();
 
@@ -175,7 +166,7 @@ export async function toggleAppointmentTypeAction(
         isActive: !currentAppointmentType.isActive,
         updatedAt: now,
       })
-      .where(eq(appointmentTypes.id, id))
+      .where(eq(appointmentTypes.id, sanitizedId))
       .run();
     
     revalidateTag("appointment-types");
