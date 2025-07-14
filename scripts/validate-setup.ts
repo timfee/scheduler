@@ -219,11 +219,13 @@ async function initializeDatabase(): Promise<void> {
     const now = new Date();
     
     // Insert default preferences
-    // eslint-disable-next-line custom/performance-patterns
-    db.run(sql`
-      INSERT INTO preferences (key, value, updated_at)
-      VALUES ('timeZone', '{"timeZone":"UTC"}', ${now.getTime()})
-    `);
+    db.insert(schema.preferences)
+      .values({
+        key: "timeZone",
+        value: JSON.stringify({ timeZone: "UTC" }),
+        updatedAt: new Date(),
+      })
+      .run();
     
     // Insert default appointment types
     db.insert(schema.appointmentTypes)
