@@ -297,8 +297,9 @@ async function main(): Promise<void> {
       }
       
       generateEnvFile(generatedVars);
+      loadEnvFile();
+      console.log("🔄 Environment variables reloaded successfully\n");
       console.log("✅ Generated .env.local with secure values");
-      console.log("📝 Please restart the application to load the new environment variables\n");
     } else {
       console.log("❌ Setup cancelled. Please set the required environment variables manually.");
       process.exit(1);
