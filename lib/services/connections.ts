@@ -1,9 +1,9 @@
 import {
-  listCalendarIntegrations,
   isProviderType,
+  listCalendarIntegrations,
   type ProviderType,
-} from '@/lib/database/integrations';
-import { type CalendarCapability } from '@/lib/types/constants';
+} from "@/lib/database/integrations";
+import { type CalendarCapability } from "@/lib/types/constants";
 
 export interface ConnectionListItem {
   id: string;
@@ -20,7 +20,7 @@ export async function getConnections(): Promise<ConnectionListItem[]> {
     id: integration.id,
     provider: isProviderType(integration.provider)
       ? integration.provider
-      : 'caldav',
+      : "caldav",
     displayName: integration.displayName,
     capabilities: integration.config.capabilities,
     createdAt: integration.createdAt,

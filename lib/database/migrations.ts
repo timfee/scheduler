@@ -1,8 +1,11 @@
 import { sql } from "drizzle-orm";
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-export function createTables<T extends Record<string, unknown>>(db: BetterSQLite3Database<T>) {
+export function createTables<T extends Record<string, unknown>>(
+  db: BetterSQLite3Database<T>,
+) {
   // Create all tables
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`
     CREATE TABLE IF NOT EXISTS calendar_integrations (
       id TEXT PRIMARY KEY,
@@ -15,6 +18,7 @@ export function createTables<T extends Record<string, unknown>>(db: BetterSQLite
     )
   `);
 
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`
     CREATE TABLE IF NOT EXISTS calendars (
       id TEXT PRIMARY KEY,
@@ -27,6 +31,7 @@ export function createTables<T extends Record<string, unknown>>(db: BetterSQLite
     )
   `);
 
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`
     CREATE TABLE IF NOT EXISTS preferences (
       key TEXT PRIMARY KEY,
@@ -35,6 +40,7 @@ export function createTables<T extends Record<string, unknown>>(db: BetterSQLite
     )
   `);
 
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`
     CREATE TABLE IF NOT EXISTS api_cache (
       key TEXT PRIMARY KEY,
@@ -43,6 +49,7 @@ export function createTables<T extends Record<string, unknown>>(db: BetterSQLite
     )
   `);
 
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`
     CREATE TABLE IF NOT EXISTS appointment_types (
       id TEXT PRIMARY KEY,
@@ -56,18 +63,43 @@ export function createTables<T extends Record<string, unknown>>(db: BetterSQLite
   `);
 
   // Create indexes
-  db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendar_integrations_provider ON calendar_integrations(provider)`);
-  db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendar_integrations_display_order ON calendar_integrations(display_order)`);
-  db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendars_integration_id ON calendars(integration_id)`);
-  db.run(sql`CREATE INDEX IF NOT EXISTS idx_calendars_capability ON calendars(capability)`);
-  db.run(sql`CREATE INDEX IF NOT EXISTS idx_api_cache_expires_at ON api_cache(expires_at)`);
-  db.run(sql`CREATE INDEX IF NOT EXISTS idx_appointment_types_active ON appointment_types(is_active)`);
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
+  db.run(
+    sql`CREATE INDEX IF NOT EXISTS idx_calendar_integrations_provider ON calendar_integrations(provider)`,
+  );
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
+  db.run(
+    sql`CREATE INDEX IF NOT EXISTS idx_calendar_integrations_display_order ON calendar_integrations(display_order)`,
+  );
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
+  db.run(
+    sql`CREATE INDEX IF NOT EXISTS idx_calendars_integration_id ON calendars(integration_id)`,
+  );
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
+  db.run(
+    sql`CREATE INDEX IF NOT EXISTS idx_calendars_capability ON calendars(capability)`,
+  );
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
+  db.run(
+    sql`CREATE INDEX IF NOT EXISTS idx_api_cache_expires_at ON api_cache(expires_at)`,
+  );
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
+  db.run(
+    sql`CREATE INDEX IF NOT EXISTS idx_appointment_types_active ON appointment_types(is_active)`,
+  );
 }
 
-export function dropTables<T extends Record<string, unknown>>(db: BetterSQLite3Database<T>) {
+export function dropTables<T extends Record<string, unknown>>(
+  db: BetterSQLite3Database<T>,
+) {
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`DROP TABLE IF EXISTS api_cache`);
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`DROP TABLE IF EXISTS preferences`);
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`DROP TABLE IF EXISTS calendars`);
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`DROP TABLE IF EXISTS calendar_integrations`);
+  // eslint-disable-next-line custom/performance-patterns -- Migration scripts should run synchronously
   db.run(sql`DROP TABLE IF EXISTS appointment_types`);
 }

@@ -1,6 +1,5 @@
 "use server";
 
-import { z } from "zod";
 import { db } from "@/lib/database";
 import {
   buildConfigFromValues,
@@ -23,22 +22,22 @@ import {
   type ProviderType,
   type UpdateCalendarIntegrationInput,
 } from "@/lib/database/integrations";
-import { calendarIntegrations } from "@/lib/schemas/database";
 import { mapErrorToUserMessage } from "@/lib/errors";
-import { eq } from "drizzle-orm";
-import { revalidatePath, revalidateTag } from "next/cache";
-
-import { getConnections, type ConnectionListItem } from "./data";
 import {
   connectionConfigSchema,
   connectionFormSchema,
   type ConnectionFormValues,
 } from "@/lib/schemas/connection";
+import { calendarIntegrations } from "@/lib/schemas/database";
+import { eq } from "drizzle-orm";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { z } from "zod";
+
+import { getConnections, type ConnectionListItem } from "./data";
 
 export type { CalendarOption, ProviderType };
 
 export type ConnectionFormData = ConnectionFormValues;
-
 
 /**
  * Create a new calendar connection
@@ -187,7 +186,7 @@ export async function listConnectionsAction(): Promise<ConnectionListItem[]> {
   try {
     // Validate - no parameters to validate
     z.void().parse(undefined);
-    
+
     const data = await getConnections();
     return data;
   } catch (error) {
@@ -266,7 +265,7 @@ export async function getConnectionDetailsAction(
   try {
     // Validate input
     const validatedId = z.string().uuid().parse(id);
-    
+
     const integration = await getCalendarIntegration(validatedId);
     if (!integration) {
       throw new Error("Connection not found");
@@ -287,7 +286,7 @@ export async function listCalendarsForConnectionAction(
   try {
     // Validate input
     const validatedId = z.string().uuid().parse(id);
-    
+
     const integration = await getCalendarIntegration(validatedId);
     if (!integration) {
       throw new Error("Connection not found");
@@ -320,10 +319,12 @@ export async function updateCalendarOrderAction(
     const target = list[newIndex]!;
 
     db.transaction((tx) => {
+      // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
       tx.update(calendarIntegrations)
         .set({ displayOrder: current.displayOrder })
         .where(eq(calendarIntegrations.id, target.id))
         .run();
+      // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
       tx.update(calendarIntegrations)
         .set({ displayOrder: target.displayOrder })
         .where(eq(calendarIntegrations.id, current.id))

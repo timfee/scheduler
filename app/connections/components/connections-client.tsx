@@ -1,47 +1,46 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import ConnectionForm from "./connection-form";
-import { useState, useEffect, useTransition, useCallback } from "react";
-
+import {
+  PROVIDER_AUTH_METHODS,
+  useConnectionForm,
+  type ConnectionFormValues,
+} from "@/app/connections/hooks/use-connection-form";
+import { useTestConnection } from "@/app/connections/hooks/use-test-connection";
 import {
   createConnectionAction,
   deleteConnectionAction,
-  updateConnectionAction,
   getConnectionDetailsAction,
   listCalendarsForConnectionAction,
   listConnectionsAction,
   updateCalendarOrderAction,
+  updateConnectionAction,
   type ConnectionFormData,
 } from "@/app/connections/server/actions";
 import { type ConnectionListItem } from "@/app/connections/server/data";
-import { mapErrorToUserMessage } from "@/lib/errors";
-import ConnectionsList from "./connections-list";
 import {
-  useConnectionForm,
-  type ConnectionFormValues,
-  PROVIDER_AUTH_METHODS,
-} from "@/app/connections/hooks/use-connection-form";
-import { buildConnectionFormData, DEFAULT_GOOGLE_TOKEN_URL } from "@/app/connections/utils/form-data-builder";
-import { useTestConnection } from "@/app/connections/hooks/use-test-connection";
+  buildConnectionFormData,
+  DEFAULT_GOOGLE_TOKEN_URL,
+} from "@/app/connections/utils/form-data-builder";
+import { Button } from "@/components/ui/button";
+import { mapErrorToUserMessage } from "@/lib/errors";
+import { useCallback, useEffect, useState, useTransition } from "react";
+
+import ConnectionForm from "./connection-form";
+import ConnectionsList from "./connections-list";
 
 interface ConnectionsClientProps {
   initialConnections: ConnectionListItem[];
 }
 
-
 export default function ConnectionsClient({
   initialConnections,
 }: ConnectionsClientProps) {
-  const [connections, setConnections] = useState<ConnectionListItem[]>(
-    initialConnections
-  );
+  const [connections, setConnections] =
+    useState<ConnectionListItem[]>(initialConnections);
   const addConnection = (item: ConnectionListItem) =>
     setConnections((prev) => [...prev, item]);
   const updateConnection = (item: ConnectionListItem) =>
-    setConnections((prev) =>
-      prev.map((c) => (c.id === item.id ? item : c))
-    );
+    setConnections((prev) => prev.map((c) => (c.id === item.id ? item : c)));
   const removeConnection = (id: string) =>
     setConnections((prev) => prev.filter((c) => c.id !== id));
   const [, startTransition] = useTransition();
@@ -50,7 +49,13 @@ export default function ConnectionsClient({
     useState<ConnectionListItem | null>(null);
 
   // Extract test connection logic
-  const { testStatus, calendars, setCalendars, testConnection, resetTestStatus } = useTestConnection();
+  const {
+    testStatus,
+    calendars,
+    setCalendars,
+    testConnection,
+    resetTestStatus,
+  } = useTestConnection();
 
   // sync state with server-provided data
   useEffect(() => {
@@ -89,7 +94,8 @@ export default function ConnectionsClient({
   const onSubmit = async (values: FormValues) => {
     try {
       // Build the connection data using the utility function
-      const connectionData: ConnectionFormData = buildConnectionFormData(values);
+      const connectionData: ConnectionFormData =
+        buildConnectionFormData(values);
 
       if (editingConnection) {
         const optimistic = {
@@ -158,7 +164,6 @@ export default function ConnectionsClient({
     setConnections(updated);
   };
 
-
   const handleEdit = async (connection: ConnectionListItem) => {
     resetTestStatus();
     setEditingConnection(connection);
@@ -213,9 +218,7 @@ export default function ConnectionsClient({
       />
 
       {/* Add Connection Button */}
-      {!isFormOpen && (
-        <Button onClick={handleOpenForm}>Add Connection</Button>
-      )}
+      {!isFormOpen && <Button onClick={handleOpenForm}>Add Connection</Button>}
 
       {/* Connections List */}
       <ConnectionsList

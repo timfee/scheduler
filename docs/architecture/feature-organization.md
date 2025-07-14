@@ -32,6 +32,7 @@ app/
 ## Example Structure
 
 ### Booking Feature
+
 ```
 app/(booking)/
   ├── _server/
@@ -48,6 +49,7 @@ app/(booking)/
 ```
 
 ### Connections Feature
+
 ```
 app/connections/
   ├── _server/
@@ -65,6 +67,7 @@ app/connections/
 ```
 
 ### Admin Features
+
 ```
 app/admin/
   ├── _components/

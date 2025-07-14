@@ -42,8 +42,9 @@ Create server actions for all mutations:
 // app/feature-name/actions.ts
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
 import { mapErrorToUserMessage } from "@/lib/errors";
+import { revalidatePath, revalidateTag } from "next/cache";
+
 import { featureSchema } from "./schemas/feature-name";
 
 export async function createFeatureAction(
@@ -76,10 +77,10 @@ export async function updateFeatureAction(
   try {
     // Similar pattern for updates
     const updated = await updateFeatureRecord(id, formData);
-    
+
     revalidatePath("/feature-name");
     revalidateTag("feature-name-list");
-    
+
     return updated;
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to update feature"));
@@ -89,7 +90,7 @@ export async function updateFeatureAction(
 export async function deleteFeatureAction(id: string): Promise<void> {
   try {
     await deleteFeatureRecord(id);
-    
+
     revalidatePath("/feature-name");
     revalidateTag("feature-name-list");
   } catch (error) {
@@ -117,7 +118,7 @@ export interface FeatureListItem {
 
 export async function getFeatures(): Promise<FeatureListItem[]> {
   const features = await db.select().from(featureTable);
-  return features.map(feature => ({
+  return features.map((feature) => ({
     id: feature.id,
     name: feature.name,
     description: feature.description,
@@ -127,7 +128,10 @@ export async function getFeatures(): Promise<FeatureListItem[]> {
 }
 
 export async function getFeature(id: string): Promise<FeatureListItem | null> {
-  const feature = await db.select().from(featureTable).where(eq(featureTable.id, id));
+  const feature = await db
+    .select()
+    .from(featureTable)
+    .where(eq(featureTable.id, id));
   return feature[0] || null;
 }
 ```
@@ -244,11 +248,11 @@ interface FeatureFormProps {
   isSubmitting?: boolean;
 }
 
-export default function FeatureForm({ 
-  initialData, 
-  onSubmit, 
-  onCancel, 
-  isSubmitting 
+export default function FeatureForm({
+  initialData,
+  onSubmit,
+  onCancel,
+  isSubmitting
 }: FeatureFormProps) {
   const [formData, setFormData] = useState<FeatureFormData>({
     name: initialData?.name || "",
@@ -259,7 +263,7 @@ export default function FeatureForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
+
     try {
       await onSubmit(formData);
     } catch (error) {
@@ -320,7 +324,10 @@ import { z } from "zod";
 
 export const featureSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name too long"),
-  description: z.string().min(1, "Description is required").max(500, "Description too long"),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(500, "Description too long"),
 });
 
 export type FeatureFormData = z.infer<typeof featureSchema>;
@@ -329,6 +336,7 @@ export type FeatureFormData = z.infer<typeof featureSchema>;
 ## State Management Patterns
 
 ### 1. Local State
+
 Use for component-specific state:
 
 ```typescript
@@ -337,6 +345,7 @@ const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 ```
 
 ### 2. URL State
+
 Use nuqs for shareable state:
 
 ```typescript
@@ -347,6 +356,7 @@ const [page, setPage] = useQueryState("page", { defaultValue: "1" });
 ```
 
 ### 3. Server State
+
 Use Server Actions for server data:
 
 ```typescript
@@ -360,6 +370,7 @@ const result = await createFeatureAction(formData);
 ## Error Handling
 
 ### 1. Server Action Errors
+
 ```typescript
 export async function createFeatureAction(data: FeatureFormData) {
   try {
@@ -372,6 +383,7 @@ export async function createFeatureAction(data: FeatureFormData) {
 ```
 
 ### 2. Client Error Handling
+
 ```typescript
 const handleSubmit = async (data: FeatureFormData) => {
   try {
@@ -387,6 +399,7 @@ const handleSubmit = async (data: FeatureFormData) => {
 ## Testing Patterns
 
 ### 1. Server Action Tests
+
 ```typescript
 // app/feature-name/__tests__/actions.test.ts
 import { createFeatureAction } from "../actions";
@@ -395,7 +408,7 @@ describe("createFeatureAction", () => {
   it("creates a feature successfully", async () => {
     const formData = { name: "Test Feature", description: "Test Description" };
     const result = await createFeatureAction(formData);
-    
+
     expect(result.id).toBeDefined();
     expect(result.name).toBe("Test Feature");
   });
@@ -403,6 +416,7 @@ describe("createFeatureAction", () => {
 ```
 
 ### 2. Component Tests
+
 ```typescript
 // app/feature-name/__tests__/components.test.tsx
 import { render, screen } from "@testing-library/react";
@@ -412,7 +426,7 @@ describe("FeatureClient", () => {
   it("renders feature list", () => {
     const features = [{ id: "1", name: "Test", description: "Test" }];
     render(<FeatureClient initialFeatures={features} />);
-    
+
     expect(screen.getByText("Test")).toBeInTheDocument();
   });
 });
@@ -421,16 +435,19 @@ describe("FeatureClient", () => {
 ## Best Practices
 
 ### 1. Keep Components Small
+
 - Aim for <300 lines per component
 - Extract logic into custom hooks
 - Split complex components into smaller pieces
 
 ### 2. Use TypeScript Strictly
+
 - Define interfaces for all props and data
 - Use Zod for runtime validation
 - Avoid `any` types
 
 ### 3. Handle Loading States
+
 ```typescript
 const [isPending, startTransition] = useTransition();
 
@@ -439,12 +456,13 @@ const [isPending, startTransition] = useTransition();
 ```
 
 ### 4. Implement Optimistic Updates
+
 ```typescript
 // Update UI immediately, handle errors gracefully
 const handleDelete = async (id: string) => {
   // Optimistic update
   removeFeature(id);
-  
+
   try {
     await deleteFeatureAction(id);
   } catch (error) {
@@ -456,6 +474,7 @@ const handleDelete = async (id: string) => {
 ```
 
 ### 5. Use Consistent Naming
+
 - `FeatureClient` for main client components
 - `FeatureForm` for form components
 - `FeatureList` for list components

@@ -1,22 +1,27 @@
 # ADR-XXX: [Decision Title]
 
 ## Status
+
 [Proposed | Accepted | Rejected | Superseded]
 
 ## Context
+
 [Describe the situation and the architectural decision to be made. Include technical, business, and project context.]
 
 ## Decision
+
 [State the architectural decision that was made. Be specific and clear about what was decided.]
 
 ## Consequences
 
 ### Positive
+
 - **[Benefit 1]**: [Description of how this decision helps]
 - **[Benefit 2]**: [Description of how this decision helps]
 - **[Benefit 3]**: [Description of how this decision helps]
 
 ### Negative
+
 - **[Cost 1]**: [Description of the trade-offs or downsides]
 - **[Cost 2]**: [Description of the trade-offs or downsides]
 - **[Cost 3]**: [Description of the trade-offs or downsides]
@@ -24,12 +29,15 @@
 ## Implementation
 
 ### Current State
+
 [Describe how things work now, if applicable]
 
 ### Future State
+
 [Describe how things will work after this decision is implemented]
 
 ### Examples
+
 ```typescript
 // Example code demonstrating the decision
 export function exampleFunction() {
@@ -38,22 +46,26 @@ export function exampleFunction() {
 ```
 
 ### Patterns to Follow
+
 - **Pattern 1**: [Description of implementation pattern]
 - **Pattern 2**: [Description of implementation pattern]
 - **Pattern 3**: [Description of implementation pattern]
 
 ### Patterns to Avoid
+
 - **Anti-pattern 1**: [Description of what not to do]
 - **Anti-pattern 2**: [Description of what not to do]
 
 ## Alternatives Considered
 
 ### [Alternative 1]
+
 - **Pros**: [Benefits of this alternative]
 - **Cons**: [Drawbacks of this alternative]
 - **Why rejected**: [Reason for not choosing this alternative]
 
 ### [Alternative 2]
+
 - **Pros**: [Benefits of this alternative]
 - **Cons**: [Drawbacks of this alternative]
 - **Why rejected**: [Reason for not choosing this alternative]
@@ -61,16 +73,19 @@ export function exampleFunction() {
 ## Implementation Strategy
 
 ### Phase 1: [Initial Implementation]
+
 - [ ] [Specific task or milestone]
 - [ ] [Specific task or milestone]
 - [ ] [Specific task or milestone]
 
 ### Phase 2: [Broader Adoption]
+
 - [ ] [Specific task or milestone]
 - [ ] [Specific task or milestone]
 - [ ] [Specific task or milestone]
 
 ### Phase 3: [Full Migration]
+
 - [ ] [Specific task or milestone]
 - [ ] [Specific task or milestone]
 - [ ] [Specific task or milestone]
@@ -78,17 +93,20 @@ export function exampleFunction() {
 ## Metrics and Success Criteria
 
 ### Success Metrics
+
 - **[Metric 1]**: [How to measure success]
 - **[Metric 2]**: [How to measure success]
 - **[Metric 3]**: [How to measure success]
 
 ### Failure Indicators
+
 - **[Indicator 1]**: [What would indicate the decision isn't working]
 - **[Indicator 2]**: [What would indicate the decision isn't working]
 
 ## When to Reconsider
 
 Consider revisiting this decision if:
+
 - [Condition 1 that would trigger reconsideration]
 - [Condition 2 that would trigger reconsideration]
 - [Condition 3 that would trigger reconsideration]
@@ -96,20 +114,24 @@ Consider revisiting this decision if:
 ## Enforcement
 
 ### Automated Checks
+
 - **ESLint Rules**: [List any ESLint rules that enforce this decision]
 - **Type Checking**: [List any TypeScript patterns that enforce this decision]
 - **Tests**: [List any tests that validate this decision]
 
 ### Code Review Guidelines
+
 - [Guideline 1 for reviewing code related to this decision]
 - [Guideline 2 for reviewing code related to this decision]
 - [Guideline 3 for reviewing code related to this decision]
 
 ## Related Decisions
+
 - [ADR-XXX: Related Decision Title](./adr-xxx-related-decision.md)
 - [ADR-XXX: Another Related Decision](./adr-xxx-another-decision.md)
 
 ## References
+
 - [Link to relevant documentation]
 - [Link to relevant resources]
 - [Link to relevant discussions]

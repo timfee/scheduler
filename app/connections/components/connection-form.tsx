@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  type CalendarOption,
+  type ProviderType,
+} from "@/app/connections/server/actions";
+import { type ConnectionListItem } from "@/app/connections/server/data";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,15 +19,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useEffect } from "react";
 import { type UseFormReturn } from "react-hook-form";
 
-import ProviderSelect from "./provider-select";
 import CapabilitiesField from "./capabilities-field";
-import { type ConnectionFormValues } from "@/app/connections/hooks/use-connection-form";
-import { type CalendarOption, type ProviderType } from "@/app/connections/server/actions";
-import { type ConnectionListItem } from "@/app/connections/server/data";
+import ProviderSelect from "./provider-select";
 
 export interface ConnectionFormProps {
   isOpen: boolean;
@@ -180,7 +178,11 @@ export default function ConnectionForm({
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="you@example.com" {...field} />
+                            <Input
+                              type="email"
+                              placeholder="you@example.com"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -261,8 +263,6 @@ export default function ConnectionForm({
             {/* Capabilities */}
             <CapabilitiesField control={form.control} />
 
-
-
             {/* Calendars fetched after testing */}
             {testStatus.success && calendars.length > 0 && (
               <div>
@@ -285,7 +285,11 @@ export default function ConnectionForm({
 
             <div className="flex gap-2">
               {!editingConnection && (
-                <Button type="button" onClick={onTestConnection} disabled={testStatus.testing}>
+                <Button
+                  type="button"
+                  onClick={onTestConnection}
+                  disabled={testStatus.testing}
+                >
                   {testStatus.testing ? "Testing..." : "Test"}
                 </Button>
               )}
@@ -302,4 +306,3 @@ export default function ConnectionForm({
     </Card>
   );
 }
-

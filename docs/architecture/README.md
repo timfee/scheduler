@@ -38,6 +38,7 @@ ADRs document the important architectural decisions made for this project, inclu
 ## Purpose
 
 This documentation serves to:
+
 - **Prevent over-engineering**: Clear guidelines on when to add complexity
 - **Maintain consistency**: Help new developers understand established patterns
 - **Preserve working solutions**: Document why current approaches work well

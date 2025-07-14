@@ -7,23 +7,26 @@ import { eq } from "drizzle-orm";
 /**
  * Get a preference value by key
  */
-export async function getPreference<T = unknown>(key: string): Promise<T | null> {
+export async function getPreference<T = unknown>(
+  key: string,
+): Promise<T | null> {
   try {
+    // eslint-disable-next-line custom/performance-patterns -- Getting single preference by key, has limit(1)
     const result = await db
       .select()
       .from(preferences)
       .where(eq(preferences.key, key))
       .limit(1);
-    
+
     if (result.length === 0) {
       return null;
     }
-    
+
     const row = result[0];
     if (!row) {
       return null;
     }
-    
+
     return JSON.parse(row.value) as T;
   } catch (error) {
     console.error(`Failed to get preference ${key}:`, error);
@@ -34,10 +37,13 @@ export async function getPreference<T = unknown>(key: string): Promise<T | null>
 /**
  * Set a preference value by key
  */
-export async function setPreference<T = unknown>(key: string, value: T): Promise<void> {
+export async function setPreference<T = unknown>(
+  key: string,
+  value: T,
+): Promise<void> {
   const now = new Date();
   const jsonValue = JSON.stringify(value);
-  
+
   try {
     await db
       .insert(preferences)
@@ -64,9 +70,7 @@ export async function setPreference<T = unknown>(key: string, value: T): Promise
  */
 export async function deletePreference(key: string): Promise<void> {
   try {
-    await db
-      .delete(preferences)
-      .where(eq(preferences.key, key));
+    await db.delete(preferences).where(eq(preferences.key, key));
   } catch (error) {
     console.error(`Failed to delete preference ${key}:`, error);
     throw error;

@@ -1,1 +1,4 @@
-export { getConnections, type ConnectionListItem } from '@/lib/services/connections';
+export {
+  getConnections,
+  type ConnectionListItem,
+} from "@/lib/services/connections";

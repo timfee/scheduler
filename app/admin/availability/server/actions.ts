@@ -1,6 +1,6 @@
 "use server";
 
-export { 
-  saveAvailabilityTemplateAction, 
-  loadAvailabilityTemplateAction 
-} from '@/lib/services/availability';
+export {
+  saveAvailabilityTemplateAction,
+  loadAvailabilityTemplateAction,
+} from "@/lib/services/availability";

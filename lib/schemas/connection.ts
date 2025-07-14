@@ -1,5 +1,5 @@
-import * as z from "zod";
 import { CALENDAR_CAPABILITY } from "@/lib/types/constants";
+import * as z from "zod";
 
 /**
  * Schema for connection form values used on both client and server.

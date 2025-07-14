@@ -1,28 +1,37 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import {
+  loadAvailabilityTemplateAction,
+  saveAvailabilityTemplateAction,
+} from "@/app/admin/availability/server/actions";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { BUSINESS_HOURS } from "@/lib/constants";
-
-import { Loader2 } from "lucide-react";
-import { type WeeklyAvailability, type TimeSlot } from "@/lib/schemas/availability";
-import { saveAvailabilityTemplateAction, loadAvailabilityTemplateAction } from "@/app/admin/availability/server/actions";
 import { mapErrorToUserMessage } from "@/lib/errors";
+import {
+  type TimeSlot,
+  type WeeklyAvailability,
+} from "@/lib/schemas/availability";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+
 import { DayAvailability } from "./day-availability";
 
 // Generate unique ID for slots
 const generateSlotId = () => `slot-${crypto.randomUUID()}`;
 
 // Create default slot with ID
-const createDefaultSlot = (start = BUSINESS_HOURS.DEFAULT_START, end = BUSINESS_HOURS.DEFAULT_END) => ({
+const createDefaultSlot = (
+  start = BUSINESS_HOURS.DEFAULT_START,
+  end = BUSINESS_HOURS.DEFAULT_END,
+) => ({
   id: generateSlotId(),
   start,
-  end
+  end,
 });
 
 // Type for slots that are guaranteed to have IDs
-type SlotWithId = Required<Pick<TimeSlot, 'id'>> & TimeSlot;
+type SlotWithId = Required<Pick<TimeSlot, "id">> & TimeSlot;
 
 // Type for availability with guaranteed slot IDs
 type WeeklyAvailabilityWithIds = {
@@ -32,7 +41,14 @@ type WeeklyAvailabilityWithIds = {
   };
 };
 
-type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
+type DayOfWeek =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
 
 const DAYS: { key: DayOfWeek; label: string }[] = [
   { key: "monday", label: "Monday" },
@@ -55,22 +71,26 @@ const DEFAULT_AVAILABILITY: WeeklyAvailability = {
 };
 
 export function AvailabilityTemplate() {
-  const [availability, setAvailability] = useState<WeeklyAvailabilityWithIds>(DEFAULT_AVAILABILITY as WeeklyAvailabilityWithIds);
+  const [availability, setAvailability] = useState<WeeklyAvailabilityWithIds>(
+    DEFAULT_AVAILABILITY as WeeklyAvailabilityWithIds,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   // Ensure slots have unique IDs
-  const ensureSlotIds = (availability: WeeklyAvailability): WeeklyAvailabilityWithIds => {
+  const ensureSlotIds = (
+    availability: WeeklyAvailability,
+  ): WeeklyAvailabilityWithIds => {
     const updated = { ...availability };
-    Object.keys(updated).forEach(day => {
+    Object.keys(updated).forEach((day) => {
       const dayKey = day as keyof WeeklyAvailability;
       updated[dayKey] = {
         ...updated[dayKey],
-        slots: updated[dayKey].slots.map(slot => ({
+        slots: updated[dayKey].slots.map((slot) => ({
           ...slot,
-          id: slot.id ?? generateSlotId()
-        }))
+          id: slot.id ?? generateSlotId(),
+        })),
       };
     });
     return updated as WeeklyAvailabilityWithIds;
@@ -88,7 +108,9 @@ export function AvailabilityTemplate() {
         }
       } catch (error) {
         console.error("Failed to load availability template:", error);
-        setError(mapErrorToUserMessage(error, "Failed to load availability template"));
+        setError(
+          mapErrorToUserMessage(error, "Failed to load availability template"),
+        );
       } finally {
         setIsLoading(false);
       }
@@ -98,45 +120,50 @@ export function AvailabilityTemplate() {
   }, []);
 
   const toggleDay = (day: DayOfWeek) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
       [day]: {
         ...prev[day],
         enabled: !prev[day].enabled,
-        slots: !prev[day].enabled ? [createDefaultSlot()] : prev[day].slots
-      }
+        slots: !prev[day].enabled ? [createDefaultSlot()] : prev[day].slots,
+      },
     }));
   };
 
   const addSlot = (day: DayOfWeek) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
       [day]: {
         ...prev[day],
-        slots: [...prev[day].slots, createDefaultSlot()]
-      }
+        slots: [...prev[day].slots, createDefaultSlot()],
+      },
     }));
   };
 
   const removeSlot = (day: DayOfWeek, slotId: string) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
       [day]: {
         ...prev[day],
-        slots: prev[day].slots.filter(slot => slot.id !== slotId)
-      }
+        slots: prev[day].slots.filter((slot) => slot.id !== slotId),
+      },
     }));
   };
 
-  const updateSlot = (day: DayOfWeek, slotId: string, field: 'start' | 'end', value: string) => {
-    setAvailability(prev => ({
+  const updateSlot = (
+    day: DayOfWeek,
+    slotId: string,
+    field: "start" | "end",
+    value: string,
+  ) => {
+    setAvailability((prev) => ({
       ...prev,
       [day]: {
         ...prev[day],
-        slots: prev[day].slots.map(slot => 
-          slot.id === slotId ? { ...slot, [field]: value } : slot
-        )
-      }
+        slots: prev[day].slots.map((slot) =>
+          slot.id === slotId ? { ...slot, [field]: value } : slot,
+        ),
+      },
     }));
   };
 
@@ -148,7 +175,9 @@ export function AvailabilityTemplate() {
         // Success - could add a toast notification here
       } catch (error) {
         console.error("Failed to save availability template:", error);
-        setError(mapErrorToUserMessage(error, "Failed to save availability template"));
+        setError(
+          mapErrorToUserMessage(error, "Failed to save availability template"),
+        );
       }
     });
   };
@@ -156,11 +185,11 @@ export function AvailabilityTemplate() {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="text-red-800 text-sm">{error}</div>
+        <div className="rounded-md border border-red-200 bg-red-50 p-4">
+          <div className="text-sm text-red-800">{error}</div>
         </div>
       )}
-      
+
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin" />
@@ -192,12 +221,12 @@ export function AvailabilityTemplate() {
       <Separator />
 
       <div className="flex justify-end">
-        <Button 
-          onClick={handleSave} 
+        <Button
+          onClick={handleSave}
           disabled={isPending || isLoading}
           className="px-8"
         >
-          {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save Availability Template
         </Button>
       </div>

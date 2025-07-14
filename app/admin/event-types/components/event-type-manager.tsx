@@ -1,16 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+/* eslint-disable max-lines -- Complex admin component with comprehensive form and validation */
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit2, Trash2, Video, Phone, MapPin, Calendar, Clock, Settings } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Calendar,
+  Clock,
+  Edit2,
+  MapPin,
+  Phone,
+  Plus,
+  Settings,
+  Trash2,
+  Video,
+} from "lucide-react";
+import { useState } from "react";
 
 interface EventType {
   id: string;
@@ -24,7 +48,13 @@ interface EventType {
 }
 
 interface EventLocation {
-  type: "google_meet" | "zoom" | "phone_call_me" | "phone_call_you" | "in_person" | "tbd";
+  type:
+    | "google_meet"
+    | "zoom"
+    | "phone_call_me"
+    | "phone_call_you"
+    | "in_person"
+    | "tbd";
   label: string;
   details?: string;
 }
@@ -49,7 +79,14 @@ const LOCATION_TYPES = [
 ];
 
 const COLORS = [
-  "#3B82F6", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6", "#F97316", "#06B6D4", "#84CC16"
+  "#3B82F6",
+  "#EF4444",
+  "#10B981",
+  "#F59E0B",
+  "#8B5CF6",
+  "#F97316",
+  "#06B6D4",
+  "#84CC16",
 ];
 
 const DEFAULT_EVENT_TYPE: Omit<EventType, "id"> = {
@@ -59,10 +96,10 @@ const DEFAULT_EVENT_TYPE: Omit<EventType, "id"> = {
   locations: [{ type: "google_meet", label: "Google Meet" }],
   rules: {
     bufferTime: 0,
-    advanceBooking: { min: 2, max: 30 }
+    advanceBooking: { min: 2, max: 30 },
   },
   color: COLORS[0] ?? "#3B82F6",
-  enabled: true
+  enabled: true,
 };
 
 export function EventTypeManager() {
@@ -74,14 +111,14 @@ export function EventTypeManager() {
       durations: [15, 30],
       locations: [
         { type: "google_meet", label: "Google Meet" },
-        { type: "zoom", label: "Zoom" }
+        { type: "zoom", label: "Zoom" },
       ],
       rules: {
         bufferTime: 5,
-        advanceBooking: { min: 2, max: 7 }
+        advanceBooking: { min: 2, max: 7 },
       },
       color: "#3B82F6",
-      enabled: true
+      enabled: true,
     },
     {
       id: "2",
@@ -90,20 +127,22 @@ export function EventTypeManager() {
       durations: [60, 90],
       locations: [
         { type: "google_meet", label: "Google Meet" },
-        { type: "in_person", label: "Office Meeting Room" }
+        { type: "in_person", label: "Office Meeting Room" },
       ],
       rules: {
         maxHoursPerDay: 4,
         maxMeetingsPerDay: 3,
         bufferTime: 15,
-        advanceBooking: { min: 24, max: 30 }
+        advanceBooking: { min: 24, max: 30 },
       },
       color: "#10B981",
-      enabled: true
-    }
+      enabled: true,
+    },
   ]);
 
-  const [editingEventType, setEditingEventType] = useState<EventType | null>(null);
+  const [editingEventType, setEditingEventType] = useState<EventType | null>(
+    null,
+  );
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const handleCreate = () => {
@@ -118,31 +157,31 @@ export function EventTypeManager() {
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this event type?")) {
-      setEventTypes(prev => prev.filter(et => et.id !== id));
+      setEventTypes((prev) => prev.filter((et) => et.id !== id));
     }
   };
 
   const handleToggle = (id: string) => {
-    setEventTypes(prev => 
-      prev.map(et => 
-        et.id === id ? { ...et, enabled: !et.enabled } : et
-      )
+    setEventTypes((prev) =>
+      prev.map((et) => (et.id === id ? { ...et, enabled: !et.enabled } : et)),
     );
   };
 
   const handleSave = (eventType: Omit<EventType, "id">) => {
     if (editingEventType) {
-      setEventTypes(prev => 
-        prev.map(et => 
-          et.id === editingEventType.id ? { ...eventType, id: editingEventType.id } : et
-        )
+      setEventTypes((prev) =>
+        prev.map((et) =>
+          et.id === editingEventType.id
+            ? { ...eventType, id: editingEventType.id }
+            : et,
+        ),
       );
     } else {
       const newEventType: EventType = {
         ...eventType,
-        id: Date.now().toString()
+        id: Date.now().toString(),
       };
-      setEventTypes(prev => [...prev, newEventType]);
+      setEventTypes((prev) => [...prev, newEventType]);
     }
     setIsFormOpen(false);
     setEditingEventType(null);
@@ -151,22 +190,28 @@ export function EventTypeManager() {
   return (
     <div className="space-y-6">
       {/* Event Type List */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Event Types</h3>
         <Button onClick={handleCreate}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           Add Event Type
         </Button>
       </div>
 
       <div className="grid gap-4">
         {eventTypes.map((eventType) => (
-          <Card key={eventType.id} className={`${eventType.enabled ? 'border-l-4' : 'opacity-60'}`} style={{ borderLeftColor: eventType.enabled ? eventType.color : undefined }}>
+          <Card
+            key={eventType.id}
+            className={`${eventType.enabled ? "border-l-4" : "opacity-60"}`}
+            style={{
+              borderLeftColor: eventType.enabled ? eventType.color : undefined,
+            }}
+          >
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="w-4 h-4 rounded-full"
+                  <div
+                    className="h-4 w-4 rounded-full"
                     style={{ backgroundColor: eventType.color }}
                   />
                   <div>
@@ -179,23 +224,31 @@ export function EventTypeManager() {
                     checked={eventType.enabled}
                     onCheckedChange={() => handleToggle(eventType.id)}
                   />
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(eventType)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(eventType)}
+                  >
                     <Edit2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(eventType.id)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(eventType.id)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div>
-                  <Label className="text-sm font-medium flex items-center gap-2">
+                  <Label className="flex items-center gap-2 text-sm font-medium">
                     <Clock className="h-4 w-4" />
                     Duration
                   </Label>
-                  <div className="flex gap-2 mt-1">
+                  <div className="mt-1 flex gap-2">
                     {eventType.durations.map((duration, idx) => (
                       <Badge key={idx} variant="secondary">
                         {duration}m
@@ -204,11 +257,11 @@ export function EventTypeManager() {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium flex items-center gap-2">
+                  <Label className="flex items-center gap-2 text-sm font-medium">
                     <MapPin className="h-4 w-4" />
                     Locations
                   </Label>
-                  <div className="flex gap-2 mt-1">
+                  <div className="mt-1 flex gap-2">
                     {eventType.locations.map((location, idx) => (
                       <Badge key={idx} variant="outline">
                         {location.label}
@@ -217,11 +270,11 @@ export function EventTypeManager() {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium flex items-center gap-2">
+                  <Label className="flex items-center gap-2 text-sm font-medium">
                     <Settings className="h-4 w-4" />
                     Rules
                   </Label>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="mt-1 text-sm text-gray-600">
                     {eventType.rules.bufferTime > 0 && (
                       <div>Buffer: {eventType.rules.bufferTime}m</div>
                     )}
@@ -229,7 +282,9 @@ export function EventTypeManager() {
                       <div>Max/day: {eventType.rules.maxMeetingsPerDay}</div>
                     )}
                     {eventType.rules.maxHoursPerDay && (
-                      <div>Max hours/day: {eventType.rules.maxHoursPerDay}h</div>
+                      <div>
+                        Max hours/day: {eventType.rules.maxHoursPerDay}h
+                      </div>
                     )}
                   </div>
                 </div>
@@ -257,9 +312,10 @@ interface EventTypeFormProps {
   onCancel: () => void;
 }
 
+// eslint-disable-next-line max-lines-per-function -- Complex form component with validation and state management
 function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
   const [formData, setFormData] = useState<Omit<EventType, "id">>(
-    eventType ?? DEFAULT_EVENT_TYPE
+    eventType ?? DEFAULT_EVENT_TYPE,
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -268,46 +324,53 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
   };
 
   const addDuration = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      durations: [...prev.durations, 30]
+      durations: [...prev.durations, 30],
     }));
   };
 
   const removeDuration = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      durations: prev.durations.filter((_, i) => i !== index)
+      durations: prev.durations.filter((_, i) => i !== index),
     }));
   };
 
   const updateDuration = (index: number, value: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      durations: prev.durations.map((d, i) => i === index ? value : d)
+      durations: prev.durations.map((d, i) => (i === index ? value : d)),
     }));
   };
 
   const addLocation = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      locations: [...prev.locations, { type: "google_meet", label: "Google Meet" }]
+      locations: [
+        ...prev.locations,
+        { type: "google_meet", label: "Google Meet" },
+      ],
     }));
   };
 
   const removeLocation = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      locations: prev.locations.filter((_, i) => i !== index)
+      locations: prev.locations.filter((_, i) => i !== index),
     }));
   };
 
-  const updateLocation = (index: number, field: keyof EventLocation, value: string) => {
-    setFormData(prev => ({
+  const updateLocation = (
+    index: number,
+    field: keyof EventLocation,
+    value: string,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      locations: prev.locations.map((l, i) => 
-        i === index ? { ...l, [field]: value } : l
-      )
+      locations: prev.locations.map((l, i) =>
+        i === index ? { ...l, [field]: value } : l,
+      ),
     }));
   };
 
@@ -327,7 +390,9 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="e.g., Quick Chat"
                 required
               />
@@ -337,21 +402,26 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 placeholder="Brief description of this event type"
                 rows={3}
               />
             </div>
             <div>
               <Label htmlFor="color">Color</Label>
-              <div className="flex gap-2 mt-2">
+              <div className="mt-2 flex gap-2">
                 {COLORS.map((color) => (
                   <button
                     key={color}
                     type="button"
-                    className={`w-8 h-8 rounded-full border-2 ${formData.color === color ? 'border-gray-400' : 'border-gray-200'}`}
+                    className={`h-8 w-8 rounded-full border-2 ${formData.color === color ? "border-gray-400" : "border-gray-200"}`}
                     style={{ backgroundColor: color }}
-                    onClick={() => setFormData(prev => ({ ...prev, color }))}
+                    onClick={() => setFormData((prev) => ({ ...prev, color }))}
                   />
                 ))}
               </div>
@@ -363,13 +433,18 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
           {/* Durations */}
           <div>
             <Label className="text-base font-medium">Durations (minutes)</Label>
-            <div className="space-y-2 mt-2">
+            <div className="mt-2 space-y-2">
               {formData.durations.map((duration, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div
+                  key={`duration-${duration}-${index}`}
+                  className="flex items-center gap-2"
+                >
                   <Input
                     type="number"
                     value={duration}
-                    onChange={(e) => updateDuration(index, parseInt(e.target.value) ?? 0)}
+                    onChange={(e) =>
+                      updateDuration(index, parseInt(e.target.value) ?? 0)
+                    }
                     className="w-24"
                     min="5"
                     max="480"
@@ -386,8 +461,13 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
                   </Button>
                 </div>
               ))}
-              <Button type="button" variant="outline" size="sm" onClick={addDuration}>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addDuration}
+              >
+                <Plus className="mr-2 h-4 w-4" />
                 Add Duration
               </Button>
             </div>
@@ -398,12 +478,17 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
           {/* Locations */}
           <div>
             <Label className="text-base font-medium">Locations</Label>
-            <div className="space-y-2 mt-2">
+            <div className="mt-2 space-y-2">
               {formData.locations.map((location, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Select 
-                    value={location.type} 
-                    onValueChange={(value) => updateLocation(index, 'type', value)}
+                <div
+                  key={`location-${location.type}-${location.details ?? ""}-${index}`}
+                  className="flex items-center gap-2"
+                >
+                  <Select
+                    value={location.type}
+                    onValueChange={(value) =>
+                      updateLocation(index, "type", value)
+                    }
                   >
                     <SelectTrigger className="w-48">
                       <SelectValue />
@@ -418,7 +503,9 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
                   </Select>
                   <Input
                     value={location.label}
-                    onChange={(e) => updateLocation(index, 'label', e.target.value)}
+                    onChange={(e) =>
+                      updateLocation(index, "label", e.target.value)
+                    }
                     placeholder="Display name"
                     className="flex-1"
                   />
@@ -432,8 +519,13 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
                   </Button>
                 </div>
               ))}
-              <Button type="button" variant="outline" size="sm" onClick={addLocation}>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addLocation}
+              >
+                <Plus className="mr-2 h-4 w-4" />
                 Add Location
               </Button>
             </div>
@@ -444,17 +536,22 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
           {/* Rules */}
           <div>
             <Label className="text-base font-medium">Booking Rules</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+            <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="bufferTime">Buffer Time (minutes)</Label>
                 <Input
                   id="bufferTime"
                   type="number"
                   value={formData.rules.bufferTime}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    rules: { ...prev.rules, bufferTime: parseInt(e.target.value) ?? 0 }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      rules: {
+                        ...prev.rules,
+                        bufferTime: parseInt(e.target.value) ?? 0,
+                      },
+                    }))
+                  }
                   min="0"
                   max="60"
                 />
@@ -465,10 +562,16 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
                   id="maxMeetingsPerDay"
                   type="number"
                   value={formData.rules.maxMeetingsPerDay ?? ""}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    rules: { ...prev.rules, maxMeetingsPerDay: parseInt(e.target.value) || undefined }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      rules: {
+                        ...prev.rules,
+                        maxMeetingsPerDay:
+                          parseInt(e.target.value) || undefined,
+                      },
+                    }))
+                  }
                   min="1"
                   max="20"
                   placeholder="No limit"
@@ -480,51 +583,64 @@ function EventTypeForm({ eventType, onSave, onCancel }: EventTypeFormProps) {
                   id="maxHoursPerDay"
                   type="number"
                   value={formData.rules.maxHoursPerDay ?? ""}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    rules: { ...prev.rules, maxHoursPerDay: parseInt(e.target.value) || undefined }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      rules: {
+                        ...prev.rules,
+                        maxHoursPerDay: parseInt(e.target.value) || undefined,
+                      },
+                    }))
+                  }
                   min="1"
                   max="12"
                   placeholder="No limit"
                 />
               </div>
               <div>
-                <Label htmlFor="advanceBookingMin">Min Advance Booking (hours)</Label>
+                <Label htmlFor="advanceBookingMin">
+                  Min Advance Booking (hours)
+                </Label>
                 <Input
                   id="advanceBookingMin"
                   type="number"
                   value={formData.rules.advanceBooking.min}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    rules: { 
-                      ...prev.rules, 
-                      advanceBooking: { 
-                        ...prev.rules.advanceBooking, 
-                        min: parseInt(e.target.value) || 0
-                      }
-                    }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      rules: {
+                        ...prev.rules,
+                        advanceBooking: {
+                          ...prev.rules.advanceBooking,
+                          min: parseInt(e.target.value) || 0,
+                        },
+                      },
+                    }))
+                  }
                   min="0"
                   max="168"
                 />
               </div>
               <div>
-                <Label htmlFor="advanceBookingMax">Max Advance Booking (days)</Label>
+                <Label htmlFor="advanceBookingMax">
+                  Max Advance Booking (days)
+                </Label>
                 <Input
                   id="advanceBookingMax"
                   type="number"
                   value={formData.rules.advanceBooking.max}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    rules: { 
-                      ...prev.rules, 
-                      advanceBooking: { 
-                        ...prev.rules.advanceBooking, 
-                        max: parseInt(e.target.value) || 0
-                      }
-                    }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      rules: {
+                        ...prev.rules,
+                        advanceBooking: {
+                          ...prev.rules.advanceBooking,
+                          max: parseInt(e.target.value) || 0,
+                        },
+                      },
+                    }))
+                  }
                   min="1"
                   max="365"
                 />

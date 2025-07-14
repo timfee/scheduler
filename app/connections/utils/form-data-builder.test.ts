@@ -1,5 +1,6 @@
-import { buildConnectionFormData } from "./form-data-builder";
 import { type ConnectionFormValues } from "@/lib/schemas/connection";
+
+import { buildConnectionFormData } from "./form-data-builder";
 
 describe("buildConnectionFormData", () => {
   it("should build Basic auth connection data", () => {

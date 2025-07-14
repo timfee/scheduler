@@ -33,6 +33,7 @@ components/                      # Shared/reusable components (global)
 ```
 
 **Component Directory Guidelines:**
+
 - Use `app/[feature-name]/components/` for components that are specific to that feature and won't be reused elsewhere
 - Use `components/` for components that might be shared across multiple features or used in different contexts
 - Main feature components (Client, Form, List) are typically placed in the global `components/` directory for easier importing
@@ -43,35 +44,43 @@ components/                      # Shared/reusable components (global)
 # [Feature Name]
 
 ## Overview
+
 Brief description of what this feature does and why it exists.
 
 ## User Stories
+
 - As a [user type], I want [functionality] so that [benefit]
 - As a [user type], I want [functionality] so that [benefit]
 
 ## Technical Implementation
+
 - Server Actions: [list main actions]
 - Components: [list main components]
 - Database: [list tables/schemas used]
 
 ## API Surface
+
 ### Server Actions
+
 - `create[Feature]Action(data: [Feature]FormData): Promise<[Feature]>`
 - `update[Feature]Action(id: string, data: Partial<[Feature]FormData>): Promise<[Feature]>`
 - `delete[Feature]Action(id: string): Promise<void>`
 - `list[Feature]sAction(): Promise<[Feature][]>`
 
 ### Components
+
 - `[Feature]Client`: Main client component
 - `[Feature]Form`: Form component
 - `[Feature]List`: List component
 
 ## Testing
+
 - Unit tests for server actions
 - Integration tests for component interactions
 - End-to-end tests for user workflows
 
 ## Future Considerations
+
 - Potential improvements
 - Known limitations
 - Scaling considerations
@@ -104,7 +113,7 @@ export type [Feature]UpdateData = z.infer<typeof [feature]UpdateSchema>;
 import { revalidatePath, revalidateTag } from "next/cache";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import { [feature]Schema, type [Feature]FormData } from "./schemas/[feature-name]";
-import { 
+import {
   create[Feature]Record,
   update[Feature]Record,
   delete[Feature]Record,
@@ -148,10 +157,10 @@ export async function update[Feature]Action(
     }
 
     const updated = await update[Feature]Record(id, formData);
-    
+
     revalidatePath("/[feature-name]");
     revalidateTag("[feature-name]-list");
-    
+
     return {
       id: updated.id,
       name: updated.name,
@@ -167,7 +176,7 @@ export async function delete[Feature]Action(id: string): Promise<void> {
     if (!deleted) {
       throw new Error("[Feature] not found");
     }
-    
+
     revalidatePath("/[feature-name]");
     revalidateTag("[feature-name]-list");
   } catch (error) {
@@ -215,9 +224,9 @@ export async function get[Feature]Records(): Promise<[Feature]ListItem[]> {
 export async function get[Feature]Record(id: string): Promise<[Feature]ListItem | null> {
   const records = await db.select().from([feature]Table).where(eq([feature]Table.id, id));
   const record = records[0];
-  
+
   if (!record) return null;
-  
+
   return {
     id: record.id,
     name: record.name,
@@ -232,7 +241,7 @@ export async function create[Feature]Record(data: [Feature]FormData): Promise<[F
     name: data.name,
     description: data.description,
   }).returning();
-  
+
   return {
     id: record.id,
     name: record.name,
@@ -243,7 +252,7 @@ export async function create[Feature]Record(data: [Feature]FormData): Promise<[F
 }
 
 export async function update[Feature]Record(
-  id: string, 
+  id: string,
   data: Partial<[Feature]FormData>
 ): Promise<[Feature]ListItem> {
   const [record] = await db.update([feature]Table)
@@ -253,7 +262,7 @@ export async function update[Feature]Record(
     })
     .where(eq([feature]Table.id, id))
     .returning();
-  
+
   return {
     id: record.id,
     name: record.name,
@@ -284,7 +293,7 @@ export default async function [Feature]Page() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">[Feature]s</h1>
       </div>
-      
+
       <[Feature]Client initial[Feature]s={[feature]s} />
     </div>
   );
@@ -369,7 +378,7 @@ export default function [Feature]Client({ initial[Feature]s }: [Feature]ClientPr
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this [feature]?")) return;
-    
+
     startTransition(async () => {
       try {
         await delete[Feature]Action(id);
@@ -450,11 +459,11 @@ interface [Feature]FormProps {
   isSubmitting?: boolean;
 }
 
-export default function [Feature]Form({ 
-  initialData, 
-  onSubmit, 
-  onCancel, 
-  isSubmitting 
+export default function [Feature]Form({
+  initialData,
+  onSubmit,
+  onCancel,
+  isSubmitting
 }: [Feature]FormProps) {
   const [formData, setFormData] = useState<[Feature]FormData>({
     name: initialData?.name || "",
@@ -465,7 +474,7 @@ export default function [Feature]Form({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
+
     try {
       await onSubmit(formData);
     } catch (error) {
@@ -538,11 +547,11 @@ interface [Feature]ListProps {
   isPending: boolean;
 }
 
-export default function [Feature]List({ 
-  [feature]s, 
-  onEdit, 
-  onDelete, 
-  isPending 
+export default function [Feature]List({
+  [feature]s,
+  onEdit,
+  onDelete,
+  isPending
 }: [Feature]ListProps) {
   if ([feature]s.length === 0) {
     return (
@@ -596,6 +605,7 @@ export default function [Feature]List({
 ## 9. Test Templates
 
 ### Server Actions Test
+
 ```typescript
 // app/[feature-name]/__tests__/actions.test.ts
 import { create[Feature]Action, update[Feature]Action, delete[Feature]Action } from "../actions";
@@ -660,6 +670,7 @@ describe("[Feature] Actions", () => {
 ```
 
 ### Component Test
+
 ```typescript
 // app/[feature-name]/__tests__/components.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
@@ -679,26 +690,26 @@ const mockData: [Feature]ListItem[] = [
 describe("[Feature]Client", () => {
   it("renders [feature] list", () => {
     render(<[Feature]Client initial[Feature]s={mockData} />);
-    
+
     expect(screen.getByText("Test [Feature]")).toBeInTheDocument();
     expect(screen.getByText("Test Description")).toBeInTheDocument();
   });
 
   it("opens form when add button is clicked", () => {
     render(<[Feature]Client initial[Feature]s={[]} />);
-    
+
     const addButton = screen.getByText("Add [Feature]");
     fireEvent.click(addButton);
-    
+
     expect(screen.getByText("Add New [Feature]")).toBeInTheDocument();
   });
 
   it("shows edit form when edit button is clicked", () => {
     render(<[Feature]Client initial[Feature]s={mockData} />);
-    
+
     const editButton = screen.getByRole("button", { name: /edit/i });
     fireEvent.click(editButton);
-    
+
     expect(screen.getByText("Edit [Feature]")).toBeInTheDocument();
   });
 });
@@ -716,11 +727,13 @@ describe("[Feature]Client", () => {
 ## Example Replacements
 
 For a "tasks" feature:
+
 - `[feature-name]` → `tasks`
 - `[Feature]` → `Task`
 - `[feature]` → `task`
 
 This would create:
+
 - `app/tasks/` directory
 - `TaskClient` component
 - `createTaskAction` function

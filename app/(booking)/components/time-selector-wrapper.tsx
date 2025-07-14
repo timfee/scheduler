@@ -1,35 +1,39 @@
-'use client'
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
-import { TimeSelector } from './time-selector'
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+
+import { TimeSelector } from "./time-selector";
 
 interface TimeSelectorWrapperProps {
-  slots: string[]
-  error: string | null
-  selectedTime?: string
+  slots: string[];
+  error: string | null;
+  selectedTime?: string;
 }
 
-export function TimeSelectorWrapper({ 
-  slots, 
-  error, 
-  selectedTime 
+export function TimeSelectorWrapper({
+  slots,
+  error,
+  selectedTime,
 }: TimeSelectorWrapperProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleSelect = useCallback((time: string) => {
-    const params = new URLSearchParams(searchParams)
-    params.set('time', time)
-    router.push(`?${params.toString()}`)
-  }, [router, searchParams])
+  const handleSelect = useCallback(
+    (time: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set("time", time);
+      router.push(`?${params.toString()}`);
+    },
+    [router, searchParams],
+  );
 
   return (
-    <TimeSelector 
-      slots={slots} 
-      error={error} 
+    <TimeSelector
+      slots={slots}
+      error={error}
       selectedTime={selectedTime}
       onSelect={handleSelect}
     />
-  )
+  );
 }

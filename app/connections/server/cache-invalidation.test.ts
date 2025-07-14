@@ -32,7 +32,7 @@ beforeAll(async () => {
   Object.assign(process.env, { NODE_ENV: "development" });
   process.env.ENCRYPTION_KEY =
     "C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148";
-    process.env.SQLITE_PATH = TEST_CONSTANTS.SQLITE_PATH;
+  process.env.SQLITE_PATH = TEST_CONSTANTS.SQLITE_PATH;
 
   const dbModule = await import("@/lib/database");
   db = dbModule.db;

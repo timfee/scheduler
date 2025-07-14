@@ -1,17 +1,17 @@
-import { listAppointmentTypes } from '@/app/(booking)/server/data'
-import { AppointmentTypeSelectorWrapper } from '@/app/(booking)/components/appointment-type-selector-wrapper'
+import { AppointmentTypeSelectorWrapper } from "@/app/(booking)/components/appointment-type-selector-wrapper";
+import { listAppointmentTypes } from "@/app/(booking)/server/data";
 
 export default async function AppointmentTypePage({
-  searchParams
+  searchParams,
 }: {
-  searchParams: { type?: string; date?: string; time?: string }
+  searchParams: { type?: string; date?: string; time?: string };
 }) {
-  const types = await listAppointmentTypes()
+  const types = await listAppointmentTypes();
 
   return (
-    <AppointmentTypeSelectorWrapper 
-      types={types} 
+    <AppointmentTypeSelectorWrapper
+      types={types}
       selectedType={searchParams.type}
     />
-  )
+  );
 }

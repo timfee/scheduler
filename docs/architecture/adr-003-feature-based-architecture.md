@@ -1,17 +1,21 @@
 # ADR-003: Feature-based Architecture
 
 ## Status
+
 Accepted
 
 ## Context
+
 The application needs a clear organization strategy for code, components, and business logic. Common approaches include layered architecture (separating by technical concerns) or feature-based architecture (separating by business domains).
 
 ## Decision
+
 Organize code by feature/domain rather than by technical layer, with clear boundaries between features and shared utilities.
 
 ## Consequences
 
 ### Positive
+
 - **Clear boundaries**: Each feature is self-contained with its own components, actions, and data
 - **Easier navigation**: Developers can find all related code in one place
 - **Better maintainability**: Changes to one feature don't affect others
@@ -20,6 +24,7 @@ Organize code by feature/domain rather than by technical layer, with clear bound
 - **Easier testing**: Feature-specific tests are co-located with the feature
 
 ### Negative
+
 - **Potential duplication**: Similar logic might be repeated across features
 - **Shared component complexity**: Determining what belongs in shared vs feature-specific areas
 - **Refactoring overhead**: Moving functionality between features requires more planning
@@ -70,19 +75,24 @@ lib/
 ## Feature Organization Principles
 
 ### 1. Feature Boundaries
+
 Each feature should be:
+
 - **Self-contained**: All related code in the feature directory
 - **Loosely coupled**: Minimal dependencies on other features
 - **Well-defined interface**: Clear public API for other features
 
 ### 2. Shared Code Strategy
+
 - **UI components**: Shared in `components/ui/` (shadcn/ui pattern)
 - **Types**: Shared in `lib/types/` when used across features
 - **Utilities**: Shared in `lib/utils/` when reusable
 - **Infrastructure**: Database, providers, and external integrations
 
 ### 3. Feature Communication
+
 Features communicate through:
+
 - **Shared types**: Common interfaces and data structures
 - **Server actions**: Cross-feature operations through actions
 - **URL state**: Shareable state via URL parameters (using nuqs)
@@ -91,6 +101,7 @@ Features communicate through:
 ## Implementation Examples
 
 ### Feature-Specific Server Actions
+
 ```tsx
 // app/connections/actions.ts
 "use server";
@@ -98,16 +109,17 @@ Features communicate through:
 export async function createConnectionAction(formData: ConnectionFormData) {
   // Feature-specific business logic
   const integration = await createCalendarIntegration(formData);
-  
+
   // Feature-specific cache invalidation
   revalidatePath("/connections");
   revalidateTag("calendars");
-  
+
   return integration;
 }
 ```
 
 ### Feature-Specific Components
+
 ```tsx
 // components/connections-client.tsx
 import { createConnectionAction } from "@/app/connections/actions";
@@ -115,13 +127,13 @@ import { createConnectionAction } from "@/app/connections/actions";
 export default function ConnectionsClient() {
   // Feature-specific state and logic
   const [connections, setConnections] = useState<ConnectionListItem[]>();
-  
+
   // Feature-specific handlers
   const handleCreate = async (formData: ConnectionFormData) => {
     const result = await createConnectionAction(formData);
     setConnections(prev => [...prev, result]);
   };
-  
+
   return (
     // Feature-specific UI
   );
@@ -129,9 +141,12 @@ export default function ConnectionsClient() {
 ```
 
 ### Shared Infrastructure
+
 ```tsx
 // infrastructure/database/integrations.ts
-export async function createCalendarIntegration(input: CreateCalendarIntegrationInput) {
+export async function createCalendarIntegration(
+  input: CreateCalendarIntegrationInput,
+) {
   // Shared database operations used by multiple features
   const integration = await db.insert(calendarIntegrations).values(input);
   return integration;
@@ -141,16 +156,19 @@ export async function createCalendarIntegration(input: CreateCalendarIntegration
 ## Cross-Feature Considerations
 
 ### Shared State
+
 - **Avoid**: Global state that spans multiple features
 - **Prefer**: URL state, server state, or explicit prop passing
 - **Pattern**: Use nuqs for shareable URL state
 
 ### Shared Components
+
 - **UI primitives**: Keep in `components/ui/` (Button, Input, etc.)
 - **Feature-specific**: Keep in feature directories
 - **Layout components**: Keep in `components/layout/`
 
 ### Shared Types
+
 ```tsx
 // lib/types/calendar.ts
 export interface CalendarEvent {
@@ -166,16 +184,19 @@ export interface CalendarEvent {
 ## Alternatives Considered
 
 ### Layered Architecture
+
 - **Pros**: Clear technical separation, familiar pattern
 - **Cons**: Scattered feature logic, harder to maintain feature cohesion
 - **Why rejected**: Feature-based organization is more maintainable for domain-driven applications
 
 ### Monolithic Structure
+
 - **Pros**: Simple, everything in one place
 - **Cons**: Becomes unmaintainable as application grows
 - **Why rejected**: Poor scalability and maintainability
 
 ### Micro-frontend Architecture
+
 - **Pros**: Complete feature isolation, independent deployments
 - **Cons**: Significant complexity overhead, unnecessary for current scale
 - **Why rejected**: Too complex for current team size and application scope
@@ -183,6 +204,7 @@ export interface CalendarEvent {
 ## When to Reconsider
 
 Consider alternative architectures if:
+
 - Features become too tightly coupled
 - Shared code becomes predominant (>50% of codebase)
 - Team structure changes significantly
@@ -190,5 +212,6 @@ Consider alternative architectures if:
 - Independent deployment of features becomes necessary
 
 ## Related Decisions
+
 - [ADR-001: Manual State Management Over Libraries](./adr-001-manual-state-management.md)
 - [ADR-004: Minimal Dependencies Approach](./adr-004-minimal-dependencies.md)

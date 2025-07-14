@@ -33,8 +33,12 @@ export class Factory<T> {
   /**
    * Build a sequence of string values
    */
-  buildStringSequence(options: { count: number; sequenceField: keyof T; prefix?: string }): T[] {
-    const { count, sequenceField, prefix = '' } = options;
+  buildStringSequence(options: {
+    count: number;
+    sequenceField: keyof T;
+    prefix?: string;
+  }): T[] {
+    const { count, sequenceField, prefix = "" } = options;
     return Array.from({ length: count }, (_, index) => {
       const sequenceValue = `${prefix}${index + 1}`;
       const overrides = {

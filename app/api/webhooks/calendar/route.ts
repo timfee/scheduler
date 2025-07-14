@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import env from "@/env.config";
 import { verifyWebhookSignature } from "@/lib/webhook-signature";
+import { NextResponse } from "next/server";
 
 /**
  * Handle calendar provider webhooks.
@@ -11,12 +11,16 @@ export async function POST(request: Request) {
   const payload = await request.text();
 
   // Verify webhook signature
-  const isValid = verifyWebhookSignature(payload, signature, env.WEBHOOK_SECRET);
-  
+  const isValid = verifyWebhookSignature(
+    payload,
+    signature,
+    env.WEBHOOK_SECRET,
+  );
+
   if (!isValid) {
     return NextResponse.json(
       { error: "Invalid webhook signature" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 

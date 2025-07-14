@@ -1,25 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {
+  createAppointmentTypeAction,
+  deleteAppointmentTypeAction,
+  getAllAppointmentTypesAction,
+  toggleAppointmentTypeAction,
+  updateAppointmentTypeAction,
+  type CreateAppointmentTypeData,
+  type UpdateAppointmentTypeData,
+} from "@/app/admin/event-types/server/actions";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit2, Trash2, Clock, AlertCircle, X } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  createAppointmentTypeAction,
-  updateAppointmentTypeAction,
-  deleteAppointmentTypeAction,
-  toggleAppointmentTypeAction,
-  getAllAppointmentTypesAction,
-  type CreateAppointmentTypeData,
-  type UpdateAppointmentTypeData 
-} from "@/app/admin/event-types/server/actions";
+import { Textarea } from "@/components/ui/textarea";
 import { type AppointmentType } from "@/lib/schemas/database";
+import { AlertCircle, Clock, Edit2, Plus, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface FormData {
   name: string;
@@ -33,8 +39,11 @@ const DEFAULT_FORM_DATA: FormData = {
   durationMinutes: 30,
 };
 
+// eslint-disable-next-line max-lines-per-function -- Complex form component with validation and state management
 export function AppointmentTypeManager() {
-  const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
+  const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +58,9 @@ export function AppointmentTypeManager() {
       const types = await getAllAppointmentTypesAction();
       setAppointmentTypes(types);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load appointment types");
+      setError(
+        err instanceof Error ? err.message : "Failed to load appointment types",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -88,10 +99,14 @@ export function AppointmentTypeManager() {
         setError(result.error ?? "Failed to delete appointment type");
         return;
       }
-      
+
       await loadAppointmentTypes();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete appointment type");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to delete appointment type",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -105,10 +120,14 @@ export function AppointmentTypeManager() {
         setError(result.error ?? "Failed to toggle appointment type");
         return;
       }
-      
+
       await loadAppointmentTypes();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to toggle appointment type");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to toggle appointment type",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -164,7 +183,9 @@ export function AppointmentTypeManager() {
       setFormData(DEFAULT_FORM_DATA);
       await loadAppointmentTypes();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save appointment type");
+      setError(
+        err instanceof Error ? err.message : "Failed to save appointment type",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -181,7 +202,7 @@ export function AppointmentTypeManager() {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
           <p className="mt-2 text-gray-600">Loading appointment types...</p>
         </div>
       </div>
@@ -198,10 +219,10 @@ export function AppointmentTypeManager() {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Appointment Types</h3>
         <Button onClick={handleCreate} disabled={isSubmitting}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           Add Appointment Type
         </Button>
       </div>
@@ -210,11 +231,18 @@ export function AppointmentTypeManager() {
       {isFormOpen && (
         <Card>
           <CardHeader>
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <CardTitle>
-                {editingType ? "Edit Appointment Type" : "Create Appointment Type"}
+                {editingType
+                  ? "Edit Appointment Type"
+                  : "Create Appointment Type"}
               </CardTitle>
-              <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSubmitting}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -225,7 +253,9 @@ export function AppointmentTypeManager() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="e.g., Quick Chat, Strategy Session"
                 disabled={isSubmitting}
               />
@@ -235,7 +265,12 @@ export function AppointmentTypeManager() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 placeholder="Brief description of this appointment type"
                 disabled={isSubmitting}
               />
@@ -246,14 +281,23 @@ export function AppointmentTypeManager() {
                 id="duration"
                 type="number"
                 value={formData.durationMinutes}
-                onChange={(e) => setFormData(prev => ({ ...prev, durationMinutes: parseInt(e.target.value) || 30 }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    durationMinutes: parseInt(e.target.value) || 30,
+                  }))
+                }
                 min="1"
                 max="480"
                 disabled={isSubmitting}
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={handleCancel} disabled={isSubmitting}>
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
               <Button onClick={handleSave} disabled={isSubmitting}>
@@ -269,21 +313,30 @@ export function AppointmentTypeManager() {
         {appointmentTypes.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
-              <p className="text-gray-500">No appointment types configured yet.</p>
+              <p className="text-gray-500">
+                No appointment types configured yet.
+              </p>
               <Button onClick={handleCreate} className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 Create your first appointment type
               </Button>
             </CardContent>
           </Card>
         ) : (
           appointmentTypes.map((appointmentType) => (
-            <Card key={appointmentType.id} className={`${appointmentType.isActive ? 'border-l-4 border-l-blue-500' : 'opacity-60'}`}>
+            <Card
+              key={appointmentType.id}
+              className={`${appointmentType.isActive ? "border-l-4 border-l-blue-500" : "opacity-60"}`}
+            >
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg">{appointmentType.name}</CardTitle>
-                    <CardDescription>{appointmentType.description}</CardDescription>
+                    <CardTitle className="text-lg">
+                      {appointmentType.name}
+                    </CardTitle>
+                    <CardDescription>
+                      {appointmentType.description}
+                    </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
@@ -291,10 +344,20 @@ export function AppointmentTypeManager() {
                       onCheckedChange={() => handleToggle(appointmentType.id)}
                       disabled={isSubmitting}
                     />
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(appointmentType)} disabled={isSubmitting}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEdit(appointmentType)}
+                      disabled={isSubmitting}
+                    >
                       <Edit2 className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(appointmentType.id)} disabled={isSubmitting}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(appointmentType.id)}
+                      disabled={isSubmitting}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -303,7 +366,9 @@ export function AppointmentTypeManager() {
               <CardContent>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  <Badge variant="secondary">{appointmentType.durationMinutes} minutes</Badge>
+                  <Badge variant="secondary">
+                    {appointmentType.durationMinutes} minutes
+                  </Badge>
                 </div>
               </CardContent>
             </Card>

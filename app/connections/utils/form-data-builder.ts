@@ -1,10 +1,11 @@
-import { type ConnectionFormValues } from "@/lib/schemas/connection";
 import { type ConnectionFormData } from "@/app/connections/server/actions";
+import { type ConnectionFormValues } from "@/lib/schemas/connection";
 
 /**
  * Default Google OAuth token URL
  */
-export const DEFAULT_GOOGLE_TOKEN_URL = "https://accounts.google.com/o/oauth2/token";
+export const DEFAULT_GOOGLE_TOKEN_URL =
+  "https://accounts.google.com/o/oauth2/token";
 
 /**
  * Builds ConnectionFormData from form values based on authentication method
@@ -12,7 +13,7 @@ export const DEFAULT_GOOGLE_TOKEN_URL = "https://accounts.google.com/o/oauth2/to
  */
 export function buildConnectionFormData(
   values: ConnectionFormValues,
-  isTestMode = false
+  isTestMode = false,
 ): ConnectionFormData {
   const baseData = {
     provider: values.provider,
@@ -37,7 +38,11 @@ export function buildConnectionFormData(
       refreshToken: values.refreshToken ?? "",
       clientId: values.clientId ?? "",
       clientSecret: values.clientSecret ?? "",
-      tokenUrl: values.tokenUrl?.trim() ? values.tokenUrl : (isTestMode ? DEFAULT_GOOGLE_TOKEN_URL : ""),
+      tokenUrl: values.tokenUrl?.trim()
+        ? values.tokenUrl
+        : isTestMode
+          ? DEFAULT_GOOGLE_TOKEN_URL
+          : "",
     };
   }
 }

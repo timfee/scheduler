@@ -6,8 +6,8 @@ import {
 } from "@/lib/schemas/calendar-event";
 import { DEFAULT_TIME_ZONE, ICAL_PROD_ID } from "@/lib/types/constants";
 import { formatISO, parseISO } from "date-fns";
-import { type createDAVClient } from "tsdav";
 import ical from "ical-generator";
+import { type createDAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
 
 // Helper functions for type-safe calendar data extraction
@@ -55,9 +55,10 @@ export function createCalDavProvider(
   /**
    * Fetch busy time ranges from the calendar
    */
-  async function listBusyTimes(
-    opts: { from: string; to: string },
-  ): Promise<{ startUtc: string; endUtc: string }[]> {
+  async function listBusyTimes(opts: {
+    from: string;
+    to: string;
+  }): Promise<{ startUtc: string; endUtc: string }[]> {
     const objects = await client.fetchCalendarObjects({
       calendar: { url: calendarUrl },
       timeRange: {

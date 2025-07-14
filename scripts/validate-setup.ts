@@ -4,16 +4,21 @@
  * Script to validate environment and database setup
  * Run with: tsx scripts/validate-setup.ts
  */
-
 import { randomBytes } from "crypto";
-import { existsSync, readFileSync, unlinkSync, copyFileSync } from "fs";
+import {
+  copyFileSync,
+  existsSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from "fs";
 import { join } from "path";
-import Database from "better-sqlite3";
-import prompts from "prompts";
-import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import { createTables } from "@/lib/database/migrations";
 import * as schema from "@/lib/schemas/database";
+import Database from "better-sqlite3";
+import { sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import prompts from "prompts";
 import { v4 as uuid } from "uuid";
 
 // Load environment variables from .env.local if it exists
@@ -22,7 +27,7 @@ function loadEnvFile(): void {
   if (existsSync(envPath)) {
     const envContent = readFileSync(envPath, "utf-8");
     const lines = envContent.split("\n");
-    
+
     for (const line of lines) {
       const trimmed = line.trim();
       if (trimmed && !trimmed.startsWith("#")) {
@@ -94,9 +99,13 @@ function validateEnvironmentVariables(): EnvValidationResult {
   };
 }
 
-function checkDatabaseHealth(): { exists: boolean; hasRequiredTables: boolean; error?: string } {
+function checkDatabaseHealth(): {
+  exists: boolean;
+  hasRequiredTables: boolean;
+  error?: string;
+} {
   const dbPath = process.env.SQLITE_PATH ?? "scheduler.db";
-  
+
   if (!existsSync(dbPath)) {
     return { exists: false, hasRequiredTables: false };
   }
@@ -108,10 +117,10 @@ function checkDatabaseHealth(): { exists: boolean; hasRequiredTables: boolean; e
     // Check if required tables exist
     const requiredTables = [
       "appointment_types",
-      "calendar_integrations", 
+      "calendar_integrations",
       "calendars",
       "preferences",
-      "api_cache"
+      "api_cache",
     ];
 
     for (const table of requiredTables) {
@@ -119,7 +128,7 @@ function checkDatabaseHealth(): { exists: boolean; hasRequiredTables: boolean; e
         SELECT name FROM sqlite_master 
         WHERE type='table' AND name=${table}
       `);
-      
+
       if (result.length === 0) {
         sqlite.close();
         return { exists: true, hasRequiredTables: false };
@@ -129,10 +138,10 @@ function checkDatabaseHealth(): { exists: boolean; hasRequiredTables: boolean; e
     sqlite.close();
     return { exists: true, hasRequiredTables: true };
   } catch (error) {
-    return { 
-      exists: true, 
-      hasRequiredTables: false, 
-      error: error instanceof Error ? error.message : "Unknown database error"
+    return {
+      exists: true,
+      hasRequiredTables: false,
+      error: error instanceof Error ? error.message : "Unknown database error",
     };
   }
 }
@@ -140,7 +149,7 @@ function checkDatabaseHealth(): { exists: boolean; hasRequiredTables: boolean; e
 function generateEnvFile(variables: Record<string, string>): void {
   const envPath = join(process.cwd(), ".env.local");
   const generatedDate = new Date().toISOString();
-  
+
   let envContent = `# Generated environment variables for scheduler
 # Generated on ${generatedDate}
 
@@ -174,36 +183,38 @@ function generateEnvFile(variables: Record<string, string>): void {
 
 async function initializeDatabase(): Promise<void> {
   const dbPath = process.env.SQLITE_PATH ?? "scheduler.db";
-  
+
   // Create or recreate database
   if (existsSync(dbPath)) {
     console.log(`⚠️ Database file "${dbPath}" already exists.`);
-    
+
     const response = await prompts({
-      type: 'confirm',
-      name: 'confirmDelete',
-      message: 'Do you want to delete the existing database file? This will result in data loss.',
+      type: "confirm",
+      name: "confirmDelete",
+      message:
+        "Do you want to delete the existing database file? This will result in data loss.",
       initial: false,
     });
-    
+
     if (!response.confirmDelete) {
       console.log("❌ Database deletion aborted.");
       process.exit(0);
     }
-    
+
     const backupResponse = await prompts({
-      type: 'confirm',
-      name: 'backup',
-      message: 'Do you want to back up the existing database file before deletion?',
+      type: "confirm",
+      name: "backup",
+      message:
+        "Do you want to back up the existing database file before deletion?",
       initial: true,
     });
-    
+
     if (backupResponse.backup) {
       const backupPath = `${dbPath}.backup-${Date.now()}`;
       copyFileSync(dbPath, backupPath);
       console.log(`✅ Database backed up to "${backupPath}".`);
     }
-    
+
     unlinkSync(dbPath);
     console.log(`✅ Deleted database file "${dbPath}".`);
   }
@@ -214,20 +225,22 @@ async function initializeDatabase(): Promise<void> {
   try {
     createTables(db);
     console.log("✅ Database tables created successfully");
-    
+
     // Add default data as in init-db.ts
     const now = new Date();
-    
+
     // Insert default preferences
+    // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
     db.insert(schema.preferences)
       .values({
-        key: 'timeZone',
+        key: "timeZone",
         value: '{"timeZone":"UTC"}',
         updatedAt: now,
       })
       .run();
-    
+
     // Insert default appointment types
+    // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
     db.insert(schema.appointmentTypes)
       .values([
         {
@@ -241,7 +254,7 @@ async function initializeDatabase(): Promise<void> {
         },
         {
           id: uuid(),
-          name: "Standard Meeting", 
+          name: "Standard Meeting",
           description: "30-minute meeting for most discussions",
           durationMinutes: 30,
           isActive: true,
@@ -251,7 +264,7 @@ async function initializeDatabase(): Promise<void> {
         {
           id: uuid(),
           name: "Extended Session",
-          description: "1-hour session for detailed discussions", 
+          description: "1-hour session for detailed discussions",
           durationMinutes: 60,
           isActive: true,
           createdAt: now,
@@ -259,9 +272,8 @@ async function initializeDatabase(): Promise<void> {
         },
       ])
       .run();
-    
+
     console.log("✅ Created default appointment types");
-    
   } catch (error) {
     console.error("❌ Error initializing database:", error);
     process.exit(1);
@@ -276,10 +288,10 @@ async function main(): Promise<void> {
 
   // Check environment variables
   const envValidation = validateEnvironmentVariables();
-  
+
   if (!envValidation.valid) {
     console.log("❌ Environment validation failed\n");
-    
+
     if (envValidation.missing.length > 0) {
       console.log("Missing required environment variables:");
       for (const key of envValidation.missing) {
@@ -288,7 +300,7 @@ async function main(): Promise<void> {
       }
       console.log();
     }
-    
+
     if (envValidation.invalid.length > 0) {
       console.log("Invalid environment variables:");
       for (const key of envValidation.invalid) {
@@ -301,43 +313,48 @@ async function main(): Promise<void> {
     const response = await prompts({
       type: "confirm",
       name: "generate",
-      message: "Would you like to auto-generate secure environment variables and save to .env.local?",
+      message:
+        "Would you like to auto-generate secure environment variables and save to .env.local?",
       initial: true,
     });
 
     if (response.generate) {
       const generatedVars: Record<string, string> = {};
-      
+
       // Generate missing required variables
       for (const key of envValidation.missing) {
         const config = REQUIRED_ENV_VARS[key as keyof typeof REQUIRED_ENV_VARS];
         generatedVars[key] = config.generator();
       }
-      
+
       // Generate invalid variables
       for (const key of envValidation.invalid) {
         const config = REQUIRED_ENV_VARS[key as keyof typeof REQUIRED_ENV_VARS];
         generatedVars[key] = config.generator();
       }
-      
+
       generateEnvFile(generatedVars);
       loadEnvFile();
       console.log("🔄 Environment variables reloaded successfully\n");
       console.log("✅ Generated .env.local with secure values");
     } else {
-      console.log("❌ Setup cancelled. Please set the required environment variables manually.");
+      console.log(
+        "❌ Setup cancelled. Please set the required environment variables manually.",
+      );
       process.exit(1);
     }
   } else {
-    console.log("✅ All required environment variables are present and valid\n");
+    console.log(
+      "✅ All required environment variables are present and valid\n",
+    );
   }
 
   // Check database health
   const dbHealth = checkDatabaseHealth();
-  
+
   if (!dbHealth.exists) {
     console.log("❌ Database does not exist");
-    
+
     const response = await prompts({
       type: "confirm",
       name: "create",
@@ -349,7 +366,9 @@ async function main(): Promise<void> {
       await initializeDatabase();
       console.log("✅ Database created successfully\n");
     } else {
-      console.log("❌ Setup cancelled. Please run 'pnpm db:init' to create the database.");
+      console.log(
+        "❌ Setup cancelled. Please run 'pnpm db:init' to create the database.",
+      );
       process.exit(1);
     }
   } else if (!dbHealth.hasRequiredTables) {
@@ -357,11 +376,12 @@ async function main(): Promise<void> {
     if (dbHealth.error) {
       console.log(`   Error: ${dbHealth.error}`);
     }
-    
+
     const response = await prompts({
-      type: "confirm", 
+      type: "confirm",
       name: "recreate",
-      message: "Would you like to recreate the database with all required tables?",
+      message:
+        "Would you like to recreate the database with all required tables?",
       initial: true,
     });
 
@@ -369,14 +389,18 @@ async function main(): Promise<void> {
       await initializeDatabase();
       console.log("✅ Database recreated successfully\n");
     } else {
-      console.log("❌ Setup cancelled. Please run 'pnpm db:init' to recreate the database.");
+      console.log(
+        "❌ Setup cancelled. Please run 'pnpm db:init' to recreate the database.",
+      );
       process.exit(1);
     }
   } else {
     console.log("✅ Database is healthy and has all required tables\n");
   }
 
-  console.log("🎉 Setup validation complete! The application is ready to start.\n");
+  console.log(
+    "🎉 Setup validation complete! The application is ready to start.\n",
+  );
 }
 
 // Handle graceful exit

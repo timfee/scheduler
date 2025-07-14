@@ -29,7 +29,9 @@ export default defineEnv({
       .describe("Google OAuth client secret for calendar integration"),
   },
   shared: {
-    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
   },
 
   clientPrefix: "NEXT_PUBLIC_",

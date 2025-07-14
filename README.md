@@ -14,6 +14,7 @@ pnpm dev
 ```
 
 The validation script will automatically:
+
 - Check for required environment variables and offer to generate them
 - Verify database health and offer to create/recreate it if needed
 - Guide you through the setup process with user-friendly prompts
@@ -23,11 +24,13 @@ The validation script will automatically:
 If you prefer to set up manually or need to troubleshoot:
 
 ### Install dependencies
+
 ```bash
 pnpm install
 ```
 
 ### Environment variables
+
 Create a `.env.local` file with required environment variables:
 
 ```bash
@@ -39,10 +42,12 @@ cp .env.example .env.local
 ```
 
 **Required variables:**
+
 - `ENCRYPTION_KEY`: 64-character hex string for encrypting sensitive data
 - `WEBHOOK_SECRET`: 32+ character secret for webhook verification
 
 **Optional variables:**
+
 - `SQLITE_PATH`: Database path (default: `scheduler.db`)
 - `NODE_ENV`: Environment mode (default: `development`)
 - `GOOGLE_OAUTH_CLIENT_ID`: Google OAuth client ID for calendar integration
@@ -51,33 +56,37 @@ cp .env.example .env.local
 📖 **See [Environment Variables Documentation](./docs/environment-variables.md) for detailed setup instructions.**
 
 ### Initialize the database
+
 Run once to create `scheduler.db`:
+
 ```bash
 pnpm db:init
 ```
 
 ### Development server
+
 ```bash
 pnpm dev
 ```
+
 Then open [http://localhost:3000](http://localhost:3000).
 
 ## Main commands
 
-| Command | Description |
-| ------- | ----------- |
-| `pnpm dev` | Start the development server with setup validation |
+| Command                    | Description                                           |
+| -------------------------- | ----------------------------------------------------- |
+| `pnpm dev`                 | Start the development server with setup validation    |
 | `pnpm dev:skip-validation` | Start the development server without setup validation |
-| `pnpm build` | Build the application |
-| `pnpm start` | Run the production server |
-| `pnpm db:init` | Initialize the SQLite database |
-| `pnpm db:generate` | Generate database types |
-| `pnpm db:push` | Apply SQLite migrations |
-| `pnpm env:generate` | Generate secure environment variables |
-| `pnpm validate-setup` | Run setup validation without starting the server |
-| `pnpm lint` | Run ESLint |
-| `pnpm test` | Execute tests |
-| `pnpm format` | Format code with Prettier |
+| `pnpm build`               | Build the application                                 |
+| `pnpm start`               | Run the production server                             |
+| `pnpm db:init`             | Initialize the SQLite database                        |
+| `pnpm db:generate`         | Generate database types                               |
+| `pnpm db:push`             | Apply SQLite migrations                               |
+| `pnpm env:generate`        | Generate secure environment variables                 |
+| `pnpm validate-setup`      | Run setup validation without starting the server      |
+| `pnpm lint`                | Run ESLint                                            |
+| `pnpm test`                | Execute tests                                         |
+| `pnpm format`              | Format code with Prettier                             |
 
 ## Architecture
 
@@ -122,3 +131,21 @@ The application follows a consistent feature-based organization pattern. Each fe
 
 📖 **See [Feature Organization Documentation](./docs/architecture/feature-organization.md) for detailed architecture guidelines.**
 
+## Code Quality
+
+This project enforces strict code quality standards that must be met before any commit:
+
+- **TypeScript compilation**: All code must compile without errors
+- **ESLint**: All linting rules must pass (includes custom performance and architectural rules)
+- **Tests**: All tests must pass (281 tests currently)
+- **Formatting**: Code must be formatted consistently with Prettier
+
+### Pre-commit Checks
+
+A pre-commit hook automatically runs all quality checks. To run them manually:
+
+```bash
+pnpm pre-commit
+```
+
+📖 **See [Code Quality Documentation](./docs/CODE_QUALITY.md) for detailed requirements and workflow.**
