@@ -13,6 +13,7 @@ import prompts from "prompts";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { createTables } from "@/lib/database/migrations";
+import * as schema from "@/lib/schemas/database";
 import { v4 as uuid } from "uuid";
 
 // Load environment variables from .env.local if it exists
@@ -198,43 +199,37 @@ function initializeDatabase(): void {
     `);
     
     // Insert default appointment types
-    const appointmentTypes = [
-      {
-        id: uuid(),
-        name: "Quick Chat",
-        description: "A brief 15-minute discussion",
-        duration_minutes: 15,
-        is_active: 1,
-        created_at: now.getTime(),
-        updated_at: now.getTime(),
-      },
-      {
-        id: uuid(),
-        name: "Standard Meeting", 
-        description: "30-minute meeting for most discussions",
-        duration_minutes: 30,
-        is_active: 1,
-        created_at: now.getTime(),
-        updated_at: now.getTime(),
-      },
-      {
-        id: uuid(),
-        name: "Extended Session",
-        description: "1-hour session for detailed discussions", 
-        duration_minutes: 60,
-        is_active: 1,
-        created_at: now.getTime(),
-        updated_at: now.getTime(),
-      },
-    ];
-    
-    for (const appointmentType of appointmentTypes) {
-      // eslint-disable-next-line custom/performance-patterns
-      db.run(sql`
-        INSERT INTO appointment_types (id, name, description, duration_minutes, is_active, created_at, updated_at)
-        VALUES (${appointmentType.id}, ${appointmentType.name}, ${appointmentType.description}, ${appointmentType.duration_minutes}, ${appointmentType.is_active}, ${appointmentType.created_at}, ${appointmentType.updated_at})
-      `);
-    }
+    db.insert(schema.appointmentTypes)
+      .values([
+        {
+          id: uuid(),
+          name: "Quick Chat",
+          description: "A brief 15-minute discussion",
+          durationMinutes: 15,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: uuid(),
+          name: "Standard Meeting", 
+          description: "30-minute meeting for most discussions",
+          durationMinutes: 30,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: uuid(),
+          name: "Extended Session",
+          description: "1-hour session for detailed discussions", 
+          durationMinutes: 60,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ])
+      .run();
     
     console.log("✅ Created default appointment types");
     
