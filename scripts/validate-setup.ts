@@ -6,7 +6,7 @@
  */
 
 import { randomBytes } from "crypto";
-import { existsSync, readFileSync, writeFileSync, unlinkSync, copyFileSync } from "fs";
+import { existsSync, readFileSync, unlinkSync, copyFileSync } from "fs";
 import { join } from "path";
 import Database from "better-sqlite3";
 import prompts from "prompts";
