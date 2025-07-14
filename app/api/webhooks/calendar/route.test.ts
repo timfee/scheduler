@@ -1,16 +1,15 @@
-import { TEST_CONSTANTS } from "@/lib/constants";
-import { describe, expect, it, beforeAll, jest } from "@jest/globals";
 import { createHmac } from "crypto";
+// Now import the route module
+import { POST } from "@/app/api/webhooks/calendar/route";
+import { TEST_CONSTANTS } from "@/lib/constants";
+import { verifyWebhookSignature } from "@/lib/webhook-signature";
+import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { z } from "zod";
 
 // Mock the webhook signature verification function
 jest.mock("@/lib/webhook-signature", () => ({
   verifyWebhookSignature: jest.fn(),
 }));
-
-// Now import the route module
-import { POST } from "@/app/api/webhooks/calendar/route";
-import { verifyWebhookSignature } from "@/lib/webhook-signature";
 
 // Response schemas for type-safe API testing
 const successResponseSchema = z.object({
@@ -25,17 +24,18 @@ const apiResponseSchema = z.union([successResponseSchema, errorResponseSchema]);
 
 // Helper function to safely parse API responses
 async function parseApiResponse(response: Response) {
-  const data = await response.json() as unknown;
+  const data = (await response.json()) as unknown;
   return apiResponseSchema.parse(data);
 }
 
 // Set up environment variables before running tests
 beforeAll(() => {
   Object.assign(process.env, {
-    NODE_ENV: 'development',
-    ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
+    NODE_ENV: "development",
+    ENCRYPTION_KEY:
+      "C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148",
     SQLITE_PATH: TEST_CONSTANTS.SQLITE_PATH,
-    WEBHOOK_SECRET: 'test-webhook-secret-key-that-is-long-enough',
+    WEBHOOK_SECRET: "test-webhook-secret-key-that-is-long-enough",
   });
 });
 
@@ -62,7 +62,7 @@ describe("POST /api/webhooks/calendar", () => {
       },
       text: async () => body,
     };
-    
+
     // Return as Request - this is acceptable for testing as we're only mocking used methods
     return mockRequest as Request;
   }
@@ -76,7 +76,11 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, validSignature);
 
     // Mock the signature verification to return true
-    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(true);
+    (
+      verifyWebhookSignature as jest.MockedFunction<
+        typeof verifyWebhookSignature
+      >
+    ).mockReturnValue(true);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);
@@ -90,7 +94,11 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, `sha256=${validSignature}`);
 
     // Mock the signature verification to return true
-    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(true);
+    (
+      verifyWebhookSignature as jest.MockedFunction<
+        typeof verifyWebhookSignature
+      >
+    ).mockReturnValue(true);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);
@@ -103,7 +111,11 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, "invalid-signature");
 
     // Mock the signature verification to return false
-    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(false);
+    (
+      verifyWebhookSignature as jest.MockedFunction<
+        typeof verifyWebhookSignature
+      >
+    ).mockReturnValue(false);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);
@@ -116,7 +128,11 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, "");
 
     // Mock the signature verification to return false
-    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(false);
+    (
+      verifyWebhookSignature as jest.MockedFunction<
+        typeof verifyWebhookSignature
+      >
+    ).mockReturnValue(false);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);
@@ -131,7 +147,11 @@ describe("POST /api/webhooks/calendar", () => {
     const request = createMockRequest(testPayload, invalidSignature);
 
     // Mock the signature verification to return false
-    (verifyWebhookSignature as jest.MockedFunction<typeof verifyWebhookSignature>).mockReturnValue(false);
+    (
+      verifyWebhookSignature as jest.MockedFunction<
+        typeof verifyWebhookSignature
+      >
+    ).mockReturnValue(false);
 
     const response = await POST(request);
     const data = await parseApiResponse(response);

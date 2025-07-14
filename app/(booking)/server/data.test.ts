@@ -1,12 +1,12 @@
+import { DURATION } from "@/lib/constants";
 import {
   cleanupTestDb,
   createTestDb,
 } from "@/lib/database/__tests__/helpers/db";
 import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
-import { DURATION } from "@/lib/constants";
 
-import type * as bookingData from "../data";
 import type * as adminActions from "../../admin/event-types/server/actions";
+import type * as bookingData from "../data";
 
 let db: ReturnType<typeof createTestDb>["db"];
 let sqlite: ReturnType<typeof createTestDb>["sqlite"];
@@ -35,16 +35,16 @@ describe("booking data", () => {
       name: "Intro",
       durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
     });
-    
+
     // Create an inactive appointment type
     await actions.createAppointmentTypeAction({
       name: "Old",
       durationMinutes: DURATION.DEFAULT_APPOINTMENT_MINUTES,
     });
-    
+
     // Toggle the second one to inactive
     const allTypes = await actions.getAllAppointmentTypesAction();
-    const oldType = allTypes.find(t => t.name === "Old");
+    const oldType = allTypes.find((t) => t.name === "Old");
     if (oldType) {
       await actions.toggleAppointmentTypeAction(oldType.id);
     }

@@ -1,15 +1,19 @@
 import "tsconfig-paths/register";
-import { jest, beforeAll, afterAll, afterEach } from "@jest/globals";
+
+import { ReadableStream, TransformStream } from "node:stream/web";
 import { TextDecoder, TextEncoder } from "util";
-import { ReadableStream, TransformStream } from 'node:stream/web';
-import { MessageChannel, MessagePort } from 'worker_threads';
-import '@testing-library/jest-dom';
+import { MessageChannel, MessagePort } from "worker_threads";
+import { afterAll, afterEach, beforeAll, jest } from "@jest/globals";
+
+import "@testing-library/jest-dom";
 
 // Set environment variables for tests
 process.env.NODE_ENV = "test";
-process.env.ENCRYPTION_KEY = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+process.env.ENCRYPTION_KEY =
+  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 process.env.SQLITE_PATH = ":memory:";
-process.env.WEBHOOK_SECRET = "test-webhook-secret-that-is-long-enough-to-meet-requirements";
+process.env.WEBHOOK_SECRET =
+  "test-webhook-secret-that-is-long-enough-to-meet-requirements";
 
 // polyfill web APIs for test environment
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
@@ -26,7 +30,14 @@ process.env.WEBHOOK_SECRET = "test-webhook-secret-that-is-long-enough-to-meet-re
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).MessagePort = MessagePort;
 
-const { fetch, ProxyAgent, setGlobalDispatcher, Response, Request, Headers } = require("undici");
+const {
+  fetch,
+  ProxyAgent,
+  setGlobalDispatcher,
+  Response,
+  Request,
+  Headers,
+} = require("undici");
 // Assign fetch globally so tests can perform network requests
 // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
 (globalThis as any).fetch = fetch as unknown as typeof globalThis.fetch;
@@ -46,18 +57,18 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 // Mock Next.js modules
-jest.mock('next/cache', () => ({
+jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
   revalidateTag: jest.fn(),
   unstable_cache: <T extends (...args: unknown[]) => unknown>(fn: T) => fn,
 }));
 
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({
     push: jest.fn(),
     refresh: jest.fn(),
   })),
-  usePathname: jest.fn(() => '/'),
+  usePathname: jest.fn(() => "/"),
 }));
 
 // Setup proxy if needed

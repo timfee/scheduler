@@ -34,28 +34,33 @@ const config: JestConfigWithTsJest = {
     "server-only": "<rootDir>/test/__mocks__/server-only.ts",
     "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
     "@test/(.*)": "<rootDir>/test/$1",
-    "envin": "<rootDir>/test/__mocks__/envin.ts",
-    "nuqs": "<rootDir>/test/__mocks__/nuqs.ts",
+    envin: "<rootDir>/test/__mocks__/envin.ts",
+    nuqs: "<rootDir>/test/__mocks__/nuqs.ts",
     "nuqs/adapters/testing": "<rootDir>/test/__mocks__/nuqs.ts",
   },
-  
+
   // Use node environment for database tests
   projects: [
     {
       displayName: "client",
       testEnvironment: "jsdom",
       testMatch: ["<rootDir>/**/*.test.ts", "<rootDir>/**/*.test.tsx"],
-      testPathIgnorePatterns: ["<rootDir>/lib/database/__tests__/.*", "<rootDir>/app/.*/server/.*\\.test\\.ts$"],
+      testPathIgnorePatterns: [
+        "<rootDir>/lib/database/__tests__/.*",
+        "<rootDir>/app/.*/server/.*\\.test\\.ts$",
+      ],
       setupFilesAfterEnv: ["<rootDir>/test/setupEnv.ts"],
       roots: ["<rootDir>"],
       modulePaths: [compilerOptions.baseUrl],
       moduleNameMapper: {
-        ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),
+        ...pathsToModuleNameMapper(compilerOptions.paths, {
+          prefix: "<rootDir>/",
+        }),
         "server-only": "<rootDir>/test/__mocks__/server-only.ts",
         "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
         "@test/(.*)": "<rootDir>/test/$1",
-        "envin": "<rootDir>/test/__mocks__/envin.ts",
-        "nuqs": "<rootDir>/test/__mocks__/nuqs.ts",
+        envin: "<rootDir>/test/__mocks__/envin.ts",
+        nuqs: "<rootDir>/test/__mocks__/nuqs.ts",
         "nuqs/adapters/testing": "<rootDir>/test/__mocks__/nuqs.ts",
       },
       transform: {
@@ -68,22 +73,25 @@ const config: JestConfigWithTsJest = {
     {
       displayName: "server",
       testEnvironment: "node",
-      testMatch: ["<rootDir>/lib/database/__tests__/**/*.test.ts", "<rootDir>/app/**/server/**/*.test.ts"],
+      testMatch: [
+        "<rootDir>/lib/database/__tests__/**/*.test.ts",
+        "<rootDir>/app/**/server/**/*.test.ts",
+      ],
       setupFilesAfterEnv: ["<rootDir>/test/setupEnv.ts"],
       roots: ["<rootDir>"],
       modulePaths: [compilerOptions.baseUrl],
       moduleNameMapper: {
-        ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),
+        ...pathsToModuleNameMapper(compilerOptions.paths, {
+          prefix: "<rootDir>/",
+        }),
         "server-only": "<rootDir>/test/__mocks__/server-only.ts",
         "@/env.config": "<rootDir>/test/__mocks__/env.config.ts",
         "@test/(.*)": "<rootDir>/test/$1",
-        "envin": "<rootDir>/test/__mocks__/envin.ts",
-        "nuqs": "<rootDir>/test/__mocks__/nuqs.ts",
+        envin: "<rootDir>/test/__mocks__/envin.ts",
+        nuqs: "<rootDir>/test/__mocks__/nuqs.ts",
         "nuqs/adapters/testing": "<rootDir>/test/__mocks__/nuqs.ts",
       },
-      transformIgnorePatterns: [
-        "node_modules/(?!(envin|zod)/)"
-      ],
+      transformIgnorePatterns: ["node_modules/(?!(envin|zod)/)"],
       transform: {
         "^.+\\.tsx?$": [
           "ts-jest",

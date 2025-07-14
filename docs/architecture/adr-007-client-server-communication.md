@@ -1,17 +1,21 @@
 # ADR-007: Client-Server Communication Patterns
 
 ## Status
+
 Accepted
 
 ## Context
+
 React Server Components and Next.js Server Actions enable new patterns for client-server communication. The application needs consistent patterns for data flow between client components and server actions, including error handling, loading states, and optimistic updates.
 
 ## Decision
+
 Establish standardized patterns for client-server communication that leverage Server Actions while maintaining type safety and good user experience.
 
 ## Consequences
 
 ### Positive
+
 - **Type safety**: End-to-end type safety from client to server
 - **Simplified data flow**: Clear patterns for common operations
 - **Better error handling**: Consistent error handling across features
@@ -19,6 +23,7 @@ Establish standardized patterns for client-server communication that leverage Se
 - **Code consistency**: Predictable patterns across the application
 
 ### Negative
+
 - **Learning curve**: Developers need to understand the specific patterns
 - **Boilerplate**: Some repetitive code for common operations
 - **Error complexity**: Error handling can be complex with optimistic updates
@@ -31,8 +36,8 @@ Establish standardized patterns for client-server communication that leverage Se
 // app/[feature]/server/actions.ts
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
 import { FormDataSchema } from "@/lib/schemas/[feature]";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function createEntityAction(
   formData: FormDataType,
@@ -46,11 +51,11 @@ export async function createEntityAction(
 
     // 2. Business logic
     const result = await createEntity(parsed.data);
-    
+
     // 3. Cache invalidation
     revalidatePath("/[feature]");
     revalidateTag("[feature]");
-    
+
     // 4. Return success result
     return result;
   } catch (error) {
@@ -78,21 +83,21 @@ export default function FeatureClient({ initialData }: Props) {
   // 2. Optimistic update helpers
   const addEntity = (entity: Entity) =>
     setEntities((prev) => [...prev, entity]);
-    
+
   const updateEntity = (entity: Entity) =>
     setEntities((prev) => prev.map((e) => (e.id === entity.id ? entity : e)));
-    
+
   const removeEntity = (id: string) =>
     setEntities((prev) => prev.filter((e) => e.id !== id));
 
   // 3. Server action handlers
   const handleCreate = async (formData: FormDataType) => {
     setError(null);
-    
+
     // Optimistic update
     const tempEntity = { ...formData, id: `temp-${Date.now()}` };
     addEntity(tempEntity);
-    
+
     try {
       startTransition(async () => {
         const result = await createEntityAction(formData);
@@ -117,13 +122,19 @@ export default function FeatureClient({ initialData }: Props) {
 ```tsx
 // lib/errors.ts
 export class BusinessError extends Error {
-  constructor(message: string, public code: string) {
+  constructor(
+    message: string,
+    public code: string,
+  ) {
     super(message);
     this.name = "BusinessError";
   }
 }
 
-export function mapErrorToUserMessage(error: unknown, fallback: string): string {
+export function mapErrorToUserMessage(
+  error: unknown,
+  fallback: string,
+): string {
   if (error instanceof BusinessError) {
     return ERROR_MESSAGES[error.code] || fallback;
   }
@@ -156,7 +167,7 @@ export default function FeatureClient() {
 
   const handleSubmit = async (formData: FormDataType) => {
     setIsSubmitting(true);
-    
+
     try {
       startTransition(async () => {
         await createEntityAction(formData);
@@ -182,18 +193,20 @@ export default function FeatureClient() {
 // Advanced optimistic updates with rollback
 export default function FeatureClient() {
   const [entities, setEntities] = useState(initialData);
-  const [optimisticOperations, setOptimisticOperations] = useState<Map<string, any>>(new Map());
+  const [optimisticOperations, setOptimisticOperations] = useState<
+    Map<string, any>
+  >(new Map());
 
   const handleUpdate = async (id: string, updates: Partial<Entity>) => {
-    const originalEntity = entities.find(e => e.id === id);
+    const originalEntity = entities.find((e) => e.id === id);
     if (!originalEntity) return;
 
     const optimisticEntity = { ...originalEntity, ...updates };
     const operationId = `update-${id}-${Date.now()}`;
 
     // Store operation for potential rollback
-    setOptimisticOperations(prev => 
-      new Map(prev).set(operationId, originalEntity)
+    setOptimisticOperations((prev) =>
+      new Map(prev).set(operationId, originalEntity),
     );
 
     // Apply optimistic update
@@ -209,7 +222,7 @@ export default function FeatureClient() {
       setError(error instanceof Error ? error.message : "Update failed");
     } finally {
       // Clean up operation tracking
-      setOptimisticOperations(prev => {
+      setOptimisticOperations((prev) => {
         const newMap = new Map(prev);
         newMap.delete(operationId);
         return newMap;
@@ -222,57 +235,64 @@ export default function FeatureClient() {
 ## Data Flow Patterns
 
 ### 1. Initial Data Loading
+
 ```tsx
 // app/[feature]/page.tsx
-import { getInitialData } from "./server/data";
 import FeatureClient from "./components/feature-client";
+import { getInitialData } from "./server/data";
 
 export default async function FeaturePage() {
   const initialData = await getInitialData();
-  
+
   return <FeatureClient initialData={initialData} />;
 }
 ```
 
 ### 2. Server Action Response Types
+
 ```tsx
 // Consistent response types for server actions
-export type ActionResult<T = any> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: string;
-};
+export type ActionResult<T = any> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 // Usage in server actions
-export async function createEntityAction(formData: FormDataType): Promise<ActionResult<Entity>> {
+export async function createEntityAction(
+  formData: FormDataType,
+): Promise<ActionResult<Entity>> {
   try {
     const result = await createEntity(formData);
     return { success: true, data: result };
   } catch (error) {
-    return { 
-      success: false, 
-      error: mapErrorToUserMessage(error, "Failed to create entity") 
+    return {
+      success: false,
+      error: mapErrorToUserMessage(error, "Failed to create entity"),
     };
   }
 }
 ```
 
 ### 3. Cache Invalidation Pattern
+
 ```tsx
 // Consistent cache invalidation
 export async function createEntityAction(formData: FormDataType) {
   // ... business logic
-  
+
   // Invalidate specific paths
   revalidatePath("/[feature]");
   revalidatePath("/[feature]/[id]");
-  
+
   // Invalidate cache tags
   revalidateTag("[feature]");
   revalidateTag(`[feature]-${result.id}`);
-  
+
   return result;
 }
 ```
@@ -280,6 +300,7 @@ export async function createEntityAction(formData: FormDataType) {
 ## Form Handling Patterns
 
 ### 1. Server Action Form Submission
+
 ```tsx
 // Direct form submission to server action
 export default function SimpleForm() {
@@ -293,6 +314,7 @@ export default function SimpleForm() {
 ```
 
 ### 2. Client-Side Form Handling
+
 ```tsx
 // Client-side form handling with validation
 export default function AdvancedForm() {
@@ -301,7 +323,7 @@ export default function AdvancedForm() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     // Client-side validation
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length > 0) {
@@ -319,9 +341,7 @@ export default function AdvancedForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Form fields with error handling */}
-    </form>
+    <form onSubmit={handleSubmit}>{/* Form fields with error handling */}</form>
   );
 }
 ```
@@ -329,6 +349,7 @@ export default function AdvancedForm() {
 ## Anti-Patterns to Avoid
 
 ### ❌ Don't Use API Routes for Internal Operations
+
 ```tsx
 // ❌ Avoid this pattern
 const response = await fetch("/api/entities", {
@@ -339,9 +360,11 @@ const result = await response.json();
 ```
 
 ### ❌ Don't Mix Server and Client Code
+
 ```tsx
 // ❌ Don't do this
 "use server";
+
 import { useState } from "react"; // Client-side code in server file
 
 export async function badServerAction() {
@@ -350,6 +373,7 @@ export async function badServerAction() {
 ```
 
 ### ❌ Don't Skip Error Handling
+
 ```tsx
 // ❌ Don't skip error handling
 const handleSubmit = async (formData: FormDataType) => {
@@ -361,6 +385,7 @@ const handleSubmit = async (formData: FormDataType) => {
 ## Testing Patterns
 
 ### 1. Server Action Testing
+
 ```tsx
 // app/[feature]/__tests__/actions.test.ts
 import { createEntityAction } from "../server/actions";
@@ -378,9 +403,11 @@ describe("createEntityAction", () => {
 ```
 
 ### 2. Client Component Testing
+
 ```tsx
 // app/[feature]/__tests__/components.test.tsx
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+
 import FeatureClient from "../components/feature-client";
 
 // Mock server actions
@@ -391,15 +418,16 @@ jest.mock("../server/actions", () => ({
 describe("FeatureClient", () => {
   it("handles form submission", async () => {
     render(<FeatureClient initialData={[]} />);
-    
+
     fireEvent.click(screen.getByText("Create"));
-    
+
     expect(createEntityAction).toHaveBeenCalled();
   });
 });
 ```
 
 ## Related Decisions
+
 - [ADR-002: Server Actions Over API Routes](./adr-002-server-actions.md)
 - [ADR-001: Manual State Management Over Libraries](./adr-001-manual-state-management.md)
 - [ADR-006: File Organization Patterns](./adr-006-file-organization-patterns.md)

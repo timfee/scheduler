@@ -1,5 +1,7 @@
-import { type BookingFormData } from "@/lib/schemas/booking";
+// Import the module after mocking
+import { getAppointmentType } from "@/app/(booking)/server/data";
 import { type CalDavProvider } from "@/lib/providers/caldav";
+import { type BookingFormData } from "@/lib/schemas/booking";
 import { type CalendarEvent } from "@/lib/schemas/calendar-event";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 
@@ -7,7 +9,7 @@ import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 jest.mock("@/app/(booking)/server/data", () => ({
   getAppointmentType: jest.fn(async () => ({
     id: "intro",
-    name: "Intro",  
+    name: "Intro",
     durationMinutes: 30,
     isActive: true,
     createdAt: 0,
@@ -43,9 +45,6 @@ let provider: Pick<CalDavProvider, "listBusyTimes" | "createAppointment">;
 jest.mock("@/lib/providers/caldav", () => ({
   createCalDavProvider: jest.fn(() => provider),
 }));
-
-// Import the module after mocking
-import { getAppointmentType } from "@/app/(booking)/server/data";
 
 let createBookingAction: (d: BookingFormData) => Promise<void>;
 

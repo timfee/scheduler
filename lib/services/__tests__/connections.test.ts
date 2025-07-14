@@ -1,13 +1,14 @@
-import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-import { type ConnectionListItem } from '../connections';
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+
+import { type ConnectionListItem } from "../connections";
 
 // Mock the dependencies
-jest.mock('@/lib/database/integrations', () => ({
+jest.mock("@/lib/database/integrations", () => ({
   listCalendarIntegrations: jest.fn(),
   isProviderType: jest.fn(),
 }));
 
-describe('connections service', () => {
+describe("connections service", () => {
   let getConnections: () => Promise<ConnectionListItem[]>;
   let listCalendarIntegrations: jest.MockedFunction<any>;
   let isProviderType: jest.MockedFunction<any>;
@@ -15,63 +16,67 @@ describe('connections service', () => {
   beforeEach(async () => {
     // Reset all mocks
     jest.clearAllMocks();
-    
+
     // Import the mocked dependencies
-    const integrationsModule = await import('@/lib/database/integrations');
-    listCalendarIntegrations = integrationsModule.listCalendarIntegrations as jest.MockedFunction<any>;
-    isProviderType = integrationsModule.isProviderType as jest.MockedFunction<any>;
-    
+    const integrationsModule = await import("@/lib/database/integrations");
+    listCalendarIntegrations =
+      integrationsModule.listCalendarIntegrations as jest.MockedFunction<any>;
+    isProviderType =
+      integrationsModule.isProviderType as jest.MockedFunction<any>;
+
     // Import the module under test
-    const connectionsModule = await import('../connections');
+    const connectionsModule = await import("../connections");
     getConnections = connectionsModule.getConnections;
   });
 
-  describe('getConnections', () => {
-    it('should map integration data to ConnectionListItem format', async () => {
+  describe("getConnections", () => {
+    it("should map integration data to ConnectionListItem format", async () => {
       const mockIntegrations = [
         {
-          id: 'integration-1',
-          provider: 'caldav',
-          displayName: 'My Calendar',
+          id: "integration-1",
+          provider: "caldav",
+          displayName: "My Calendar",
           config: {
-            capabilities: ['booking', 'conflict'],
+            capabilities: ["booking", "conflict"],
           },
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-          updatedAt: new Date('2024-01-02T00:00:00Z'),
+          createdAt: new Date("2024-01-01T00:00:00Z"),
+          updatedAt: new Date("2024-01-02T00:00:00Z"),
         },
         {
-          id: 'integration-2', 
-          provider: 'google',
-          displayName: 'Google Calendar',
+          id: "integration-2",
+          provider: "google",
+          displayName: "Google Calendar",
           config: {
-            capabilities: ['booking', 'conflict', 'availability'],
+            capabilities: ["booking", "conflict", "availability"],
           },
-          createdAt: new Date('2024-01-03T00:00:00Z'),
-          updatedAt: new Date('2024-01-04T00:00:00Z'),
+          createdAt: new Date("2024-01-03T00:00:00Z"),
+          updatedAt: new Date("2024-01-04T00:00:00Z"),
         },
       ];
 
       listCalendarIntegrations.mockResolvedValue(mockIntegrations);
-      isProviderType.mockImplementation((provider: string) => provider === 'caldav' || provider === 'google');
+      isProviderType.mockImplementation(
+        (provider: string) => provider === "caldav" || provider === "google",
+      );
 
       const result = await getConnections();
 
       expect(result).toEqual([
         {
-          id: 'integration-1',
-          provider: 'caldav',
-          displayName: 'My Calendar',
-          capabilities: ['booking', 'conflict'],
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-          updatedAt: new Date('2024-01-02T00:00:00Z'),
+          id: "integration-1",
+          provider: "caldav",
+          displayName: "My Calendar",
+          capabilities: ["booking", "conflict"],
+          createdAt: new Date("2024-01-01T00:00:00Z"),
+          updatedAt: new Date("2024-01-02T00:00:00Z"),
         },
         {
-          id: 'integration-2',
-          provider: 'google',
-          displayName: 'Google Calendar',
-          capabilities: ['booking', 'conflict', 'availability'],
-          createdAt: new Date('2024-01-03T00:00:00Z'),
-          updatedAt: new Date('2024-01-04T00:00:00Z'),
+          id: "integration-2",
+          provider: "google",
+          displayName: "Google Calendar",
+          capabilities: ["booking", "conflict", "availability"],
+          createdAt: new Date("2024-01-03T00:00:00Z"),
+          updatedAt: new Date("2024-01-04T00:00:00Z"),
         },
       ]);
     });
@@ -79,14 +84,14 @@ describe('connections service', () => {
     it('should fallback to "caldav" provider for invalid provider types', async () => {
       const mockIntegrations = [
         {
-          id: 'integration-1',
-          provider: 'invalid-provider',
-          displayName: 'Unknown Provider',
+          id: "integration-1",
+          provider: "invalid-provider",
+          displayName: "Unknown Provider",
           config: {
-            capabilities: ['booking'],
+            capabilities: ["booking"],
           },
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-          updatedAt: new Date('2024-01-02T00:00:00Z'),
+          createdAt: new Date("2024-01-01T00:00:00Z"),
+          updatedAt: new Date("2024-01-02T00:00:00Z"),
         },
       ];
 
@@ -97,17 +102,17 @@ describe('connections service', () => {
 
       expect(result).toEqual([
         {
-          id: 'integration-1',
-          provider: 'caldav', // Should fallback to 'caldav'
-          displayName: 'Unknown Provider',
-          capabilities: ['booking'],
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-          updatedAt: new Date('2024-01-02T00:00:00Z'),
+          id: "integration-1",
+          provider: "caldav", // Should fallback to 'caldav'
+          displayName: "Unknown Provider",
+          capabilities: ["booking"],
+          createdAt: new Date("2024-01-01T00:00:00Z"),
+          updatedAt: new Date("2024-01-02T00:00:00Z"),
         },
       ]);
     });
 
-    it('should handle empty integration list', async () => {
+    it("should handle empty integration list", async () => {
       listCalendarIntegrations.mockResolvedValue([]);
 
       const result = await getConnections();
@@ -115,47 +120,49 @@ describe('connections service', () => {
       expect(result).toEqual([]);
     });
 
-    it('should handle mixed valid and invalid provider types', async () => {
+    it("should handle mixed valid and invalid provider types", async () => {
       const mockIntegrations = [
         {
-          id: 'integration-1',
-          provider: 'google',
-          displayName: 'Google Calendar',
-          config: { capabilities: ['booking'] },
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-          updatedAt: new Date('2024-01-02T00:00:00Z'),
+          id: "integration-1",
+          provider: "google",
+          displayName: "Google Calendar",
+          config: { capabilities: ["booking"] },
+          createdAt: new Date("2024-01-01T00:00:00Z"),
+          updatedAt: new Date("2024-01-02T00:00:00Z"),
         },
         {
-          id: 'integration-2',
-          provider: 'unknown',
-          displayName: 'Unknown Calendar',
-          config: { capabilities: ['conflict'] },
-          createdAt: new Date('2024-01-03T00:00:00Z'),
-          updatedAt: new Date('2024-01-04T00:00:00Z'),
+          id: "integration-2",
+          provider: "unknown",
+          displayName: "Unknown Calendar",
+          config: { capabilities: ["conflict"] },
+          createdAt: new Date("2024-01-03T00:00:00Z"),
+          updatedAt: new Date("2024-01-04T00:00:00Z"),
         },
       ];
 
       listCalendarIntegrations.mockResolvedValue(mockIntegrations);
-      isProviderType.mockImplementation((provider: string) => provider === 'google');
+      isProviderType.mockImplementation(
+        (provider: string) => provider === "google",
+      );
 
       const result = await getConnections();
 
       expect(result).toEqual([
         {
-          id: 'integration-1',
-          provider: 'google',
-          displayName: 'Google Calendar',
-          capabilities: ['booking'],
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-          updatedAt: new Date('2024-01-02T00:00:00Z'),
+          id: "integration-1",
+          provider: "google",
+          displayName: "Google Calendar",
+          capabilities: ["booking"],
+          createdAt: new Date("2024-01-01T00:00:00Z"),
+          updatedAt: new Date("2024-01-02T00:00:00Z"),
         },
         {
-          id: 'integration-2',
-          provider: 'caldav', // Should fallback to 'caldav'
-          displayName: 'Unknown Calendar',
-          capabilities: ['conflict'],
-          createdAt: new Date('2024-01-03T00:00:00Z'),
-          updatedAt: new Date('2024-01-04T00:00:00Z'),
+          id: "integration-2",
+          provider: "caldav", // Should fallback to 'caldav'
+          displayName: "Unknown Calendar",
+          capabilities: ["conflict"],
+          createdAt: new Date("2024-01-03T00:00:00Z"),
+          updatedAt: new Date("2024-01-04T00:00:00Z"),
         },
       ]);
     });

@@ -1,16 +1,16 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
-import { mapErrorToUserMessage } from "@/lib/errors";
 import {
   createDAVClientFromIntegration,
   getBookingCalendar,
 } from "@/lib/database/integrations";
+import { mapErrorToUserMessage } from "@/lib/errors";
 import { createCalDavProvider } from "@/lib/providers/caldav";
+import { bookingFormSchema, type BookingFormData } from "@/lib/schemas/booking";
 import { DEFAULT_TIME_ZONE } from "@/lib/types/constants";
+import { revalidateTag } from "next/cache";
 
 import { getAppointmentType } from "./data";
-import { bookingFormSchema, type BookingFormData } from "@/lib/schemas/booking";
 
 // Simple in-memory rate limiter keyed by email address
 const lastBookingAt = new Map<string, number>();
@@ -26,7 +26,7 @@ const CLEANUP_THRESHOLD = 2 * 60 * 1000; // 2 minutes in milliseconds
 function cleanupOldEntries() {
   const now = Date.now();
   const cutoff = now - CLEANUP_THRESHOLD;
-  
+
   // Use forEach instead of for...of for better compatibility
   lastBookingAt.forEach((timestamp, email) => {
     if (timestamp < cutoff) {
@@ -36,21 +36,24 @@ function cleanupOldEntries() {
 }
 
 // Set up periodic cleanup every 5 minutes to prevent memory growth
-setInterval(() => {
-  cleanupOldEntries();
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    cleanupOldEntries();
+  },
+  5 * 60 * 1000,
+);
 
 /**
  * Generate a unique ISO-based key for a time slot to prevent concurrent bookings.
- * 
+ *
  * Creates a composite key from the start and end times that uniquely identifies
  * a time slot for use in the booking locks Map. This ensures that concurrent
  * booking attempts for the same time slot are properly serialized.
- * 
+ *
  * @param startTime - The start time of the booking slot
  * @param endTime - The end time of the booking slot
  * @returns A unique string key in the format "startISO-endISO"
- * 
+ *
  * @remarks
  * Both Date objects are converted to ISO strings using toISOString(), which
  * always returns UTC time regardless of the local timezone. This ensures
@@ -68,11 +71,12 @@ function getTimeSlotKey(startTime: Date, endTime: Date): string {
  */
 export async function createBookingAction(formData: BookingFormData) {
   try {
-    const { type, selectedDate, selectedTime, name, email } = bookingFormSchema.parse(formData);
+    const { type, selectedDate, selectedTime, name, email } =
+      bookingFormSchema.parse(formData);
 
     // Clean up old entries before rate limit check
     cleanupOldEntries();
-    
+
     const now = Date.now();
     const last = lastBookingAt.get(email) ?? 0;
     if (now - last < 60_000) {
@@ -103,7 +107,7 @@ export async function createBookingAction(formData: BookingFormData) {
 
     // Create a unique key for this time slot to prevent concurrent bookings
     const timeSlotKey = getTimeSlotKey(start, end);
-    
+
     // Check if there's already a booking attempt in progress for this time slot
     const existingLock = bookingLocks.get(timeSlotKey);
     if (existingLock) {
@@ -149,9 +153,9 @@ export async function createBookingAction(formData: BookingFormData) {
     // Store the lock and await the booking
     bookingLocks.set(timeSlotKey, bookingPromise);
     await bookingPromise;
-    
+
     // Invalidate busy times cache after successful booking
-    revalidateTag('busy-times');
+    revalidateTag("busy-times");
   } catch (error) {
     throw new Error(mapErrorToUserMessage(error, "Failed to create booking"));
   }

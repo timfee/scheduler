@@ -1,10 +1,9 @@
 import "server-only";
 
+import env from "@/env.config";
+import * as schema from "@/lib/schemas/database";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-
-import * as schema from "@/lib/schemas/database";
-import env from "@/env.config";
 
 const sqlite = new Database(env.SQLITE_PATH);
 export const db = drizzle(sqlite, { schema });

@@ -1,8 +1,8 @@
+import { createTables } from "@/lib/database/migrations";
+import * as schema from "@/lib/schemas/database";
 import Database from "better-sqlite3";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { createTables } from "@/lib/database/migrations";
-import * as schema from "@/lib/schemas/database";
 import { v4 as uuid } from "uuid";
 
 function initDb() {
@@ -16,6 +16,7 @@ function initDb() {
     createTables(db);
 
     // Insert default preferences if they don't exist
+    // eslint-disable-next-line custom/performance-patterns -- Setup scripts: checking for existing preferences (small dataset)
     const existingPrefs = db
       .select()
       .from(schema.preferences)
@@ -23,6 +24,7 @@ function initDb() {
       .all();
 
     if (existingPrefs.length === 0) {
+      // eslint-disable-next-line custom/performance-patterns -- Setup scripts should run synchronously
       db.insert(schema.preferences)
         .values({
           key: "timeZone",
@@ -33,6 +35,7 @@ function initDb() {
     }
 
     // Insert default appointment types if they don't exist
+    // eslint-disable-next-line custom/performance-patterns -- Setup scripts: checking for existing appointment types (small dataset)
     const existingAppointmentTypes = db
       .select()
       .from(schema.appointmentTypes)
@@ -40,7 +43,8 @@ function initDb() {
 
     if (existingAppointmentTypes.length === 0) {
       const now = new Date();
-      
+
+      // eslint-disable-next-line custom/performance-patterns -- Setup scripts should run synchronously
       db.insert(schema.appointmentTypes)
         .values([
           {
@@ -72,7 +76,7 @@ function initDb() {
           },
         ])
         .run();
-      
+
       console.log("✅ Created default appointment types");
     }
   } catch (error) {

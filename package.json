@@ -19,6 +19,7 @@
     "format:check": "prettier '**/*.{cjs,mjs,ts,tsx,md,json}' --ignore-path ../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --check",
     "lint": "eslint",
     "lint:fix": "pnpm lint --fix",
+    "pre-commit": "pnpm format:check && npx tsc -p tsconfig.json --noEmit && npx eslint . --ext .js,.jsx,.ts,.tsx && pnpm test --silent",
     "start": "next start",
     "test": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest",
     "test:e2e": "playwright test",

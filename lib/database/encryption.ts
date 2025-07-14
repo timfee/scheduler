@@ -67,7 +67,10 @@ export function decrypt(encryptedText: string): string {
 
     const [ivHex, authTagHex, encrypted] = parts;
     if (!ivHex || !authTagHex || !encrypted) {
-      throw new EncryptionError("Invalid encrypted data format", "DECRYPT_FAILED");
+      throw new EncryptionError(
+        "Invalid encrypted data format",
+        "DECRYPT_FAILED",
+      );
     }
 
     const key = env.ENCRYPTION_KEY;

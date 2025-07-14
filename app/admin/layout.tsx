@@ -1,5 +1,5 @@
-import { type ReactNode } from 'react';
-import { AdminNavigation } from '@/app/admin/components/navigation';
+import { AdminNavigation } from "@/app/admin/components/navigation";
+import { type ReactNode } from "react";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -15,12 +15,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             Manage your calendar connections, availability, and booking settings
           </p>
         </div>
-        
+
         <AdminNavigation />
-        
-        <main className="mt-8">
-          {children}
-        </main>
+
+        <main className="mt-8">{children}</main>
       </div>
     </div>
   );

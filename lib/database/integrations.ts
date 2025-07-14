@@ -1,19 +1,19 @@
 import "server-only";
 
 import { db } from "@/lib/database";
-import { unstable_cache } from 'next/cache'
 import { decrypt, encrypt } from "@/lib/database/encryption";
+import { CalendarConnectionError } from "@/lib/errors";
 import {
   calendarIntegrations,
   calendars,
-  type CalendarIntegration,
-  type NewCalendarIntegration,
   type Calendar,
+  type CalendarIntegration,
   type NewCalendar,
+  type NewCalendarIntegration,
 } from "@/lib/schemas/database";
 import { type CalendarCapability } from "@/lib/types/constants";
-import { CalendarConnectionError } from "@/lib/errors";
-import { eq, sql, asc } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import { createDAVClient } from "tsdav";
 import { v4 as uuid } from "uuid";
 
@@ -76,7 +76,10 @@ export interface UpdateCalendarIntegrationInput {
 /**
  * Get the server URL for a provider
  */
-export function resolveServerUrl(provider: ProviderType, customUrl?: string): string {
+export function resolveServerUrl(
+  provider: ProviderType,
+  customUrl?: string,
+): string {
   const wellKnownUrl = WELL_KNOWN_SERVERS[provider];
 
   // For providers that require custom URLs
@@ -109,7 +112,9 @@ export async function prepareConfig(
     return resolved;
   } catch (error) {
     throw new CalendarConnectionError(
-      error instanceof Error ? error.message : "Failed to prepare configuration",
+      error instanceof Error
+        ? error.message
+        : "Failed to prepare configuration",
       "INVALID_CONFIG",
     );
   }
@@ -135,6 +140,7 @@ export async function createCalendarIntegration(
   // Encrypt the configuration
   const encryptedConfig = encrypt(JSON.stringify(configWithServerUrl));
 
+  // eslint-disable-next-line custom/performance-patterns -- Getting max display order (single aggregation result)
   const orderResult = db
     .select({ maxOrder: sql<number>`max(display_order)` })
     .from(calendarIntegrations)
@@ -182,7 +188,11 @@ export async function addCalendarToIntegration(
 export async function getCalendarsForIntegration(
   integrationId: string,
 ): Promise<Calendar[]> {
-  return db.select().from(calendars).where(eq(calendars.integrationId, integrationId));
+  // eslint-disable-next-line custom/performance-patterns -- Getting calendars for one integration (small dataset)
+  return db
+    .select()
+    .from(calendars)
+    .where(eq(calendars.integrationId, integrationId));
 }
 
 // NEW: Update calendar capability
@@ -201,6 +211,7 @@ export async function updateCalendarCapability(
 
 // NEW: Remove a calendar
 export async function removeCalendar(calendarId: string): Promise<boolean> {
+  // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
   const result = db.delete(calendars).where(eq(calendars.id, calendarId)).run();
   return result.changes > 0;
 }
@@ -211,6 +222,7 @@ export async function removeCalendar(calendarId: string): Promise<boolean> {
 export async function listCalendarIntegrations(): Promise<
   Array<CalendarIntegration & { config: CalendarIntegrationConfig }>
 > {
+  // eslint-disable-next-line custom/performance-patterns -- Getting all calendar integrations (small dataset)
   const integrations = await db
     .select()
     .from(calendarIntegrations)
@@ -219,7 +231,9 @@ export async function listCalendarIntegrations(): Promise<
   return integrations.map((integration) => {
     let cfg: CalendarIntegrationConfig | Record<string, unknown> = {};
     try {
-      cfg = JSON.parse(decrypt(integration.encryptedConfig)) as CalendarIntegrationConfig;
+      cfg = JSON.parse(
+        decrypt(integration.encryptedConfig),
+      ) as CalendarIntegrationConfig;
     } catch {
       cfg = {};
     }
@@ -232,9 +246,9 @@ export async function listCalendarIntegrations(): Promise<
 
 export const getCachedCalendars = unstable_cache(
   async () => listCalendarIntegrations(),
-  ['calendars'],
-  { revalidate: 300, tags: ['calendars'] }
-)
+  ["calendars"],
+  { revalidate: 300, tags: ["calendars"] },
+);
 
 /**
  * Fetch the calendar integration used for bookings.
@@ -247,7 +261,7 @@ export async function getBookingCalendar(): Promise<
 > {
   const list = await listCalendarIntegrations();
   const sorted = list
-    .filter((i) => i.config.capabilities.includes('booking'))
+    .filter((i) => i.config.capabilities.includes("booking"))
     .sort((a, b) => a.displayOrder - b.displayOrder);
   return sorted[0] ?? null;
 }
@@ -260,6 +274,7 @@ export async function getCalendarIntegration(
 ): Promise<
   (CalendarIntegration & { config: CalendarIntegrationConfig }) | null
 > {
+  // eslint-disable-next-line custom/performance-patterns -- Getting single calendar integration by ID, has limit(1)
   const [integration] = await db
     .select()
     .from(calendarIntegrations)
@@ -271,7 +286,9 @@ export async function getCalendarIntegration(
   }
 
   try {
-    const cfg = JSON.parse(decrypt(integration.encryptedConfig)) as CalendarIntegrationConfig;
+    const cfg = JSON.parse(
+      decrypt(integration.encryptedConfig),
+    ) as CalendarIntegrationConfig;
     return {
       ...integration,
       config: cfg,
@@ -283,7 +300,6 @@ export async function getCalendarIntegration(
     };
   }
 }
-
 
 /**
  * Update a calendar integration
@@ -348,6 +364,7 @@ export async function updateCalendarIntegration(
  * Delete a calendar integration
  */
 export async function deleteCalendarIntegration(id: string): Promise<boolean> {
+  // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
   const result = db
     .delete(calendarIntegrations)
     .where(eq(calendarIntegrations.id, id))

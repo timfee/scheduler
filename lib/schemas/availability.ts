@@ -2,8 +2,12 @@ import { z } from "zod/v4";
 
 export const timeSlotSchema = z.object({
   id: z.string().optional(), // Optional for backward compatibility
-  start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
-  end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
+  start: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
+  end: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
 });
 
 export const dayAvailabilitySchema = z.object({
@@ -24,4 +28,11 @@ export const weeklyAvailabilitySchema = z.object({
 export type TimeSlot = z.infer<typeof timeSlotSchema>;
 export type DayAvailability = z.infer<typeof dayAvailabilitySchema>;
 export type WeeklyAvailability = z.infer<typeof weeklyAvailabilitySchema>;
-export type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
+export type DayOfWeek =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";

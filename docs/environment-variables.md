@@ -92,6 +92,7 @@ The application uses a consolidated environment validation system in `env.config
 ## Migration from Duplicate Configuration
 
 Previous versions had duplicate environment validation in:
+
 - `env.config.ts` (using `envin` library)
 - `lib/utils/env.ts` (using direct `zod` validation)
 

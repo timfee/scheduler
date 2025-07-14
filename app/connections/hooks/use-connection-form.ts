@@ -1,13 +1,13 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type UseFormReturn } from "react-hook-form";
 import { type ProviderType } from "@/app/connections/server/actions";
+import { DEFAULT_GOOGLE_TOKEN_URL } from "@/app/connections/utils/form-data-builder";
 import {
   connectionFormSchema,
   type ConnectionFormValues,
 } from "@/lib/schemas/connection";
-import { DEFAULT_GOOGLE_TOKEN_URL } from "@/app/connections/utils/form-data-builder";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, type UseFormReturn } from "react-hook-form";
 
 const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   apple: "Basic",
@@ -17,7 +17,10 @@ const PROVIDER_AUTH_METHODS: Record<ProviderType, "Basic" | "Oauth"> = {
   caldav: "Basic",
 };
 
-export { connectionFormSchema, type ConnectionFormValues } from "@/lib/schemas/connection";
+export {
+  connectionFormSchema,
+  type ConnectionFormValues,
+} from "@/lib/schemas/connection";
 
 export interface UseConnectionFormReturn {
   form: UseFormReturn<ConnectionFormValues, unknown, ConnectionFormValues>;

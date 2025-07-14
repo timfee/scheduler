@@ -1,17 +1,21 @@
 "use server";
 
 import { db } from "@/lib/database";
-import { appointmentTypes, type AppointmentType, type NewAppointmentType } from "@/lib/schemas/database";
+import { mapErrorToUserMessage } from "@/lib/errors";
+import {
+  appointmentTypes,
+  type AppointmentType,
+  type NewAppointmentType,
+} from "@/lib/schemas/database";
+import {
+  validateAppointmentTypeDuration,
+  validateAppointmentTypeId,
+  validateAppointmentTypeName,
+} from "@/lib/utils/validation";
 import { eq } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
-import { mapErrorToUserMessage } from "@/lib/errors";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
-import { 
-  validateAppointmentTypeName, 
-  validateAppointmentTypeDuration, 
-  validateAppointmentTypeId 
-} from "@/lib/utils/validation";
 
 export interface CreateAppointmentTypeData {
   name: string;
@@ -31,7 +35,7 @@ export interface UpdateAppointmentTypeData {
  * Create a new appointment type
  */
 export async function createAppointmentTypeAction(
-  data: CreateAppointmentTypeData
+  data: CreateAppointmentTypeData,
 ): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
     // Validate input data
@@ -40,7 +44,7 @@ export async function createAppointmentTypeAction(
 
     const now = new Date();
     const id = uuid();
-    
+
     const newAppointmentType: NewAppointmentType = {
       id,
       name: sanitizedName,
@@ -51,10 +55,11 @@ export async function createAppointmentTypeAction(
       updatedAt: now,
     };
 
+    // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
     db.insert(appointmentTypes).values(newAppointmentType).run();
-    
+
     revalidateTag("appointment-types");
-    
+
     return { success: true, id };
   } catch (error) {
     return {
@@ -68,7 +73,7 @@ export async function createAppointmentTypeAction(
  * Update an existing appointment type
  */
 export async function updateAppointmentTypeAction(
-  data: UpdateAppointmentTypeData
+  data: UpdateAppointmentTypeData,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate input data
@@ -77,7 +82,8 @@ export async function updateAppointmentTypeAction(
     validateAppointmentTypeDuration(data.durationMinutes);
 
     const now = new Date();
-    
+
+    // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
     const result = db
       .update(appointmentTypes)
       .set({
@@ -93,9 +99,9 @@ export async function updateAppointmentTypeAction(
     if (result.changes === 0) {
       return { success: false, error: "Appointment type not found" };
     }
-    
+
     revalidateTag("appointment-types");
-    
+
     return { success: true };
   } catch (error) {
     return {
@@ -109,12 +115,13 @@ export async function updateAppointmentTypeAction(
  * Delete an appointment type
  */
 export async function deleteAppointmentTypeAction(
-  id: string
+  id: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate input data
     const sanitizedId = validateAppointmentTypeId(id);
 
+    // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
     const result = db
       .delete(appointmentTypes)
       .where(eq(appointmentTypes.id, sanitizedId))
@@ -123,9 +130,9 @@ export async function deleteAppointmentTypeAction(
     if (result.changes === 0) {
       return { success: false, error: "Appointment type not found" };
     }
-    
+
     revalidateTag("appointment-types");
-    
+
     return { success: true };
   } catch (error) {
     return {
@@ -139,13 +146,14 @@ export async function deleteAppointmentTypeAction(
  * Toggle the active status of an appointment type
  */
 export async function toggleAppointmentTypeAction(
-  id: string
+  id: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate input data
     const sanitizedId = validateAppointmentTypeId(id);
 
     // First get the current state
+    // eslint-disable-next-line custom/performance-patterns -- Loading single appointment type, appropriate for lookup
     const current = db
       .select()
       .from(appointmentTypes)
@@ -160,17 +168,17 @@ export async function toggleAppointmentTypeAction(
     const currentAppointmentType = current[0]!;
 
     const now = new Date();
-    db
-      .update(appointmentTypes)
+    // eslint-disable-next-line custom/performance-patterns -- better-sqlite3 is synchronous by design
+    db.update(appointmentTypes)
       .set({
         isActive: !currentAppointmentType.isActive,
         updatedAt: now,
       })
       .where(eq(appointmentTypes.id, sanitizedId))
       .run();
-    
+
     revalidateTag("appointment-types");
-    
+
     return { success: true };
   } catch (error) {
     return {
@@ -184,14 +192,17 @@ export async function toggleAppointmentTypeAction(
  * Get all appointment types (including inactive ones for admin)
  */
 export async function getAllAppointmentTypesAction(
-  _input = {}
+  _input = {},
 ): Promise<AppointmentType[]> {
   try {
     // Validate input (no parameters needed but required for linter)
     z.object({}).parse(_input);
-    
+
+    // eslint-disable-next-line custom/performance-patterns -- Admin view needs all appointment types (small dataset)
     return db.select().from(appointmentTypes).all();
   } catch (error) {
-    throw new Error(mapErrorToUserMessage(error, "Failed to fetch appointment types"));
+    throw new Error(
+      mapErrorToUserMessage(error, "Failed to fetch appointment types"),
+    );
   }
 }

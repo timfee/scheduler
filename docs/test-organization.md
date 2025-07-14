@@ -30,6 +30,7 @@ app/
 ```
 
 **Benefits:**
+
 - Tests are close to the code they test
 - Easy to find and maintain
 - Clear ownership and responsibility
@@ -47,6 +48,7 @@ test/
 ```
 
 **Benefits:**
+
 - Clear separation of concerns
 - Easier to run integration tests separately
 - Can test interactions between multiple modules
@@ -66,6 +68,7 @@ test/
 ```
 
 **Benefits:**
+
 - Reusable across all tests
 - Single source of truth for test configuration
 - Easier to maintain shared test utilities
@@ -73,6 +76,7 @@ test/
 ## Test Types and Placement
 
 ### Unit Tests (Co-located)
+
 - Component tests (React components)
 - Function tests (utility functions)
 - Service tests (individual services)
@@ -80,12 +84,14 @@ test/
 - Hook tests (custom React hooks)
 
 ### Integration Tests (Centralized)
+
 - End-to-end workflows
 - Cross-module interactions
 - API route tests (when testing full request/response cycle)
 - Database integration tests
 
 ### Test Utilities (Centralized)
+
 - Test factories
 - Mock implementations
 - Setup and teardown utilities

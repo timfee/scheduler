@@ -1,7 +1,7 @@
-import Database, { type Database as DatabaseType } from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import { createTables, dropTables } from "@/lib/database/migrations";
 import * as schema from "@/lib/schemas/database";
+import Database, { type Database as DatabaseType } from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 
 export function createTestDb() {
   const sqlite = new Database(":memory:");
@@ -19,7 +19,7 @@ export function cleanupTestDb(sqlite: DatabaseType) {
 // Helper to create test data
 export async function createTestIntegration(
   db: ReturnType<typeof drizzle>,
-  data: Partial<schema.NewCalendarIntegration> = {}
+  data: Partial<schema.NewCalendarIntegration> = {},
 ) {
   const integration: schema.NewCalendarIntegration = {
     id: data.id ?? "test-id",
@@ -31,5 +31,9 @@ export async function createTestIntegration(
     updatedAt: data.updatedAt ?? new Date(),
   };
 
-  return db.insert(schema.calendarIntegrations).values(integration).returning().get();
+  return db
+    .insert(schema.calendarIntegrations)
+    .values(integration)
+    .returning()
+    .get();
 }

@@ -1,8 +1,8 @@
+import { ConnectionsClient } from "@/app/connections/components";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getConnections } from "@/lib/services/connections";
 import { AlertCircle } from "lucide-react";
 import { Suspense } from "react";
-import { getConnections } from "@/lib/services/connections";
-import { ConnectionsClient } from "@/app/connections/components";
 
 async function ConnectionsLoader() {
   try {
@@ -24,11 +24,12 @@ export default function SharedConnectionsView() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Calendar Connections</h2>
-        <p className="text-gray-600 mt-1">
-          Connect your calendars for conflict checking, availability management, and event booking
+        <p className="mt-1 text-gray-600">
+          Connect your calendars for conflict checking, availability management,
+          and event booking
         </p>
       </div>
-      
+
       <Suspense fallback={<p>Loading connections...</p>}>
         <ConnectionsLoader />
       </Suspense>

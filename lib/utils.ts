@@ -1,6 +1,6 @@
+import { formatDateForDisplay } from "@/lib/utils/date-range";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { formatDateForDisplay } from "@/lib/utils/date-range";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

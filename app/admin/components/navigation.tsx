@@ -1,37 +1,37 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Calendar, Clock, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, Calendar, Users, Clock } from "lucide-react";
 
 export function AdminNavigation() {
   const pathname = usePathname();
 
   const navItems = [
-    { 
-      href: "/admin/connections", 
-      label: "Connections", 
+    {
+      href: "/admin/connections",
+      label: "Connections",
       icon: Calendar,
-      description: "Manage calendar connections"
+      description: "Manage calendar connections",
     },
-    { 
-      href: "/admin/availability", 
-      label: "Availability", 
+    {
+      href: "/admin/availability",
+      label: "Availability",
       icon: Clock,
-      description: "Set your booking availability"
+      description: "Set your booking availability",
     },
-    { 
-      href: "/admin/event-types", 
-      label: "Event Types", 
+    {
+      href: "/admin/event-types",
+      label: "Event Types",
       icon: Users,
-      description: "Configure meeting types"
+      description: "Configure meeting types",
     },
-    { 
-      href: "/admin/settings", 
-      label: "Settings", 
+    {
+      href: "/admin/settings",
+      label: "Settings",
       icon: Settings,
-      description: "System settings"
+      description: "System settings",
     },
   ];
 
@@ -41,7 +41,7 @@ export function AdminNavigation() {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
-          
+
           return (
             <Button
               key={item.href}

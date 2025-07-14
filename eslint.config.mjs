@@ -3,6 +3,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import drizzle from "eslint-plugin-drizzle";
 import importPlugin from "eslint-plugin-import-x";
 import tseslint from "typescript-eslint";
+
 import customRules from "./eslint-rules/index.js";
 
 const compat = new FlatCompat({
@@ -11,7 +12,15 @@ const compat = new FlatCompat({
 
 export default tseslint.config(
   {
-    ignores: [".next", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "test/**", "**/__tests__/**"],
+    ignores: [
+      ".next",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "test/**",
+      "**/__tests__/**",
+    ],
   },
   ...compat.extends("next/core-web-vitals"),
   {
@@ -19,7 +28,7 @@ export default tseslint.config(
     plugins: {
       drizzle,
       "import-x": importPlugin,
-      "custom": customRules,
+      custom: customRules,
     },
     extends: [
       ...tseslint.configs.recommended,
@@ -72,71 +81,95 @@ export default tseslint.config(
             {
               target: "./components/!(ui|layout)/**",
               from: "*",
-              message: "Only 'ui' and 'layout' directories are allowed under components/. Place shared components in the root components/ directory or create feature-specific components in features/*/components/",
+              message:
+                "Only 'ui' and 'layout' directories are allowed under components/. Place shared components in the root components/ directory or create feature-specific components in features/*/components/",
             },
             // Feature organization rules - prevent server code from importing client code
             {
               target: "./app/**/_server/**",
               from: "./app/**/_components/**",
-              message: "Server code cannot import from client components. Move shared logic to /lib/ or create server-only utilities.",
+              message:
+                "Server code cannot import from client components. Move shared logic to /lib/ or create server-only utilities.",
             },
             {
               target: "./app/**/_server/**",
               from: "./app/**/_hooks/**",
-              message: "Server code cannot import from client hooks. Move shared logic to /lib/ or create server-only utilities.",
+              message:
+                "Server code cannot import from client hooks. Move shared logic to /lib/ or create server-only utilities.",
             },
           ],
         },
       ],
       // Consistent imports - prefer absolute paths with @/ alias
       "import-x/no-relative-parent-imports": "error",
-      "custom/enforce-alias-imports": ["error", { allowSameDirectoryImports: true }],
+      "custom/enforce-alias-imports": [
+        "error",
+        { allowSameDirectoryImports: true },
+      ],
       // Dynamic import paths should use absolute paths with @/ alias
       "custom/dynamic-import-paths": ["error", { allowTestFiles: true }],
-      
+
       // Performance optimization patterns
-      "custom/performance-patterns": ["warn", {
-        maxQueryResults: 100,
-        warnOnLargeImports: true,
-      }],
-      
+      "custom/performance-patterns": [
+        "warn",
+        {
+          maxQueryResults: 100,
+          warnOnLargeImports: true,
+        },
+      ],
+
       // Component size and organization rules
-      "max-lines": ["warn", { max: 600, skipComments: true, skipBlankLines: true }],
-      "max-lines-per-function": ["warn", { max: 300, skipComments: true, skipBlankLines: true }],
-      
+      "max-lines": [
+        "warn",
+        { max: 600, skipComments: true, skipBlankLines: true },
+      ],
+      "max-lines-per-function": [
+        "warn",
+        { max: 300, skipComments: true, skipBlankLines: true },
+      ],
+
       // Date/time naming conventions
-      "custom/datetime-naming": ["warn", {
-        allowAmbiguous: [], // Don't allow any ambiguous names
-      }],
-      
+      "custom/datetime-naming": [
+        "warn",
+        {
+          allowAmbiguous: [], // Don't allow any ambiguous names
+        },
+      ],
+
       // File organization patterns (ADR-006)
-      "custom/file-organization": ["error", {
-        features: ["booking", "connections", "admin", "appointments"],
-      }],
-      
+      "custom/file-organization": [
+        "error",
+        {
+          features: ["booking", "connections", "admin", "appointments"],
+        },
+      ],
+
       // Server action patterns (ADR-007)
-      "custom/server-action-patterns": ["error", {
-        requireValidation: true,
-        requireCacheInvalidation: true,
-        requireErrorHandling: true,
-      }],
-      
+      "custom/server-action-patterns": [
+        "error",
+        {
+          requireValidation: true,
+          requireCacheInvalidation: true,
+          requireErrorHandling: true,
+        },
+      ],
+
       // Date/time formatting rules (ADR-008)
       "custom/consistent-date-formatting": ["warn"],
-      
+
       // Constants naming convention - enforce ALL_CAPS for constants
       "@typescript-eslint/naming-convention": [
         "error",
         {
-          "selector": "variable",
-          "modifiers": ["const", "exported"],
-          "types": ["boolean", "string", "number", "array"],
-          "format": ["UPPER_CASE"],
-          "filter": {
-            "regex": "^(ok|err|.*Schema|.*Table|.*Factory|.*Variants|server)$",
-            "match": false
-          }
-        }
+          selector: "variable",
+          modifiers: ["const", "exported"],
+          types: ["boolean", "string", "number", "array"],
+          format: ["UPPER_CASE"],
+          filter: {
+            regex: "^(ok|err|.*Schema|.*Table|.*Factory|.*Variants|server)$",
+            match: false,
+          },
+        },
       ],
     },
   },

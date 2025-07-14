@@ -41,26 +41,27 @@ Instead of inline test data, use the factory system:
 ```typescript
 // ❌ Don't do this
 const bookingData = {
-  type: 'intro',
-  date: '2024-01-01',
-  time: '10:00',
-  name: 'Test User',
-  email: 'test@example.com'
+  type: "intro",
+  date: "2024-01-01",
+  time: "10:00",
+  name: "Test User",
+  email: "test@example.com",
 };
 
 // ✅ Do this
-import { bookingFactory, bookingVariants } from '@test/factories';
+import { bookingFactory, bookingVariants } from "@test/factories";
 
 const bookingData = bookingFactory.build();
 const introBooking = bookingVariants.intro();
-const customBooking = bookingFactory.build({ email: 'custom@example.com' });
+const customBooking = bookingFactory.build({ email: "custom@example.com" });
 ```
 
 ### Available Factories
 
 #### Booking Factory
+
 ```typescript
-import { bookingFactory, bookingVariants } from '@test/factories';
+import { bookingFactory, bookingVariants } from "@test/factories";
 
 // Basic usage
 const booking = bookingFactory.build();
@@ -70,12 +71,13 @@ const bookings = bookingFactory.buildList(5);
 const intro = bookingVariants.intro();
 const followUp = bookingVariants.followUp();
 const consultation = bookingVariants.consultation();
-const customTime = bookingVariants.withCustomTime('14:30');
+const customTime = bookingVariants.withCustomTime("14:30");
 ```
 
 #### Calendar Event Factory
+
 ```typescript
-import { calendarEventFactory, calendarEventVariants } from '@test/factories';
+import { calendarEventFactory, calendarEventVariants } from "@test/factories";
 
 // Basic usage
 const event = calendarEventFactory.build();
@@ -84,12 +86,16 @@ const events = calendarEventFactory.buildList(3);
 // Variants
 const intro = calendarEventVariants.intro();
 const duration60 = calendarEventVariants.withDuration(60);
-const timeRange = calendarEventVariants.withTimeRange('2024-01-01T10:00:00Z', '2024-01-01T11:00:00Z');
+const timeRange = calendarEventVariants.withTimeRange(
+  "2024-01-01T10:00:00Z",
+  "2024-01-01T11:00:00Z",
+);
 ```
 
 #### Connection Factory
+
 ```typescript
-import { connectionFactory, connectionVariants } from '@test/factories';
+import { connectionFactory, connectionVariants } from "@test/factories";
 
 // Basic usage
 const connection = connectionFactory.build();
@@ -102,8 +108,12 @@ const bookingCapable = connectionVariants.bookingCapable();
 ```
 
 #### Appointment Type Factory
+
 ```typescript
-import { appointmentTypeFactory, appointmentTypeVariants } from '@test/factories';
+import {
+  appointmentTypeFactory,
+  appointmentTypeVariants,
+} from "@test/factories";
 
 // Basic usage
 const appointmentType = appointmentTypeFactory.build();
@@ -118,8 +128,12 @@ const customDuration = appointmentTypeVariants.withDuration(45);
 ```
 
 #### Calendar Integration Factory
+
 ```typescript
-import { calendarIntegrationFactory, calendarIntegrationVariants } from '@test/factories';
+import {
+  calendarIntegrationFactory,
+  calendarIntegrationVariants,
+} from "@test/factories";
 
 // Basic usage
 const integration = calendarIntegrationFactory.build();
@@ -136,11 +150,11 @@ const orderedIntegration = calendarIntegrationVariants.withDisplayOrder(5);
 ### Creating Custom Factories
 
 ```typescript
-import { Factory } from '@test/factories';
+import { Factory } from "@test/factories";
 
 export const customFactory = Factory.define<CustomType>(() => ({
   id: randomUUID(),
-  name: 'Default Name',
+  name: "Default Name",
   value: 0,
 }));
 
@@ -158,10 +172,11 @@ export const customVariants = {
 Import the standardized mock setup:
 
 ```typescript
-import '@test/setup/jest.setup';
+import "@test/setup/jest.setup";
 ```
 
 This provides:
+
 - `beforeEach(() => jest.clearAllMocks())` - Clear mock call history
 - `afterEach(() => jest.restoreAllMocks())` - Restore original implementations
 
@@ -170,16 +185,16 @@ This provides:
 Use type-safe Jest ESM mocking:
 
 ```typescript
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
 // Type-safe module mocking
-jest.unstable_mockModule('@/some/module', () => ({
+jest.unstable_mockModule("@/some/module", () => ({
   someFunction: jest.fn(),
-  someValue: 'mocked-value',
+  someValue: "mocked-value",
 }));
 
 // Import after mocking
-const { someFunction } = await import('@/some/module');
+const { someFunction } = await import("@/some/module");
 ```
 
 ### When to Use resetModules
@@ -197,18 +212,25 @@ afterAll(() => {
 ### Unit Tests
 
 ```typescript
-import { describe, it, expect, beforeAll, afterEach } from '@jest/globals';
-import { jest } from '@jest/globals';
-import { someFactory } from '@test/factories';
-import '@test/setup/jest.setup';
+import {
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
+import { someFactory } from "@test/factories";
 
-describe('Feature Name', () => {
+import "@test/setup/jest.setup";
+
+describe("Feature Name", () => {
   beforeAll(async () => {
     // Setup that runs once before all tests
   });
 
-  describe('specific functionality', () => {
-    it('should do something specific', () => {
+  describe("specific functionality", () => {
+    it("should do something specific", () => {
       const testData = someFactory.build();
       // Test implementation
     });
@@ -219,23 +241,26 @@ describe('Feature Name', () => {
 ### Integration Tests
 
 ```typescript
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { jest } from '@jest/globals';
-import { createTestDb, cleanupTestDb } from '@/infrastructure/database/__tests__/helpers/db';
-import { connectionFactory } from '@test/factories';
-import '@test/setup/jest.setup';
+import {
+  cleanupTestDb,
+  createTestDb,
+} from "@/infrastructure/database/__tests__/helpers/db";
+import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
+import { connectionFactory } from "@test/factories";
 
-describe('Integration Test', () => {
-  let db: ReturnType<typeof createTestDb>['db'];
-  let sqlite: ReturnType<typeof createTestDb>['sqlite'];
+import "@test/setup/jest.setup";
+
+describe("Integration Test", () => {
+  let db: ReturnType<typeof createTestDb>["db"];
+  let sqlite: ReturnType<typeof createTestDb>["sqlite"];
 
   beforeAll(async () => {
     const testDb = createTestDb();
     db = testDb.db;
     sqlite = testDb.sqlite;
-    
+
     // Mock database module
-    jest.unstable_mockModule('@/infrastructure/database', () => ({ db }));
+    jest.unstable_mockModule("@/infrastructure/database", () => ({ db }));
   });
 
   afterAll(() => {
@@ -248,7 +273,7 @@ describe('Integration Test', () => {
     db.delete(schema.someTable).where(sql`1=1`);
   });
 
-  it('should work with real database', async () => {
+  it("should work with real database", async () => {
     const testData = connectionFactory.build();
     // Test implementation
   });
@@ -264,10 +289,11 @@ Common environment variables for tests:
 ```typescript
 beforeAll(() => {
   Object.assign(process.env, {
-    NODE_ENV: 'development',
-    ENCRYPTION_KEY: 'C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148',
-    SQLITE_PATH: ':memory:',
-    WEBHOOK_SECRET: 'test-webhook-secret-with-at-least-32-characters',
+    NODE_ENV: "development",
+    ENCRYPTION_KEY:
+      "C726D901D86543855E6F0FA9F0CF142FEC4431F3A98ECC521DA0F67F88D75148",
+    SQLITE_PATH: ":memory:",
+    WEBHOOK_SECRET: "test-webhook-secret-with-at-least-32-characters",
   });
 });
 ```
@@ -306,26 +332,31 @@ pnpm test --silent
 ## Best Practices
 
 ### 1. Use Factories Over Inline Data
+
 - Factories provide consistent, valid test data
 - Easier to maintain and update
 - Reduce test duplication
 
 ### 2. Keep Tests Focused
+
 - One assertion per test when possible
 - Clear test names that describe expected behavior
 - Group related tests in describe blocks
 
 ### 3. Mock at the Right Level
+
 - Mock external dependencies (APIs, databases)
 - Don't mock the code under test
 - Use type-safe mocking patterns
 
 ### 4. Clean Up After Tests
+
 - Use the standardized mock setup
 - Clear database state between tests
 - Don't rely on test execution order
 
 ### 5. Test Error Conditions
+
 - Test both success and failure scenarios
 - Verify error messages and types
 - Test edge cases and boundary conditions
@@ -335,7 +366,7 @@ pnpm test --silent
 ### Testing Async Functions
 
 ```typescript
-it('should handle async operations', async () => {
+it("should handle async operations", async () => {
   const result = await asyncFunction();
   expect(result).toBeDefined();
 });
@@ -344,19 +375,19 @@ it('should handle async operations', async () => {
 ### Testing Errors
 
 ```typescript
-it('should throw error for invalid input', async () => {
-  await expect(functionThatThrows()).rejects.toThrow('Expected error message');
+it("should throw error for invalid input", async () => {
+  await expect(functionThatThrows()).rejects.toThrow("Expected error message");
 });
 ```
 
 ### Testing with Mocks
 
 ```typescript
-it('should call external service', async () => {
-  const mockService = jest.fn().mockResolvedValue('success');
-  
+it("should call external service", async () => {
+  const mockService = jest.fn().mockResolvedValue("success");
+
   await functionUnderTest();
-  
+
   expect(mockService).toHaveBeenCalledWith(expectedParams);
 });
 ```
@@ -374,11 +405,11 @@ it('should call external service', async () => {
 
 ```typescript
 // Debug factory data
-console.log('Factory data:', factoryName.build());
+console.log("Factory data:", factoryName.build());
 
 // Debug mock calls
-console.log('Mock calls:', mockFunction.mock.calls);
+console.log("Mock calls:", mockFunction.mock.calls);
 
 // Debug test environment
-console.log('Process env:', process.env);
+console.log("Process env:", process.env);
 ```

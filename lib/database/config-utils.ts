@@ -1,5 +1,10 @@
-import { type CalendarIntegrationConfig, type BasicAuthConfig, type OAuthConfig } from "./integrations";
 import { type ConnectionConfigValues } from "@/lib/schemas/connection";
+
+import {
+  type BasicAuthConfig,
+  type CalendarIntegrationConfig,
+  type OAuthConfig,
+} from "./integrations";
 
 /**
  * Extract common fields shared by both auth methods.
@@ -20,7 +25,7 @@ function mergeBaseConfigFields(
   existing: CalendarIntegrationConfig,
   updates: Partial<ConnectionConfigValues>,
   result: CalendarIntegrationConfig,
-  credentialsChanged: boolean
+  credentialsChanged: boolean,
 ) {
   if (updates.username !== undefined) {
     credentialsChanged ||= updates.username !== existing.username;
@@ -43,9 +48,11 @@ function mergeBaseConfigFields(
 /**
  * Build a CalendarIntegrationConfig from validated form values.
  */
-export function buildConfigFromValues(values: ConnectionConfigValues): CalendarIntegrationConfig {
+export function buildConfigFromValues(
+  values: ConnectionConfigValues,
+): CalendarIntegrationConfig {
   const baseFields = buildBaseConfigFields(values);
-  
+
   if (values.authMethod === "Basic") {
     if (!values.password) {
       throw new Error("Password is required for Basic authentication");
@@ -58,7 +65,12 @@ export function buildConfigFromValues(values: ConnectionConfigValues): CalendarI
     return cfg;
   }
 
-  if (!values.refreshToken || !values.clientId || !values.clientSecret || !values.tokenUrl) {
+  if (
+    !values.refreshToken ||
+    !values.clientId ||
+    !values.clientSecret ||
+    !values.tokenUrl
+  ) {
     throw new Error("All OAuth fields are required for OAuth authentication");
   }
 
@@ -90,7 +102,12 @@ export function mergeConfig(
       credentialsChanged ||= updates.password !== existing.password;
       result.password = updates.password;
     }
-    credentialsChanged = mergeBaseConfigFields(existing, updates, result, credentialsChanged);
+    credentialsChanged = mergeBaseConfigFields(
+      existing,
+      updates,
+      result,
+      credentialsChanged,
+    );
     return { config: result, credentialsChanged };
   }
 
@@ -110,7 +127,12 @@ export function mergeConfig(
   if (updates.tokenUrl !== undefined) {
     result.tokenUrl = updates.tokenUrl;
   }
-  credentialsChanged = mergeBaseConfigFields(existing, updates, result, credentialsChanged);
+  credentialsChanged = mergeBaseConfigFields(
+    existing,
+    updates,
+    result,
+    credentialsChanged,
+  );
 
   return { config: result, credentialsChanged };
 }

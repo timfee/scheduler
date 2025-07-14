@@ -17,6 +17,7 @@ import { connectionFactory, connectionVariants } from "@test/factories";
 
 import "@test/setup/jest.setup";
 
+import * as schema from "@/lib/schemas/database";
 import { type Database as DatabaseType } from "better-sqlite3";
 import { sql } from "drizzle-orm";
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
@@ -25,7 +26,6 @@ import {
   cleanupTestDb,
   createTestDb,
 } from "../../../lib/database/__tests__/helpers/db";
-import * as schema from "@/lib/schemas/database";
 
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
