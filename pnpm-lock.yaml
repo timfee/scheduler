@@ -115,7 +115,7 @@ importers:
         version: 8.6.0(react@19.1.0)
       envin:
         specifier: ^1.1.3
-        version: 1.1.3(arktype@2.1.20)(typescript@5.8.3)(zod@4.0.3)
+        version: 1.1.3(arktype@2.1.20)(typescript@5.8.3)(zod@4.0.5)
       ical-generator:
         specifier: ^9.0.0
         version: 9.0.0(@types/node@24.0.13)
@@ -289,8 +289,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
       zod:
-        specifier: ^4.0.3
-        version: 4.0.3
+        specifier: ^4.0.5
+        version: 4.0.5
 
 packages:
 
@@ -5171,8 +5171,8 @@ packages:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
 
-  zod@4.0.3:
-    resolution: {integrity: sha512-V78FonTAxtGAyF2xR75x0YoW8uKXdQiusoPtzbT07vH3mZiGdTQN6INuivHyYT6M2V2YRFDEKIF4ylTJh54EXg==}
+  zod@4.0.5:
+    resolution: {integrity: sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA==}
 
 snapshots:
 
@@ -7694,12 +7694,12 @@ snapshots:
 
   entities@6.0.1: {}
 
-  envin@1.1.3(arktype@2.1.20)(typescript@5.8.3)(zod@4.0.3):
+  envin@1.1.3(arktype@2.1.20)(typescript@5.8.3)(zod@4.0.5):
     dependencies:
       arktype: 2.1.20
     optionalDependencies:
       typescript: 5.8.3
-      zod: 4.0.3
+      zod: 4.0.5
 
   error-ex@1.3.2:
     dependencies:
@@ -10312,4 +10312,4 @@ snapshots:
 
   yoctocolors-cjs@2.1.2: {}
 
-  zod@4.0.3: {}
+  zod@4.0.5: {}
