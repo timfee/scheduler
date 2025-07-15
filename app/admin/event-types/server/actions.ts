@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/lib/database";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
+import { db } from "@/lib/database";
 import { mapErrorToUserMessage } from "@/lib/errors";
 import {
   appointmentTypes,
@@ -65,7 +65,10 @@ export async function createAppointmentTypeAction(
   } catch (error) {
     return {
       success: false,
-      error: mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_CREATE_APPOINTMENT_TYPE),
+      error: mapErrorToUserMessage(
+        error,
+        ERROR_MESSAGES.FAILED_TO_CREATE_APPOINTMENT_TYPE,
+      ),
     };
   }
 }
@@ -98,7 +101,10 @@ export async function updateAppointmentTypeAction(
       .run();
 
     if (result.changes === 0) {
-      return { success: false, error: ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND };
+      return {
+        success: false,
+        error: ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND,
+      };
     }
 
     revalidateTag("appointment-types");
@@ -107,7 +113,10 @@ export async function updateAppointmentTypeAction(
   } catch (error) {
     return {
       success: false,
-      error: mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_UPDATE_APPOINTMENT_TYPE),
+      error: mapErrorToUserMessage(
+        error,
+        ERROR_MESSAGES.FAILED_TO_UPDATE_APPOINTMENT_TYPE,
+      ),
     };
   }
 }
@@ -129,7 +138,10 @@ export async function deleteAppointmentTypeAction(
       .run();
 
     if (result.changes === 0) {
-      return { success: false, error: ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND };
+      return {
+        success: false,
+        error: ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND,
+      };
     }
 
     revalidateTag("appointment-types");
@@ -138,7 +150,10 @@ export async function deleteAppointmentTypeAction(
   } catch (error) {
     return {
       success: false,
-      error: mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_DELETE_APPOINTMENT_TYPE),
+      error: mapErrorToUserMessage(
+        error,
+        ERROR_MESSAGES.FAILED_TO_DELETE_APPOINTMENT_TYPE,
+      ),
     };
   }
 }
@@ -163,7 +178,10 @@ export async function toggleAppointmentTypeAction(
       .all();
 
     if (current.length === 0) {
-      return { success: false, error: ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND };
+      return {
+        success: false,
+        error: ERROR_MESSAGES.APPOINTMENT_TYPE_NOT_FOUND,
+      };
     }
 
     const currentAppointmentType = current[0]!;
@@ -184,7 +202,10 @@ export async function toggleAppointmentTypeAction(
   } catch (error) {
     return {
       success: false,
-      error: mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_TOGGLE_APPOINTMENT_TYPE),
+      error: mapErrorToUserMessage(
+        error,
+        ERROR_MESSAGES.FAILED_TO_TOGGLE_APPOINTMENT_TYPE,
+      ),
     };
   }
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
 import {
   type CalendarOption,
   type ProviderType,
@@ -19,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useEffect } from "react";
 import { type UseFormReturn } from "react-hook-form";

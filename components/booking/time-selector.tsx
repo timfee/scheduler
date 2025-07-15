@@ -1,7 +1,7 @@
 "use client";
 
-import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { useCallback } from "react";
 
 interface TimeSelectorProps {

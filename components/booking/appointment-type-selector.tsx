@@ -1,7 +1,7 @@
 "use client";
 
-import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { type AppointmentType } from "@/app/(booking)/server/data";
+import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { useCallback } from "react";
 
 interface AppointmentTypeSelectorProps {

@@ -1,6 +1,5 @@
 "use client";
 
-import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
 import { type ProviderType } from "@/app/connections/server/actions";
 import {
   FormControl,
@@ -16,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
 import { type Control } from "react-hook-form";
 
 interface ProviderSelectProps {

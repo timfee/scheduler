@@ -181,7 +181,11 @@ function generateEnvFile(variables: Record<string, string>): void {
   writeFileSync(envPath, envContent);
 }
 
-function logSkippingVariable(key: string, reason: "missing" | "invalid", action: "set" | "fix"): void {
+function logSkippingVariable(
+  key: string,
+  reason: "missing" | "invalid",
+  action: "set" | "fix",
+): void {
   console.log(`⚠️  Skipping ${key} - you'll need to ${action} this manually`);
 }
 
