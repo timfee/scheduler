@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, unlinkSync } from "fs";
 import { join } from "path";
+import { afterEach, beforeEach, describe, expect, test } from "@jest/globals";
 
 /**
  * Test for validate-setup.ts per-variable prompting behavior
@@ -31,10 +32,10 @@ describe("validate-setup per-variable prompting", () => {
     // This test verifies the new behavior where each missing variable
     // is prompted for individually instead of all at once
     expect(existsSync(validateSetupPath)).toBe(true);
-    
+
     // The updated script should include individual prompts for each variable
     const content = readValidateSetupContent();
-    
+
     // Check that the script contains the new per-variable prompting logic
     // This will fail initially and pass after we implement the fix
     expect(content).toContain("for (const key of envValidation.missing)");
@@ -45,9 +46,9 @@ describe("validate-setup per-variable prompting", () => {
     // Test that we can generate some variables but not others
     // This validates that the new behavior gives users more control
     expect(existsSync(validateSetupPath)).toBe(true);
-    
+
     const content = readValidateSetupContent();
-    
+
     // The script should track which variables to generate
     expect(content).toContain("generatedVars");
     expect(content).toContain("REQUIRED_ENV_VARS");

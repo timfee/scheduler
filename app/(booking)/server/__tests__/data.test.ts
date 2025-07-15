@@ -8,11 +8,11 @@ import { afterAll, beforeAll, describe, expect, it, jest } from "@jest/globals";
 // prettier-ignore
 import type * as adminActions from "../../admin/event-types/server/actions";
 // prettier-ignore
-import type * as bookingData from "../data";
+import type * as bookingDataModule from "../data";
 
 let db: ReturnType<typeof createTestDb>["db"];
 let sqlite: ReturnType<typeof createTestDb>["sqlite"];
-let data: typeof bookingData;
+let data: typeof bookingDataModule;
 let actions: typeof adminActions;
 
 beforeAll(async () => {
