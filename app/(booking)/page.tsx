@@ -1,12 +1,12 @@
 "use client";
 
-import { BookingProgress } from "@/components/booking/booking-progress";
-import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { createBookingAction } from "@/app/(booking)/server/actions";
+import { BookingProgress } from "@/components/booking/booking-progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ERROR_MESSAGES } from "@/lib/constants/errors";
 import { mapErrorToUserMessage } from "@/lib/errors";
+import { useBookingState } from "@/lib/hooks/use-booking-state";
 import { formatDateForBooking } from "@/lib/utils";
 
 const TOTAL_STEPS = 3;
@@ -60,7 +60,9 @@ export default function BookingPage() {
         email: rawEmail,
       });
     } catch (error) {
-      throw new Error(mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_SUBMIT_BOOKING));
+      throw new Error(
+        mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_SUBMIT_BOOKING),
+      );
     }
   }
 

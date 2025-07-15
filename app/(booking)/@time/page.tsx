@@ -1,9 +1,9 @@
-import { TimeSelectorWrapper } from "@/components/booking/time-selector-wrapper";
 import {
   calculateAvailableSlots,
   type BusinessHours,
 } from "@/app/(booking)/server/availability-core";
 import { getAppointmentType } from "@/app/(booking)/server/data";
+import { TimeSelectorWrapper } from "@/components/booking/time-selector-wrapper";
 import { TIME_ZONES } from "@/lib/constants";
 import { listBusyTimesAction } from "@/lib/services/busy-times";
 

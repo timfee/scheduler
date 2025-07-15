@@ -16,6 +16,14 @@ const config = {
     "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss", // MUST come last
   ],
+  overrides: [
+    {
+      files: ["*.md"],
+      options: {
+        plugins: ["prettier-plugin-tailwindcss"],
+      },
+    },
+  ],
 };
 
 export default config;

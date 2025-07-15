@@ -1,12 +1,6 @@
 "use client";
 
 import {
-  PROVIDER_AUTH_METHODS,
-  useConnectionForm,
-  type ConnectionFormValues,
-} from "@/lib/hooks/use-connection-form";
-import { useTestConnection } from "@/lib/hooks/use-test-connection";
-import {
   createConnectionAction,
   deleteConnectionAction,
   getConnectionDetailsAction,
@@ -23,6 +17,12 @@ import {
 } from "@/app/connections/utils/form-data-builder";
 import { Button } from "@/components/ui/button";
 import { mapErrorToUserMessage } from "@/lib/errors";
+import {
+  PROVIDER_AUTH_METHODS,
+  useConnectionForm,
+  type ConnectionFormValues,
+} from "@/lib/hooks/use-connection-form";
+import { useTestConnection } from "@/lib/hooks/use-test-connection";
 import { useCallback, useEffect, useState, useTransition } from "react";
 
 import ConnectionForm from "./connection-form";

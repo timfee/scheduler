@@ -131,9 +131,15 @@ function useAvailabilityLoader(
           setAvailability(template);
         }
       } catch (error) {
-        console.error(ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE, error);
+        console.error(
+          ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE,
+          error,
+        );
         setError(
-          mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE),
+          mapErrorToUserMessage(
+            error,
+            ERROR_MESSAGES.FAILED_TO_LOAD_AVAILABILITY_TEMPLATE,
+          ),
         );
       } finally {
         setIsLoading(false);
@@ -160,9 +166,15 @@ function useAvailabilitySaver(
         await saveAvailabilityTemplateAction(availability);
         // Success - could add a toast notification here
       } catch (error) {
-        console.error(ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE, error);
+        console.error(
+          ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE,
+          error,
+        );
         setError(
-          mapErrorToUserMessage(error, ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE),
+          mapErrorToUserMessage(
+            error,
+            ERROR_MESSAGES.FAILED_TO_SAVE_AVAILABILITY_TEMPLATE,
+          ),
         );
       }
     });

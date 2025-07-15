@@ -1,6 +1,5 @@
 "use client";
 
-import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   FormControl,
@@ -10,6 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { type ConnectionFormValues } from "@/lib/hooks/use-connection-form";
 import {
   CALENDAR_CAPABILITY,
   type CalendarCapability,
