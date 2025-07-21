@@ -85,7 +85,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.5.1",
     "@jest/globals": "^30.0.4",
-    "@next/eslint-plugin-next": "^15.3.5",
+    "@next/eslint-plugin-next": "^15.4.2",
     "@playwright/test": "^1.54.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/jest-dom": "^6.6.3",
